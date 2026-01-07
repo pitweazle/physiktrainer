@@ -4,16 +4,26 @@ body {
 }
 
 .page-container {
-    max-width: 1200px;   /* kannst du feinjustieren: 1200–1600 */
-    margin: 0 auto;      /* zentriert */
-    padding: 0 16px;     /* etwas Luft am Rand */
-    background: #ffffff;  /* weißer Arbeitsbereich */
+    max-width: 1400px;   
+    margin: 0 auto;      
+    padding: 0 16px;     
+    background: #ffffff;  
+    transition: max-width 0.3s ease; /* NEU: sanfter Übergang */
+}
+
+/* NEU: Container-Breite anpassen je nach sichtbaren Spalten */
+.hide-profi .page-container {
+    max-width: 1000px;
+}
+
+.hide-mittel .page-container {
+    max-width: 700px;
 }
 
 .physik-tabelle {
-  width: 100%;
+  width: 100%;              
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed;       
   font-family: Arial, sans-serif;
   font-size: 14px;
 }
@@ -33,10 +43,10 @@ td.kapitel-name {
     border: 1px solid #000;
 }
 
-/* Erste Spalte breiter und linksbündig */
+/* Erste Spalte */
 .physik-tabelle th:first-child,
 .physik-tabelle td:first-child {
-  width: 380px;
+  width: 280px;        
   text-align: left;
 }
 
@@ -49,8 +59,8 @@ td.kapitel-name {
 /* echte Abstandsspalten – komplett linienlos */
 td.spacer,
 th.spacer {
-    width: 25px;
-    min-width: 12px;
+    width: 20px;        
+    min-width: 20px;
     border: none !important;
     background: transparent !important;
     padding: 0;
@@ -61,22 +71,15 @@ th.spacer {
 .col-box { width: 28px; }
 .col-sum { width: 42px; }
 
-
-/* .hidden-col {
-  display: none;
-} */
-
 /* spalten ausblenden über body-klassen */
 .hide-mittel .col-mittel { display: none; }
 .hide-profi  .col-profi  { display: none; }
-
 
 .table-controls {
   margin: 8px 0 12px;
   display: flex;
   gap: 8px;
 }
-
 
 /* Themenbereich-Zeilen */
 .themenbereich td {
@@ -92,7 +95,13 @@ th.spacer {
 
 /* Box-Zellen gleichmäßig schmal */
 .box {
-  width: 28px;
+  width: 25px;        
+  text-align: center;
+}
+
+/* Summen-Spalten */
+.summe {
+  width: 35px;        
   text-align: center;
 }
 
