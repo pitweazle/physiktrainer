@@ -24,8 +24,6 @@ body {
   vertical-align: middle;
 }
 
-
-
 /* Linien nur dort, wo sie gewollt sind */
 .physik-tabelle thead th,
 td.box,
@@ -33,7 +31,6 @@ td.summe,
 td.kapitel-name {
     border: 1px solid #000;
 }
-
 
 /* Erste Spalte breiter und linksbündig */
 .physik-tabelle th:first-child,
