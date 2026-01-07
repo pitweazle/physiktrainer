@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'physik/physik.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <h1>Physiktrainer</h1>
+
+    <div class="table-controls">
+        <button type="button" id="toggle-mittel">mittel</button>
+        <button type="button" id="toggle-profi">profi</button>
+    </div>
+
+    <table class="physik-tabelle">
+
+    <thead>
+        <tr>
+        <th rowspan="2">Thema / Kapitel</th>
+
+        <th class="spacer" rowspan="2"></th>
+        <th colspan="5">einfach</th>
+
+        <th class="spacer" rowspan="2"></th>
+
+        <th colspan="5" class="col-mittel">mittel</th>
+        <th rowspan="2" class="col-mittel">Σ<br>E+M</th>
+
+        <th class="spacer" rowspan="2"></th>
+
+        <th colspan="5" class="col-profi">profi</th>
+        <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
+        </tr>
+
+        <tr>
+        <th>0</th><th>1</th><th>2</th><th>3</th><th>Σ</th>
+        <th class="col-mittel">0</th><th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Σ</th>
+        <th class="col-profi">0</th><th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Σ</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for tb in themenbereiche %}
+            <!-- Themenbereich -->
+            <tr class="themenbereich thementitel" style="background: {{ tb.farbe }};" data-target="tb-{{ tb.id }}">
+              <td class="tb-title">{{ tb.thema }}</td>
+
+              <td class="spacer"></td>
+
+              <!-- einfach -->
+              <td></td><td></td><td></td><td></td><td></td>
+
+              <td class="spacer col-mittel"></td>
+              <!-- mittel -->
+              <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
+
+              <td class="spacer col-profi"></td>
+              <!-- profi -->
+              <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
+
+              <td></td> <!-- Σ gesamt -->
+            </tr>
+
+            <!-- Kapitel -->
+            {% for kap in tb.kapitel.all %}
+                <tr class="kapitel tb-{{ tb.id }}">
+
+                    <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
+
+                    <td class="spacer"></td>
+
+                    <!-- einfach -->
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+
+                    <td class="spacer"></td>
+
+                    <!-- mittel -->
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <!-- Σ einfach + mittel -->
+                    <td class="summe leer col-mittel"></td>
+
+                    <td class="spacer col-mittel"></td>
+
+                    <!-- profi -->
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+
+                    <!-- Σ gesamt -->
+                    <td class="summe leer col-profi"></td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+    </table>
+  </div>
+
+
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+
+      // Themenbereich-Kapitel toggeln (dein vorhandenes bleibt wie es ist)
+
+      document.getElementById("toggle-mittel")?.addEventListener("click", () => {
+          body.classList.toggle("hide-mittel");
+          // wenn mittel aus -> profi automatisch aus
+          if (body.classList.contains("hide-mittel")) body.classList.add("hide-profi");
+      });
+
+      document.getElementById("toggle-profi")?.addEventListener("click", () => {
+          // profi darf nur an, wenn mittel sichtbar ist
+          if (body.classList.contains("hide-mittel")) {
+          body.classList.add("hide-profi");
+          return;
+          }
+          body.classList.toggle("hide-profi");
+      });
+      });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+    // Kapitel ein-/ausklappen (hast du schon)
+    document.querySelectorAll(".thementitel").forEach(function (row) {
+      row.addEventListener("click", function () {
+        const target = row.dataset.target;
+        document.querySelectorAll("." + target).forEach(function (tr) {
+          tr.classList.toggle("hidden");
+        });
+      });
+    });
+
+    // Spaltenblöcke mittel/profi ein-/ausblenden
+    document.querySelectorAll(".toggle-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const key = btn.dataset.toggle;          // "mittel" oder "profi"
+        const selector = ".col-" + key;          // ".col-mittel" / ".col-profi"
+        document.querySelectorAll(selector).forEach(function (cell) {
+          cell.classList.toggle("hidden-col");
+        });
+      });
+    });
+
+  });
+  </script>
+
+
+{% endblock %}

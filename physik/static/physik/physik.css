@@ -1,0 +1,103 @@
+/* Grundlayout */
+body {
+    background: #f2f2f2;   /* z.B. hellgrau, kannst du ändern */
+}
+.page-container {
+    max-width: 1000px;   /* kannst du feinjustieren: 1200–1600 */
+    margin: 0 auto;      /* zentriert */
+    padding: 0 16px;     /* etwas Luft am Rand */
+    background: #ffffff;  /* weißer Arbeitsbereich */
+}
+
+.physik-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.physik-tabelle th,
+.physik-tabelle td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+
+
+/* Linien nur dort, wo sie gewollt sind */
+.physik-tabelle thead th,
+td.box,
+td.summe,
+td.kapitel-name {
+    border: 1px solid #000;
+}
+
+
+/* Erste Spalte breiter und linksbündig */
+.physik-tabelle th:first-child,
+.physik-tabelle td:first-child {
+  width: 380px;
+  text-align: left;
+}
+
+/* Header sauberer */
+.physik-tabelle thead th {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* echte Abstandsspalten – komplett linienlos */
+td.spacer,
+th.spacer {
+    width: 25px;
+    min-width: 12px;
+    border: none !important;
+    background: transparent !important;
+    padding: 0;
+}
+
+/* .hidden-col {
+  display: none;
+} */
+
+/* spalten ausblenden über body-klassen */
+.hide-mittel .col-mittel { display: none; }
+.hide-profi  .col-profi  { display: none; }
+
+
+.table-controls {
+  margin: 8px 0 12px;
+  display: flex;
+  gap: 8px;
+}
+
+
+/* Themenbereich-Zeilen */
+.themenbereich td {
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+}
+
+/* Kapitel-Zeilen */
+.kapitel-name {
+  text-align: left;
+}
+
+/* Box-Zellen gleichmäßig schmal */
+.box {
+  width: 28px;
+  text-align: center;
+}
+
+/* Leere Boxen leicht grau */
+.box.leer {
+  background: #f2f2f2;
+}
+
+/* Collapse */
+.hidden {
+  display: none;
+}
