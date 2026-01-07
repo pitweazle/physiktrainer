@@ -66,11 +66,6 @@ th.spacer {
     padding: 0;
 }
 
-.col-text { width: 280px; }
-.col-spacer { width: 12px; }
-.col-box { width: 28px; }
-.col-sum { width: 42px; }
-
 /* spalten ausblenden über body-klassen */
 .hide-mittel .col-mittel { display: none; }
 .hide-profi  .col-profi  { display: none; }
