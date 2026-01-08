@@ -109,3 +109,69 @@ th.spacer {
 .hidden {
   display: none;
 }
+
+
+
+.hidden { display: none; }
+
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+/* sichtbar */
+.modal-overlay:not(.hidden){
+  display: flex;
+}
+
+/* versteckt */
+.hidden{
+  display: none;
+}
+
+.modal{
+  background: #b7d8ff;
+  border: 1px solid #333;
+  width: 520px;
+  max-width: 95vw;
+  padding: 12px;
+}
+
+.modal-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-close{
+  font-size: 22px;
+  line-height: 22px;
+  width: 32px;
+  height: 32px;
+}
+
+.modal-body label{
+  display:block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.modal-body select{
+  width: 100%;
+}
+
+.radio-row{
+  display:flex;
+  gap: 12px;
+}
+
+.modal-footer{
+  margin-top: 12px;
+  text-align: right;
+}

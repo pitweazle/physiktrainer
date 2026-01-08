@@ -14,6 +14,103 @@
         <button type="button" id="toggle-mittel">mittel und profi</button>
         <button type="button" id="toggle-profi">profi</button>
     </div>
+
+
+<button type="button" id="openModal">Start</button>
+
+{{ kapitel_map|json_script:"kapitel-data" }}
+
+<div id="overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div><strong>Wähle Themenbereich und Schwierigkeitsgrad</strong></div>
+      <button type="button" id="closeModal" class="modal-close">×</button>
+    </div>
+
+    <form method="get" action="{% url 'physik:aufgaben' %}">
+      <div class="modal-body">
+        <label>Themenbereich</label>
+        <select name="tb" id="tbSelect" required>
+          <option value="">– bitte wählen –</option>
+          {% for tb in themenbereiche %}
+            <option value="{{ tb.id }}">{{ tb.thema }}</option>
+          {% endfor %}
+        </select>
+
+        <label>Schwierigkeitsgrad</label>
+        <div class="radio-row">
+          <label><input type="radio" name="level" value="0" required> 0</label>
+          <label><input type="radio" name="level" value="1"> 1</label>
+          <label><input type="radio" name="level" value="2"> 2</label>
+          <label><input type="radio" name="level" value="3"> 3</label>
+        </div>
+
+        <hr>
+
+        <label>Start-Kapitel</label>
+        <select name="start" id="startSelect" required></select>
+
+        <label>End-Kapitel</label>
+        <select name="end" id="endSelect" required></select>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit">weiter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(() => {
+  const overlay = document.getElementById("overlay");
+  const openBtn = document.getElementById("openModal");
+  const closeBtn = document.getElementById("closeModal");
+
+  const tbSelect = document.getElementById("tbSelect");
+  const startSelect = document.getElementById("startSelect");
+  const endSelect = document.getElementById("endSelect");
+
+  const kapitelMap = JSON.parse(document.getElementById("kapitel-data").textContent);
+
+  function fillKapitel(tbId) {
+    const list = kapitelMap[tbId] || [];
+
+    startSelect.innerHTML = "";
+    endSelect.innerHTML = "";
+
+    for (const k of list) {
+      const o1 = document.createElement("option");
+      o1.value = k.zeile;
+      o1.textContent = `${k.zeile}. ${k.name}`;
+      startSelect.appendChild(o1);
+
+      const o2 = document.createElement("option");
+      o2.value = k.zeile;
+      o2.textContent = `${k.zeile}. ${k.name}`;
+      endSelect.appendChild(o2);
+    }
+
+    // Default: Start erstes, End letztes
+    if (list.length) {
+      startSelect.value = list[0].zeile;
+      endSelect.value = list[list.length - 1].zeile;
+    }
+  }
+
+  openBtn.addEventListener("click", () => overlay.classList.remove("hidden"));
+  closeBtn.addEventListener("click", () => overlay.classList.add("hidden"));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.add("hidden"); });
+
+  tbSelect.addEventListener("change", () => fillKapitel(tbSelect.value));
+})();
+</script>
+
+
+
+
+
+
 <div class="table-wrapper">
     <table class="physik-tabelle">
 
