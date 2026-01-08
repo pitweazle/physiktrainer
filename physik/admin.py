@@ -40,10 +40,22 @@ class AufgabeAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {"fields": ("thema", "kapitel", "schwierigkeit", "typ")}),
-        ("Frage", {"fields": ("frage", "einheit")}),
+
+        ("Frage", {"fields": ("frage",)}),
+
+        ("Einheit (optional)", {
+            "fields": ("einheit",),
+            "classes": ("collapse",),
+            "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
+        }),
+
         ("Antwort", {"fields": ("antwort",)}),
-        ("Zusatzinformationen", {"fields": ("anmerkung", "erklaerung", "hilfe")}),
-        )
+
+        ("Zusatzinformationen", {
+            "fields": ("anmerkung", "erklaerung", "hilfe"),
+            "classes": ("collapse",),
+        }),
+    )
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
