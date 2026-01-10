@@ -81,6 +81,13 @@ class AufgabeAdmin(admin.ModelAdmin):
             "fields": ("anmerkung", "erklaerung", "hilfe"),
             "classes": ("collapse",),
         }),
+
+        ("Admin", {
+            "fields": ("lfd_nr", "erstellt"),
+            "classes": ("collapse",),
+        })
+
+
     )
 
     def save_model(self, request, obj, form, change):

@@ -2,21 +2,17 @@
 {% load static %}
 {% load dict_extras %}
 
-
 {% block css_files %}
 <link rel="stylesheet" href="{% static 'physik/physik.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="page-container">
-
     <h1>Physiktrainer</h1>
-
     <div class="table-controls">
         <button type="button" id="toggle-mittel">mittel und profi</button>
         <button type="button" id="toggle-profi">profi</button>
     </div>
-
 
 <button type="button" id="openModal">Start</button>
 
@@ -111,52 +107,62 @@
 <div class="table-wrapper">
     <table class="physik-tabelle">
       <thead>
-          <tr>
-          <th rowspan="2">Thema / Kapitel</th>
+        <tr>
+        <th rowspan="2">Thema / Kapitel</th>
 
-          <th class="spacer" rowspan="2"></th>
-          <th colspan="5">einfach</th>
+        <th class="spacer" rowspan="2"></th>
+        <th colspan="5">einfach</th>
 
-          <th class="spacer" rowspan="2"></th>
+        <th class="spacer" rowspan="2"></th>
 
-          <th colspan="5" class="col-mittel">mittel</th>
-          <th rowspan="2" class="col-mittel">Σ<br>E+M</th>
+        <th colspan="5" class="col-mittel">mittel</th>
+        <th rowspan="2" class="col-mittel">Σ<br>E+M</th>
 
-          <th class="spacer" rowspan="2"></th>
+        <th class="spacer" rowspan="2"></th>
 
-          <th colspan="5" class="col-profi">profi</th>
-          <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
-          </tr>
+        <th colspan="5" class="col-profi">profi</th>
+        <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
+        </tr>
 
-          <tr>
-          <th>0</th><th>1</th><th>2</th><th>3</th><th>Σ</th>
-          <th class="col-mittel">0</th><th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Σ</th>
-          <th class="col-profi">0</th><th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Σ</th>
-          </tr>
+        <tr>
+        <th>0</th><th>1</th><th>2</th><th>3</th><th>Σ</th>
+        <th class="col-mittel">0</th><th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Σ</th>
+        <th class="col-profi">0</th><th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Σ</th>
+        </tr>
       </thead>
       <tbody>
         {% for tb in themenbereiche %}
+          {% with d=tb_totals|get_item:tb.id %}
+          {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
           <!-- Themenbereich -->
           <tr class="themenbereich thementitel" style="background: {{ tb.farbe }};" data-target="tb-{{ tb.id }}">
             <td class="tb-title">{{ tb.thema }}</td>
 
             <td class="spacer"></td>
-
             <!-- einfach -->
-            <td></td><td></td><td></td><td></td><td></td>
+            <td></td> <td></td> <td></td> <td></td> <td class="summe">{{ e }}</td>
 
             <td class="spacer col-mittel"></td>
             <!-- mittel -->
-            <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
+            <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
+            <td class="summe col-mittel">{{ m }}</td>
+            <td class="summe col-mittel">{{ e|add:m }}</td>
 
             <td class="spacer col-profi"></td>
             <!-- profi -->
-            <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
-
-            <td></td> <!-- Σ gesamt -->
+            <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
+            <td class="summe col-profi">{{ p }}</td>
+            <!-- Σ gesamt -->
+            <td class="summe col-profi">{{ e|add:m|add:p }}</td>
           </tr>
+          {% endwith %}
+          {% endwith %}
           <!-- Kapitel -->
           {% for kap in tb.kapitel.all %}
+            {% with tb_map=counts|get_item:tb.id %}
+            {% with d=tb_map|get_item:kap.id %}
+            {# d kann None sein, wenn es keine Aufgaben gibt #}
+             {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
               <tr class="kapitel tb-{{ tb.id }}">
                   <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
                   <td class="spacer"></td>
@@ -165,26 +171,31 @@
                   <td class="box leer"></td>
                   <td class="box leer"></td>
                   <td class="box leer"></td>
-                  <td class="box leer"></td>
+                  <td class="summe col-mittel">{{ e}}</td>
+
                   <td class="spacer"></td>
                   <!-- mittel -->
                   <td class="box leer col-mittel"></td>
                   <td class="box leer col-mittel"></td>
                   <td class="box leer col-mittel"></td>
                   <td class="box leer col-mittel"></td>
-                  <td class="box leer col-mittel"></td>
+                  <td class="summe col-mittel">{{ m }}</td>
                   <!-- Σ einfach + mittel -->
-                  <td class="summe leer col-mittel"></td>
+                  <td class="summe col-mittel">{{ e|add:m }}</td>
+
                   <td class="spacer col-mittel"></td>
                   <!-- profi -->
                   <td class="box leer col-profi"></td>
                   <td class="box leer col-profi"></td>
                   <td class="box leer col-profi"></td>
                   <td class="box leer col-profi"></td>
-                  <td class="box leer col-profi"></td>
+                  <td class="summe col-mittel">{{ p }}</td>
                   <!-- Σ gesamt -->
-                  <td class="summe leer col-profi"></td>
+                  <td class="summe col-profi">{{ p|add:e|add:m }}</td>
               </tr>
+            {% endwith %}
+            {% endwith %}
+            {% endwith %}
           {% endfor %}
         {% endfor %}
       </tbody>
