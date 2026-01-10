@@ -145,7 +145,7 @@
             <td class="spacer col-mittel"></td>
             <!-- mittel -->
             <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
-            <td class="summe col-mittel">{{ m }}</td>
+            <td class="summe col-mittel" >{{ m }}</td>
             <td class="summe col-mittel">{{ e|add:m }}</td>
 
             <td class="spacer col-profi"></td>
@@ -171,7 +171,7 @@
                   <td class="box leer"></td>
                   <td class="box leer"></td>
                   <td class="box leer"></td>
-                  <td class="summe col-mittel">{{ e}}</td>
+                  <td class="box leer" style="background: {{ tb.farbe }};">{{ e}}</td>
 
                   <td class="spacer"></td>
                   <!-- mittel -->
@@ -179,9 +179,9 @@
                   <td class="box leer col-mittel"></td>
                   <td class="box leer col-mittel"></td>
                   <td class="box leer col-mittel"></td>
-                  <td class="summe col-mittel">{{ m }}</td>
+                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ m }}</td>
                   <!-- Σ einfach + mittel -->
-                  <td class="summe col-mittel">{{ e|add:m }}</td>
+                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ e|add:m }}</td>
 
                   <td class="spacer col-mittel"></td>
                   <!-- profi -->
@@ -189,9 +189,9 @@
                   <td class="box leer col-profi"></td>
                   <td class="box leer col-profi"></td>
                   <td class="box leer col-profi"></td>
-                  <td class="summe col-mittel">{{ p }}</td>
+                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ p }}</td>
                   <!-- Σ gesamt -->
-                  <td class="summe col-profi">{{ p|add:e|add:m }}</td>
+                  <td class="summe col-profi" style="background: {{ tb.farbe }};">{{ p|add:e|add:m }}</td>
               </tr>
             {% endwith %}
             {% endwith %}
