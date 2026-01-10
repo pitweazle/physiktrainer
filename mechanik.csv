@@ -1,0 +1,24 @@
+"erklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"schwierigkeit";"kapitel";"typ";"frage";"antwort";2;3;4;5;6;7;8;9;;
+;;;"MD0004";1;1;"Kraft, Masse und Gewicht";1;"Wie heißt die Einheit der Kraft ?";"Newton";;;;;;;;;;"1 Kraft, Masse und Gewicht"
+;;;"MD0005";1;1;"Kraft, Masse und Gewicht";1;"Wie wird die Einheit der Masse abgekürzt ?";"kg";;;;;;;;;;"2 einfache Maschinen"
+;;;"MD0005";1;1;"Kraft, Masse und Gewicht";1;"Woran kann man eine Kraft erkennen ?";"Bewegungsänderung oder Verformung";;;;;;;;;;"3 Arbeit und Leistung"
+;;;"MD0006";1;1;"Kraft, Masse und Gewicht";"o12";"Wie heißt das Messgerät mit dem man Kräfte misst?";"Federwaage";;;;;;;;;;
+;;;"MD0007";1;1;"Kraft, Masse und Gewicht";1;"Mit welcher Waage bestimmt man die Masse?";"Balkenwaage";;;;;;;;;;
+;;;"MD0008";1;1;"Kraft, Masse und Gewicht";"o13";"Wie groß ist die Masse von 1 Liter Wasser ?";"m=1 kg";"1kg";"1 Kilogramm";"Ein Kilogramm";;;;;;;
+;;;"MD0009";1;1;"Kraft, Masse und Gewicht";1;"Wie viel Kubikzentimeter entsprechen 1 Liter Wasser ?";"1000";;;;;;;;;;
+;;;"MD0010";1;1;"Kraft, Masse und Gewicht";"o12";"Welche Dichte hat Wasser ?";"1 g/cm³";;;;;;;;;;
+;;;"MD0011";1;1;"Kraft, Masse und Gewicht";"o12";"Welche Masse hat 1 m³ Wasser ?";"1000kg";;;;;;;;;;
+;;;"MD0012";1;1;"Kraft, Masse und Gewicht";"w";"Hat ein Liter Wasser auf einem Berg die gleiche Masse wie auf Meereshöhe ?";"wahr";;;;;;;;;;
+;;;"MD0013";1;1;"Kraft, Masse und Gewicht";"w";"Hat ein Liter Wasser auf einem Berg die gleiche Masse wie auf Meereshöhe ?";"falsch";;;;;;;;;;
+;;;"MD0014";1;1;"Kraft, Masse und Gewicht";2;"Wie lautet das Hooksche Gesetz ?";"Die Ausdehnung einer Feder ist proportional zur angreifenden Kraft";"l~F";;;;;;;;;
+;;;"MD0015";2;1;"einfache Maschinen";"o12";"Mit welcher Kraft muss man ziehen, wenn man einen Flaschenzug mit 4 Seilen (Rollen) einsetzt?";"Ein Viertel";"¼";"(Die Masse der losen Rollen, sowie die Reibung werden nicht berücksichtigt)";;;;;;;;
+;;;"MD0002";3;1;"Arbeit und Leistung";1;"Welche Einheit hat die Leistung ?";"Watt";;;;;;;;;;
+;;;"MD0003";3;1;"Arbeit und Leistung";1;"Welche Abkürzung hat die Einheit der Leistung ?";"W";;;;;;;;;;
+;;;"MD0004";3;1;"Arbeit und Leistung";"o13";"Mit welcher Formel berechnet man die mechanische Arbeit?";"W=F*l";"W=Fl";"W=F*s";;;;;;;;
+;;;"MD0016";3;1;"Arbeit und Leistung";1;"Wie wird die Einheit der Kraft abgekürzt ?";"N";;;;;;;;;;
+;;;"MD0017";3;1;"Arbeit und Leistung";1;"Wie heißt die Einheit der Arbeit ?";"Newtonmeter";;;;;;;;;;
+;;;"MD0018";3;1;"Arbeit und Leistung";1;"Wie heißt die Einheit der Leistung ?";"Watt";;;;;;;;;;
+;;;"MD0019";3;1;"Arbeit und Leistung";1;"Wie wird die Einheit der Arbeit abgekürzt ?";"Nm";;;;;;;;;;
+;;;"MD0020";3;1;"Arbeit und Leistung";1;"Wie wird die Einheit der Leistung abgekürzt ?";"Watt";;;;;;;;;;
+;;;"MD0021";3;1;"Arbeit und Leistung";1;"Welche Einheit hat die Arbeit ?";"Newtonmeter";;;;;;;;;;
+;;;"MD0022";3;1;"Arbeit und Leistung";1;"Wie wird die Einheit der Arbeit abgekürzt ?";"Nm";;;;;;;;;;

@@ -25,7 +25,7 @@ class Kapitel(models.Model):
 
     # Sortierung innerhalb eines Themenbereichs (1..n, ohne Obergrenze)
     zeile = models.PositiveSmallIntegerField()
-    kapitel = models.CharField(max_length=50)
+    kapitel = models.CharField(max_length=100)
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -41,6 +41,7 @@ class Kapitel(models.Model):
         return f"{self.thema.thema} – {self.zeile}: {self.kapitel}"
 
 class Aufgabe(models.Model):
+    lfd_nr = models.CharField("lfd_Nr", max_length=10, unique=True)
     thema = models.ForeignKey("ThemenBereich", on_delete=models.CASCADE, related_name="aufgaben")
     kapitel = models.ForeignKey("Kapitel", on_delete=models.CASCADE, related_name="aufgaben")
 
@@ -68,10 +69,7 @@ class Aufgabe(models.Model):
     antwort = models.CharField("Antwort", max_length=255, blank=True, help_text="Hier steht die offizielle Antwort.")
 
     anmerkung = models.CharField("Anmerkung", max_length=255, blank=True, help_text="Optional, nur wenn gewünscht.")
-    erklaerung = models.CharField(
-        "Erklärung",
-        max_length=255,
-        blank=True,
+    erklaerung = models.TextField("Erklärung",blank=True,
         help_text="Optional. Wird angezeigt, wenn auf »Lösung« geklickt wird oder eine falsche Eingabe gemacht wurde.",
     )
     hilfe = models.CharField("Hilfe", max_length=255, blank=True, help_text="Optional, nur wenn gewünscht.")
@@ -92,7 +90,6 @@ class Aufgabe(models.Model):
 
     def __str__(self):
         return f"{self.thema} / {self.kapitel} – {self.frage[:50]}"
-
 
 class AufgabeOption(models.Model):
     aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="optionen")

@@ -4,15 +4,15 @@ from django.http import HttpResponse
 from .models import ThemenBereich
 
 
-def index(request):
-    themenbereiche = ThemenBereich.objects.filter(eingeblendet=True).prefetch_related("kapitel").all()
-    return render(
-        request,
-        "physik/index.html",
-        {
-            "themenbereiche": themenbereiche,
-        },
-    )
+# def index(request):
+#     themenbereiche = ThemenBereich.objects.filter(eingeblendet=True).prefetch_related("kapitel").all()
+#     return render(
+#         request,
+#         "physik/index.html",
+#         {
+#             "themenbereiche": themenbereiche,
+#         },
+#     )
 
 def index(request):
     themenbereiche = (
@@ -32,8 +32,6 @@ def index(request):
         "themenbereiche": themenbereiche,
         "kapitel_map": kapitel_map,
     })
-
-
 
 def aufgaben(request):
     return HttpResponse(

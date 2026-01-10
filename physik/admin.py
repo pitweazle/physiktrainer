@@ -28,8 +28,8 @@ class AufgabeOptionInline(admin.TabularInline):
 @admin.register(Aufgabe)
 class AufgabeAdmin(admin.ModelAdmin):
     inlines = [AufgabeOptionInline]
-
-    list_display = ("id", "thema", "kapitel", "schwierigkeit", "typ", "von", "erstellt")
+    list_display = ("frage", "lfd_nr", "thema", "kapitel", "schwierigkeit")
+    #list_editable = ("lfd_nr",)
     list_filter = ("thema", "kapitel", "schwierigkeit")
     search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
