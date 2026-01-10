@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load dict_extras %}
+
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static 'physik/physik.css' %}">
@@ -132,7 +134,6 @@
           <th class="col-profi">0</th><th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Σ</th>
           </tr>
       </thead>
-
       <tbody>
           {% for tb in themenbereiche %}
               <!-- Themenbereich -->
@@ -154,7 +155,6 @@
 
                 <td></td> <!-- Σ gesamt -->
               </tr>
-
               <!-- Kapitel -->
               {% for kap in tb.kapitel.all %}
                   <tr class="kapitel tb-{{ tb.id }}">
@@ -235,18 +235,6 @@
         });
       });
     });
-
-    // Spaltenblöcke mittel/profi ein-/ausblenden
-    document.querySelectorAll(".toggle-btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        const key = btn.dataset.toggle;          // "mittel" oder "profi"
-        const selector = ".col-" + key;          // ".col-mittel" / ".col-profi"
-        document.querySelectorAll(selector).forEach(function (cell) {
-          cell.classList.toggle("hidden-col");
-        });
-      });
-    });
-
   });
   </script>
 
