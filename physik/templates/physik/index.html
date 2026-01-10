@@ -162,37 +162,39 @@
             {% with tb_map=counts|get_item:tb.id %}
             {% with d=tb_map|get_item:kap.id %}
             {# d kann None sein, wenn es keine Aufgaben gibt #}
-             {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
-              <tr class="kapitel tb-{{ tb.id }}">
-                  <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
-                  <td class="spacer"></td>
-                  <!-- einfach -->
-                  <td class="box leer"></td>
-                  <td class="box leer"></td>
-                  <td class="box leer"></td>
-                  <td class="box leer"></td>
-                  <td class="box leer" style="background: {{ tb.farbe }};">{{ e}}</td>
+            {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
+                {% if e|add:m|add:p > 0 %}
+                <tr class="kapitel tb-{{ tb.id }}">
+                    <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
+                    <td class="spacer"></td>
+                    <!-- einfach -->
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer"></td>
+                    <td class="box leer" style="background: {{ tb.farbe }};">{{ e}}</td>
 
-                  <td class="spacer"></td>
-                  <!-- mittel -->
-                  <td class="box leer col-mittel"></td>
-                  <td class="box leer col-mittel"></td>
-                  <td class="box leer col-mittel"></td>
-                  <td class="box leer col-mittel"></td>
-                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ m }}</td>
-                  <!-- Σ einfach + mittel -->
-                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ e|add:m }}</td>
+                    <td class="spacer"></td>
+                    <!-- mittel -->
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="box leer col-mittel"></td>
+                    <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ m }}</td>
+                    <!-- Σ einfach + mittel -->
+                    <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ e|add:m }}</td>
 
-                  <td class="spacer col-mittel"></td>
-                  <!-- profi -->
-                  <td class="box leer col-profi"></td>
-                  <td class="box leer col-profi"></td>
-                  <td class="box leer col-profi"></td>
-                  <td class="box leer col-profi"></td>
-                  <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ p }}</td>
-                  <!-- Σ gesamt -->
-                  <td class="summe col-profi" style="background: {{ tb.farbe }};">{{ p|add:e|add:m }}</td>
-              </tr>
+                    <td class="spacer col-mittel"></td>
+                    <!-- profi -->
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="box leer col-profi"></td>
+                    <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ p }}</td>
+                    <!-- Σ gesamt -->
+                    <td class="summe col-profi" style="background: {{ tb.farbe }};">{{ p|add:e|add:m }}</td>
+                </tr>
+              {% endif %}
             {% endwith %}
             {% endwith %}
             {% endwith %}
