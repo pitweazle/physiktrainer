@@ -135,71 +135,62 @@
           </tr>
       </thead>
       <tbody>
-          {% for tb in themenbereiche %}
-              <!-- Themenbereich -->
-              <tr class="themenbereich thementitel" style="background: {{ tb.farbe }};" data-target="tb-{{ tb.id }}">
-                <td class="tb-title">{{ tb.thema }}</td>
+        {% for tb in themenbereiche %}
+          <!-- Themenbereich -->
+          <tr class="themenbereich thementitel" style="background: {{ tb.farbe }};" data-target="tb-{{ tb.id }}">
+            <td class="tb-title">{{ tb.thema }}</td>
 
-                <td class="spacer"></td>
+            <td class="spacer"></td>
 
-                <!-- einfach -->
-                <td></td><td></td><td></td><td></td><td></td>
+            <!-- einfach -->
+            <td></td><td></td><td></td><td></td><td></td>
 
-                <td class="spacer col-mittel"></td>
-                <!-- mittel -->
-                <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
+            <td class="spacer col-mittel"></td>
+            <!-- mittel -->
+            <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
 
-                <td class="spacer col-profi"></td>
-                <!-- profi -->
-                <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
+            <td class="spacer col-profi"></td>
+            <!-- profi -->
+            <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
 
-                <td></td> <!-- Σ gesamt -->
+            <td></td> <!-- Σ gesamt -->
+          </tr>
+          <!-- Kapitel -->
+          {% for kap in tb.kapitel.all %}
+              <tr class="kapitel tb-{{ tb.id }}">
+                  <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
+                  <td class="spacer"></td>
+                  <!-- einfach -->
+                  <td class="box leer"></td>
+                  <td class="box leer"></td>
+                  <td class="box leer"></td>
+                  <td class="box leer"></td>
+                  <td class="box leer"></td>
+                  <td class="spacer"></td>
+                  <!-- mittel -->
+                  <td class="box leer col-mittel"></td>
+                  <td class="box leer col-mittel"></td>
+                  <td class="box leer col-mittel"></td>
+                  <td class="box leer col-mittel"></td>
+                  <td class="box leer col-mittel"></td>
+                  <!-- Σ einfach + mittel -->
+                  <td class="summe leer col-mittel"></td>
+                  <td class="spacer col-mittel"></td>
+                  <!-- profi -->
+                  <td class="box leer col-profi"></td>
+                  <td class="box leer col-profi"></td>
+                  <td class="box leer col-profi"></td>
+                  <td class="box leer col-profi"></td>
+                  <td class="box leer col-profi"></td>
+                  <!-- Σ gesamt -->
+                  <td class="summe leer col-profi"></td>
               </tr>
-              <!-- Kapitel -->
-              {% for kap in tb.kapitel.all %}
-                  <tr class="kapitel tb-{{ tb.id }}">
-
-                      <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
-
-                      <td class="spacer"></td>
-
-                      <!-- einfach -->
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-
-                      <td class="spacer"></td>
-
-                      <!-- mittel -->
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <!-- Σ einfach + mittel -->
-                      <td class="summe leer col-mittel"></td>
-
-                      <td class="spacer col-mittel"></td>
-
-                      <!-- profi -->
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-
-                      <!-- Σ gesamt -->
-                      <td class="summe leer col-profi"></td>
-                  </tr>
-              {% endfor %}
           {% endfor %}
+        {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
-
 
   <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -225,7 +216,6 @@
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-
     // Kapitel ein-/ausklappen (hast du schon)
     document.querySelectorAll(".thementitel").forEach(function (row) {
       row.addEventListener("click", function () {
@@ -237,6 +227,4 @@
     });
   });
   </script>
-
-
 {% endblock %}

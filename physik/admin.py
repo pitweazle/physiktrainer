@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption
-
+from django import forms
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):
@@ -24,9 +24,35 @@ class AufgabeOptionInline(admin.TabularInline):
     fields = ("position", "text")
     ordering = ("position",)
 
+class AufgabeAdminForm(forms.ModelForm):
+    class Meta:
+        model = Aufgabe
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # alle bisher verwendeten Typen sammeln
+        typen = (
+            Aufgabe.objects
+            .exclude(typ__isnull=True)
+            .exclude(typ__exact="")
+            .values_list("typ", flat=True)
+            .distinct()
+            .order_by("typ")
+        )
+
+        # datalist-ID setzen
+        self.fields["typ"].widget.attrs.update({
+            "list": "typ-vorschlaege"
+        })
+
+        # HTML für datalist erzeugen
+        self.typ_datalist = list(typen)
 
 @admin.register(Aufgabe)
 class AufgabeAdmin(admin.ModelAdmin):
+    form = AufgabeAdminForm
     inlines = [AufgabeOptionInline]
     list_display = ("frage", "lfd_nr", "thema", "kapitel", "schwierigkeit")
     #list_editable = ("lfd_nr",)
@@ -61,3 +87,5 @@ class AufgabeAdmin(admin.ModelAdmin):
         if not obj.pk:
             obj.von = request.user
         super().save_model(request, obj, form, change)
+
+

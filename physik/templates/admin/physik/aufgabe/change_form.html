@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<datalist id="typ-vorschlaege">
+  {% for t in adminform.form.typ_datalist %}
+    <option value="{{ t }}">
+  {% endfor %}
+</datalist>
+{% endblock %}
