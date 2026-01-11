@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if aufgabe %}
+
+<h3>{{ aufgabe.thema }} – {{ aufgabe.kapitel }}</h3>
+
+<div class="aufgabe">
+  <strong>Frage:</strong><br>
+  {{ aufgabe.frage }}
+</div>
+
+<form method="post">
+  {% csrf_token %}
+
+  {% if aufgabe.typ|slice:":1" in "alpq" %}
+      {% for opt in aufgabe.optionen.all %}
+          <div>
+            <label>
+              <input type="radio" name="antwort" value="{{ opt.id }}">
+              {{ opt.text }}
+            </label>
+          </div>
+      {% endfor %}
+  {% else %}
+      <input type="text" name="antwort">
+      {{ aufgabe.einheit }}
+  {% endif %}
+
+  <hr>
+
+  <button name="action" value="stop">Stop</button>
+  <button name="action" value="loesung">Lösung anzeigen</button>
+
+  {% if aufgabe.hilfe %}
+      <button name="action" value="hilfe">Hilfe anzeigen</button>
+  {% endif %}
+
+  <button name="action" value="weiter">weiter</button>
+</form>
+
+{% if show_loesung %}
+  <div class="loesung">
+      <strong>Lösung:</strong><br>
+      {{ aufgabe.antwort }}<br>
+      {{ aufgabe.erklaerung }}
+  </div>
+{% endif %}
+
+{% if show_hilfe %}
+  <div class="hilfe">
+      <strong>Hilfe:</strong><br>
+      {{ aufgabe.hilfe }}
+  </div>
+{% endif %}
+
+{% else %}
+  <p>Keine Aufgabe gefunden.</p>
+{% endif %}
+
+{% endblock %}
+

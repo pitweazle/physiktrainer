@@ -1,8 +1,10 @@
+import random
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count
 
-from .models import ThemenBereich, Aufgabe
+from .models import ThemenBereich, Aufgabe, Kapitel
 
 def index(request):
     themenbereiche = (
@@ -50,10 +52,52 @@ def index(request):
         "tb_totals": tb_totals,
     })
 
+import random
+from django.shortcuts import render, redirect
+from .models import Aufgabe
 
 
 def aufgaben(request):
-    return HttpResponse(
-        f"tb={request.GET.get('tb')} level={request.GET.get('level')} "
-        f"start={request.GET.get('start')} end={request.GET.get('end')}"
+    tb_id = request.GET.get("tb")
+    level = request.GET.get("level")
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+
+    qs = Aufgabe.objects.filter(
+        thema_id=tb_id,
+        schwierigkeit=level,
+        kapitel__id__gte=start,
+        kapitel__id__lte=end,
     )
+
+    aufgabe = None
+    if qs.exists():
+        aufgabe = random.choice(list(qs))
+
+    # Buttons auswerten
+    action = request.POST.get("action")
+
+    show_loesung = False
+    show_hilfe = False
+
+    if action == "loesung":
+        show_loesung = True
+    elif action == "hilfe":
+        show_hilfe = True
+    elif action == "stop":
+        return redirect("physik:index")
+    elif action == "weiter":
+        return redirect(
+            f"{request.path}?tb={tb_id}&level={level}&start={start}&end={end}"
+        )
+
+    return render(request, "physik/aufgabe.html", {
+        "aufgabe": aufgabe,
+        "show_loesung": show_loesung,
+        "show_hilfe": show_hilfe,
+        "tb": tb_id,
+        "level": level,
+        "start": start,
+        "end": end,
+    })
+
