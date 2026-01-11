@@ -3,6 +3,11 @@
 
 {% if aufgabe %}
 
+<div class="aufgabe-topbar">
+    <a href="{% url 'physik:index' %}" class="stop-button">Stop</a>
+</div>
+
+
 <h3>{{ aufgabe.thema }} – {{ aufgabe.kapitel }}</h3>
 
 <div class="aufgabe">
@@ -13,19 +18,20 @@
 <form method="post">
   {% csrf_token %}
 
-  {% if aufgabe.typ|slice:":1" in "alpq" %}
-      {% for opt in aufgabe.optionen.all %}
-          <div>
-            <label>
-              <input type="radio" name="antwort" value="{{ opt.id }}">
-              {{ opt.text }}
-            </label>
-          </div>
-      {% endfor %}
-  {% else %}
-      <input type="text" name="antwort">
-      {{ aufgabe.einheit }}
-  {% endif %}
+{% if aufgabe.typ == "a3" %}
+  {% for a in anzeigen %}
+    <div>
+      <label>
+        <input type="radio" name="antwort" value="{{ a.text }}">
+        {{ a.text }}
+      </label>
+    </div>
+  {% endfor %}
+{% else %}
+  <input type="text" name="antwort">
+  {{ aufgabe.einheit }}
+{% endif %}
+
 
   <hr>
 

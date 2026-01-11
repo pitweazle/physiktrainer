@@ -52,18 +52,13 @@ def index(request):
         "tb_totals": tb_totals,
     })
 
-import random
-from django.shortcuts import render, redirect
-from .models import Aufgabe
-
-
 def aufgaben(request):
     tb_id = request.GET.get("tb")
     level = request.GET.get("level")
     start = request.GET.get("start")
     end = request.GET.get("end")
 
-    qs = Aufgabe.objects.filter(
+    aufgaben = Aufgabe.objects.filter(
         thema_id=tb_id,
         schwierigkeit=level,
         kapitel__id__gte=start,
@@ -71,33 +66,27 @@ def aufgaben(request):
     )
 
     aufgabe = None
-    if qs.exists():
-        aufgabe = random.choice(list(qs))
+    anzeigen = []
 
-    # Buttons auswerten
-    action = request.POST.get("action")
+    if aufgaben.exists():
+        aufgabe = random.choice(list(aufgaben))
 
-    show_loesung = False
-    show_hilfe = False
+        # a3-Logik
+        if aufgabe.typ.startswith("a3"):
+            anzeigen = [
+                {"text": aufgabe.antwort, "richtig": True},
+            ]
 
-    if action == "loesung":
-        show_loesung = True
-    elif action == "hilfe":
-        show_hilfe = True
-    elif action == "stop":
-        return redirect("physik:index")
-    elif action == "weiter":
-        return redirect(
-            f"{request.path}?tb={tb_id}&level={level}&start={start}&end={end}"
-        )
+            # erste zwei Optionen aus der DB
+            optionen = list(aufgabe.optionen.order_by("position")[:2])
+            for opt in optionen:
+                anzeigen.append({"text": opt.text, "richtig": False})
+
+            random.shuffle(anzeigen)
 
     return render(request, "physik/aufgabe.html", {
         "aufgabe": aufgabe,
-        "show_loesung": show_loesung,
-        "show_hilfe": show_hilfe,
-        "tb": tb_id,
-        "level": level,
-        "start": start,
-        "end": end,
+        "anzeigen": anzeigen,
     })
+
 
