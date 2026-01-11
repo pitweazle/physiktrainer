@@ -64,8 +64,8 @@ def aufgaben(request):
         qs = Aufgabe.objects.filter(
             thema_id=tb_id,
             schwierigkeit=level,
-            kapitel__id__gte=start,
-            kapitel__id__lte=end,
+            kapitel__zeile__gte=start,
+            kapitel__zeile__lte=end,
         )
 
         alle = list(qs)
@@ -87,7 +87,7 @@ def aufgaben(request):
     if index >= len(ids):
         del request.session["aufgaben_ids"]
         del request.session["index"]
-        return render(request, "physik/ende.html")
+        return redirect("physik:index")
 
     aufgabe = Aufgabe.objects.get(id=ids[index])
 
@@ -111,3 +111,4 @@ def aufgaben(request):
         "fragenummer": index + 1,
         "anzahl": len(ids),
     })
+

@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption
-from django import forms
+from django import forms 
+from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption, AufgabeBild
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):
@@ -9,7 +9,6 @@ class ThemenBereichAdmin(admin.ModelAdmin):
     search_fields = ("thema",)
     ordering = ("ordnung",)
 
-
 @admin.register(Kapitel)
 class KapitelAdmin(admin.ModelAdmin):
     list_display = ("thema", "zeile", "kapitel")
@@ -17,6 +16,13 @@ class KapitelAdmin(admin.ModelAdmin):
     search_fields = ("kapitel", "thema__thema")
     ordering = ("thema__ordnung", "zeile")
 
+class AufgabeBildInline(admin.TabularInline):
+    model = AufgabeBild
+    extra = 0
+    can_delete = True
+    verbose_name = "Bild"
+    verbose_name_plural = "Bilder"
+    fields = ("bild",)
 
 class AufgabeOptionInline(admin.TabularInline):
     model = AufgabeOption
@@ -51,9 +57,10 @@ class AufgabeAdminForm(forms.ModelForm):
         self.typ_datalist = list(typen)
 
 @admin.register(Aufgabe)
+
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
-    inlines = [AufgabeOptionInline]
+    inlines = [AufgabeOptionInline, AufgabeBildInline]    
     list_display = ("frage", "lfd_nr", "thema", "kapitel", "schwierigkeit")
     #list_editable = ("lfd_nr",)
     list_filter = ("thema", "kapitel", "schwierigkeit")

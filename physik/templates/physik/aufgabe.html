@@ -44,27 +44,30 @@
                     <span class="task-einheit">{{ aufgabe.einheit }}</span>
                     {% endif %}
                 {% endif %}
-
             </div>
-
             {% if aufgabe.bilder.exists %}
-
-            <div class="task-bilder zeile1">
-                {% for bild in aufgabe.bilder.all %}
-                {% if bild.position <= 2 %}
-                    <img src="{{ bild.bild.url }}" class="task-bild">
+                {% with bilder=aufgabe.bilder.all %}
+                {% if bilder|length > 0 %}
+                    <div class="task-images row1">
+                    {% for b in bilder %}
+                        {% if b.position <= 2 %}
+                        <img src="{{ b.bild.url }}" class="task-image">
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                    {% if bilder|length > 2 %}
+                    <div class="task-images row2">
+                        {% for b in bilder %}
+                        {% if b.position > 2 %}
+                            <img src="{{ b.bild.url }}" class="task-image">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 {% endif %}
-                {% endfor %}
-            </div>
-
-            <div class="task-bilder zeile2">
-                {% for bild in aufgabe.bilder.all %}
-                {% if bild.position > 2 %}
-                    <img src="{{ bild.bild.url }}" class="task-bild">
-                {% endif %}
-                {% endfor %}
-            </div>
+                {% endwith %}
             {% endif %}
+
             <!-- Button-Leiste -->
             <div class="task-buttons">
                 <button type="button" onclick="location.href='/'">Stop</button>
@@ -78,3 +81,4 @@
         </div>
     </form>
 {% endblock %}
+

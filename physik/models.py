@@ -104,3 +104,24 @@ class AufgabeOption(models.Model):
 
     def __str__(self):
         return f"{self.aufgabe_id}:{self.position} {self.text}"
+
+class AufgabeBild(models.Model):
+    aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="bilder")
+    position = models.PositiveSmallIntegerField()
+    def bild_pfad(instance, filename):
+        thema = instance.aufgabe.kapitel.thema.thema
+        lfd = instance.aufgabe.lfd_nr
+        return f"aufgabenbilder/{thema}/{lfd}/{filename}"
+
+    bild = models.ImageField(upload_to=bild_pfad)
+
+    class Meta:
+        ordering = ["position"]
+
+    def save(self, *args, **kwargs):
+        if not self.position:
+            max_pos = AufgabeBild.objects.filter(aufgabe=self.aufgabe).aggregate(
+                m=models.Max("position")
+            )["m"] or 0
+            self.position = max_pos + 1
+        super().save(*args, **kwargs)
