@@ -1,6 +1,6 @@
 import random
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Count
 
@@ -53,40 +53,61 @@ def index(request):
     })
 
 def aufgaben(request):
-    tb_id = request.GET.get("tb")
-    level = request.GET.get("level")
-    start = request.GET.get("start")
-    end = request.GET.get("end")
+    # Wenn noch keine Serie existiert → neu erzeugen
+    if "aufgaben_ids" not in request.session:
 
-    aufgaben = Aufgabe.objects.filter(
-        thema_id=tb_id,
-        schwierigkeit=level,
-        kapitel__id__gte=start,
-        kapitel__id__lte=end,
-    )
+        tb_id = request.GET.get("tb")
+        level = request.GET.get("level")
+        start = request.GET.get("start")
+        end = request.GET.get("end")
 
-    aufgabe = None
+        qs = Aufgabe.objects.filter(
+            thema_id=tb_id,
+            schwierigkeit=level,
+            kapitel__id__gte=start,
+            kapitel__id__lte=end,
+        )
+
+        alle = list(qs)
+        if not alle:
+            return render(request, "physik/aufgabe.html", {
+                "aufgabe": None
+            })
+
+        ziel = min(10, len(alle))
+        serie = random.sample(alle, ziel)
+
+        request.session["aufgaben_ids"] = [a.id for a in serie]
+        request.session["index"] = 0
+
+    ids = request.session["aufgaben_ids"]
+    index = request.session["index"]
+
+    # Wenn am Ende → Session löschen (später kommt hier Auswertung)
+    if index >= len(ids):
+        del request.session["aufgaben_ids"]
+        del request.session["index"]
+        return render(request, "physik/ende.html")
+
+    aufgabe = Aufgabe.objects.get(id=ids[index])
+
+    # a3 vorbereiten
     anzeigen = []
+    if aufgabe.typ == "a3":
+        anzeigen = [{"text": aufgabe.antwort, "richtig": True}]
+        opts = list(aufgabe.optionen.order_by("position")[:2])
+        for o in opts:
+            anzeigen.append({"text": o.text, "richtig": False})
+        random.shuffle(anzeigen)
 
-    if aufgaben.exists():
-        aufgabe = random.choice(list(aufgaben))
-
-        # a3-Logik
-        if aufgabe.typ.startswith("a3"):
-            anzeigen = [
-                {"text": aufgabe.antwort, "richtig": True},
-            ]
-
-            # erste zwei Optionen aus der DB
-            optionen = list(aufgabe.optionen.order_by("position")[:2])
-            for opt in optionen:
-                anzeigen.append({"text": opt.text, "richtig": False})
-
-            random.shuffle(anzeigen)
+    # Wenn „Weiter“ gedrückt wurde → zur nächsten Aufgabe
+    if request.method == "POST":
+        request.session["index"] += 1
+        return redirect("physik:aufgaben")
 
     return render(request, "physik/aufgabe.html", {
         "aufgabe": aufgabe,
         "anzeigen": anzeigen,
+        "fragenummer": index + 1,
+        "anzahl": len(ids),
     })
-
-

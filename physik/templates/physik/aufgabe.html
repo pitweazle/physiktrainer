@@ -1,68 +1,80 @@
 {% extends "base.html" %}
-{% block content %}
+{% load static %}
 
-{% if aufgabe %}
-
-<div class="aufgabe-topbar">
-    <a href="{% url 'physik:index' %}" class="stop-button">Stop</a>
-</div>
-
-
-<h3>{{ aufgabe.thema }} – {{ aufgabe.kapitel }}</h3>
-
-<div class="aufgabe">
-  <strong>Frage:</strong><br>
-  {{ aufgabe.frage }}
-</div>
-
-<form method="post">
-  {% csrf_token %}
-
-{% if aufgabe.typ == "a3" %}
-  {% for a in anzeigen %}
-    <div>
-      <label>
-        <input type="radio" name="antwort" value="{{ a.text }}">
-        {{ a.text }}
-      </label>
-    </div>
-  {% endfor %}
-{% else %}
-  <input type="text" name="antwort">
-  {{ aufgabe.einheit }}
-{% endif %}
-
-
-  <hr>
-
-  <button name="action" value="stop">Stop</button>
-  <button name="action" value="loesung">Lösung anzeigen</button>
-
-  {% if aufgabe.hilfe %}
-      <button name="action" value="hilfe">Hilfe anzeigen</button>
-  {% endif %}
-
-  <button name="action" value="weiter">weiter</button>
-</form>
-
-{% if show_loesung %}
-  <div class="loesung">
-      <strong>Lösung:</strong><br>
-      {{ aufgabe.antwort }}<br>
-      {{ aufgabe.erklaerung }}
-  </div>
-{% endif %}
-
-{% if show_hilfe %}
-  <div class="hilfe">
-      <strong>Hilfe:</strong><br>
-      {{ aufgabe.hilfe }}
-  </div>
-{% endif %}
-
-{% else %}
-  <p>Keine Aufgabe gefunden.</p>
-{% endif %}
-
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'physik/oo.css' %}">
 {% endblock %}
 
+{% block content %}
+    <form method="post">
+    {% csrf_token %}
+        <div class="task-dialog">
+
+            <!-- Kopfzeile -->
+            <div class="task-header">
+            <div class="task-title">
+                {{ fragenummer }} von {{ anzahl }} Aufgaben
+            </div>
+            <div class="task-kapitel">
+                {{ aufgabe.kapitel }}
+            </div>
+            </div>
+
+
+            <!-- Frage -->
+            <div class="task-frage">
+                {{ aufgabe.frage }}
+            </div>
+
+            <!-- Antwortbereich -->
+            <div class="task-antwort">
+
+                {% if aufgabe.typ == "a3" %}
+                    {% for a in anzeigen %}
+                    <div class="task-option">
+                        <label>
+                        <input type="radio" name="antwort" value="{{ a.text }}">
+                        {{ a.text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <input type="text" name="antwort" class="task-input">
+                    {% if aufgabe.einheit %}
+                    <span class="task-einheit">{{ aufgabe.einheit }}</span>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+            {% if aufgabe.bilder.exists %}
+
+            <div class="task-bilder zeile1">
+                {% for bild in aufgabe.bilder.all %}
+                {% if bild.position <= 2 %}
+                    <img src="{{ bild.bild.url }}" class="task-bild">
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="task-bilder zeile2">
+                {% for bild in aufgabe.bilder.all %}
+                {% if bild.position > 2 %}
+                    <img src="{{ bild.bild.url }}" class="task-bild">
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Button-Leiste -->
+            <div class="task-buttons">
+                <button type="button" onclick="location.href='/'">Stop</button>
+                {% if aufgabe.hilfe %}
+                    <button type="button" onclick="alert('{{ aufgabe.hilfe|escapejs }}')">
+                    Hilfe
+                    </button>
+                {% endif %}
+                <button type="submit">Weiter</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
