@@ -4,7 +4,7 @@ from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption, AufgabeBild
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):
-    list_display = ("ordnung", "thema", "farbe", "eingeblendet")
+    list_display = ("ordnung", "thema", "kurz", "eingeblendet")
     list_filter = ("eingeblendet",)
     search_fields = ("thema",)
     ordering = ("ordnung",)
@@ -68,7 +68,6 @@ class AufgabeAdmin(admin.ModelAdmin):
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
     date_hierarchy = "erstellt"
 
-    exclude = ("von",)
     readonly_fields = ("erstellt",)
 
     fieldsets = (
@@ -86,6 +85,11 @@ class AufgabeAdmin(admin.ModelAdmin):
 
         ("Zusatzinformationen", {
             "fields": ("anmerkung", "erklaerung", "hilfe"),
+            "classes": ("collapse",),
+        }),
+
+        ("Admin", {
+            "fields": ("lfd_nr", "erstellt", "von"),
             "classes": ("collapse",),
         }),
     )

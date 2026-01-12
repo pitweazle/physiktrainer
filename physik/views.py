@@ -112,3 +112,14 @@ def aufgaben(request):
         "anzahl": len(ids),
     })
 
+def call(request, lfd_nr):
+    try:
+        aufgabe = Aufgabe.objects.get(lfd_nr=lfd_nr)
+    except Aufgabe.DoesNotExist:
+        return HttpResponse(f"Aufgabe {lfd_nr} nicht gefunden")
+
+    # Serie aus genau dieser einen Aufgabe
+    request.session["aufgaben_ids"] = [aufgabe.id]
+    request.session["index"] = 0
+
+    return redirect("physik:aufgaben")

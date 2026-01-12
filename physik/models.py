@@ -4,6 +4,7 @@ from django.db import models
 
 class ThemenBereich(models.Model):
     ordnung = models.PositiveSmallIntegerField(unique=True)
+    kurz = models.CharField(max_length=2, default="", blank=True)
     thema = models.CharField(max_length=30)
     farbe = models.CharField(max_length=40,)
     eingeblendet = models.BooleanField(default = True)
@@ -90,6 +91,23 @@ class Aufgabe(models.Model):
 
     def __str__(self):
         return f"{self.thema} / {self.kapitel} – {self.frage[:50]}"
+
+    def naechste_lfd_nr(self):
+        thema = self.kapitel.thema
+        prefix = thema.kurz   # z.B. "E", "O", "W"
+
+        letzte = (
+            Aufgabe.objects
+            .filter(kapitel__thema=thema, lfd_nr__startswith=prefix)
+            .order_by("-lfd_nr")
+            .first()
+        )
+
+        if not letzte:
+            return f"{prefix}001"
+
+        num = int(letzte.lfd_nr[1:]) + 1
+        return f"{prefix}{num:03d}"
 
 class AufgabeOption(models.Model):
     aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="optionen")

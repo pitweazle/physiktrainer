@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block css_files %}
-    <link rel="stylesheet" href="{% static 'physik/oo.css' %}">
+    <link rel="stylesheet" href="{% static 'physik/aufgabe.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -45,6 +45,17 @@
                     {% endif %}
                 {% endif %}
             </div>
+
+<div id="solutionBox" style="display:none;" class="solution-box">
+  <strong>Lösung:</strong><br>
+  {{ aufgabe.antwort }}<br><br>
+
+  {% if aufgabe.erklaerung %}
+    {{ aufgabe.erklaerung|linebreaks }}
+  {% endif %}
+</div>
+
+
             {% if aufgabe.bilder.exists %}
                 {% with bilder=aufgabe.bilder.all %}
                 {% if bilder|length > 0 %}
@@ -76,9 +87,19 @@
                     Hilfe
                     </button>
                 {% endif %}
+                <button type="button" id="showSolution">Lösung anzeigen</button>
                 <button type="submit">Weiter</button>
             </div>
         </div>
     </form>
+
+<script>
+document.getElementById("showSolution").addEventListener("click", function () {
+  const box = document.getElementById("solutionBox");
+  box.style.display = (box.style.display === "none") ? "block" : "none";
+});
+</script>
+
+
 {% endblock %}
 
