@@ -90,6 +90,20 @@ def aufgaben(request):
         return redirect("physik:index")
 
     aufgabe = Aufgabe.objects.get(id=ids[index])
+    bilder_anzeige = None
+    p_richtig = None
+
+    if aufgabe.typ.startswith("p"):
+        bilder = list(aufgabe.bilder.order_by("position"))
+
+        if bilder:
+            # OO-Regel: Bild mit Position 1 ist richtig
+            p_richtig = bilder[0].id
+
+            random.shuffle(bilder)
+
+            bilder_anzeige = bilder
+            request.session["p_richtig"] = p_richtig
 
     # a3 vorbereiten
     anzeigen = []
@@ -102,15 +116,26 @@ def aufgaben(request):
 
     # Wenn „Weiter“ gedrückt wurde → zur nächsten Aufgabe
     if request.method == "POST":
+        # p-Typen auswerten
+        if aufgabe.typ.startswith("p"):
+            gewaehltes = request.POST.get("bild_antwort")
+            richtig = str(request.session.get("p_richtig"))
+
+            # hier später: speichern ob richtig/falsch
+            # z.B. request.session["letzte_ok"] = (gewaehltes == richtig)
+
         request.session["index"] += 1
         return redirect("physik:aufgaben")
+
 
     return render(request, "physik/aufgabe.html", {
         "aufgabe": aufgabe,
         "anzeigen": anzeigen,
+        "bilder": bilder_anzeige,
         "fragenummer": index + 1,
         "anzahl": len(ids),
     })
+
 
 def call(request, lfd_nr):
     try:

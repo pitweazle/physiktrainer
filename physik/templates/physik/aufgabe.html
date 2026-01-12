@@ -46,38 +46,43 @@
                 {% endif %}
             </div>
 
-<div id="solutionBox" style="display:none;" class="solution-box">
-  <strong>Lösung:</strong><br>
-  {{ aufgabe.antwort }}<br><br>
+            <div id="solutionBox" style="display:none;" class="solution-box">
+            <strong>Lösung:</strong><br>
+            {{ aufgabe.antwort }}<br><br>
 
-  {% if aufgabe.erklaerung %}
-    {{ aufgabe.erklaerung|linebreaks }}
-  {% endif %}
-</div>
-
-
-            {% if aufgabe.bilder.exists %}
-                {% with bilder=aufgabe.bilder.all %}
-                {% if bilder|length > 0 %}
-                    <div class="task-images row1">
-                    {% for b in bilder %}
-                        {% if b.position <= 2 %}
-                        <img src="{{ b.bild.url }}" class="task-image">
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                    {% if bilder|length > 2 %}
-                    <div class="task-images row2">
-                        {% for b in bilder %}
-                        {% if b.position > 2 %}
-                            <img src="{{ b.bild.url }}" class="task-image">
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                {% endif %}
-                {% endwith %}
+            {% if aufgabe.erklaerung %}
+                {{ aufgabe.erklaerung|linebreaks }}
             {% endif %}
+            </div>
+
+{% if bilder %}
+  {% with bilder_liste=bilder %}
+    <div class="task-images row1">
+      {% for b in bilder_liste %}
+        {% if forloop.counter <= 2 %}
+          <img src="{{ b.bild.url }}"
+               class="task-image clickable"
+               data-id="{{ b.id }}">
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if bilder_liste|length > 2 %}
+      <div class="task-images row2">
+        {% for b in bilder_liste %}
+          {% if forloop.counter > 2 %}
+            <img src="{{ b.bild.url }}"
+                 class="task-image clickable"
+                 data-id="{{ b.id }}">
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <input type="hidden" name="bild_antwort" id="bild_antwort">
+{% endif %}
+
 
             <!-- Button-Leiste -->
             <div class="task-buttons">
@@ -92,6 +97,18 @@
             </div>
         </div>
     </form>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".task-image.clickable").forEach(img => {
+    img.addEventListener("click", function () {
+      document.getElementById("bild_antwort").value = this.dataset.id;
+
+      document.querySelectorAll(".task-image").forEach(i => i.classList.remove("selected"));
+      this.classList.add("selected");
+    });
+  });
+});
+</script>
 
 <script>
 document.getElementById("showSolution").addEventListener("click", function () {

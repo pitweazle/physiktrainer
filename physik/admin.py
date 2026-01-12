@@ -61,9 +61,9 @@ class AufgabeAdminForm(forms.ModelForm):
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
     inlines = [AufgabeOptionInline, AufgabeBildInline]    
-    list_display = ("frage", "lfd_nr", "thema", "kapitel", "schwierigkeit")
+    list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
     #list_editable = ("lfd_nr",)
-    list_filter = ("thema", "kapitel", "schwierigkeit")
+    list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
     search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
     date_hierarchy = "erstellt"

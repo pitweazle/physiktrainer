@@ -74,3 +74,7 @@
 .task-buttons button {
   margin: 0;
 }
+
+.task-image.selected {
+  outline: 3px solid blue;
+}
