@@ -12,14 +12,20 @@
 
             <!-- Kopfzeile -->
             <div class="task-header">
-            <div class="task-title">
-                {{ fragenummer }} von {{ anzahl }} Aufgaben
+              <div class="task-title">
+                  {{ fragenummer }} von {{ anzahl }} Aufgaben
+              </div>
+              <div class="task-kapitel">
+                  {{ aufgabe.kapitel }}
+              </div>
             </div>
-            <div class="task-kapitel">
-                {{ aufgabe.kapitel }}
-            </div>
-            </div>
-
+            {% if messages %}
+              {% for message in messages %}
+                  <div class="alert {{ message.tags }}">
+                  {{ message }}
+                  </div>
+              {% endfor %}
+            {% endif %}
 
             <!-- Frage -->
             <div class="task-frage">

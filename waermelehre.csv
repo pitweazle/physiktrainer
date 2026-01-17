@@ -1,54 +1,54 @@
-"Erklärungerklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"thema";"schwierigkeit";"typ";"frage";"1";2;3;4;5;6;7;8;9;;
-"Kälter geht es nicht.";;5;"W001";1;"Temperatur und Thermometer";2;"o14f67";"Bei welcher Temperatur liegt der absolute Nullpunkt?";"-273°C";"Null Kelvin";"$0K";"$-273,15°C";;;;;;;"1 Temperatur und Thermometer"
-"Da man Salz auf die Straßen streut um das Eis aufzutauen, sollte man meinen, die Temperatur würde steigen. Das stimmt aber nicht – Wasser + Salz ergibt Salzwasser und Salzwasser hat einen niedrigeren Gefriepunkt als reines Wasser. Da also Salzwasser entsteht und dieses bei der Temperatur auf der Straße noch nicht gefriert, taut das Eis auf – zum Auftauen wird Energie benötigt, daher sinkt die Temperatur.";;5;"W002";1;"Temperatur und Thermometer";2;"o13";"Wie ändert sich die Temperatur von Eis wenn man Salz darauf streut?";"sie wird niedriger";"sie fällt";"sie sinkt";;;;;;;;"2 Ausdehnung"
-"Es ist die Siedetemperatur von Wasser und die Schmelztemperatur von Wasser";;;"W003";1;"Temperatur und Thermometer";1;"u23ou45";"Bei welchen Temperaturen liegen die Fixpunkte der Celsiusskala?";"0°C und 100°C";"0°C";"100°C";"0°Celsius";"100°Celsius";;;;;;"3 Anomalie des Wassers"
-"in dieser Tiefe gefriert die Erde nicht";;;"W004";3;"Anomalie des Wassers";2;"l41";"Warum müssen Wasserleitungen immer mindestens 80 cm tief im Erdboden eingegraben werden?";"Damit sie im Winter nicht einfrieren.";"Damit das Wasser im Sommer nicht so heiß wird und die Leitung nicht platzt";"Damit sie beim Graben mit Bagerrn nicht kaputt gemacht werden.";"Damit kaltes Wasser aus dem Kaltwasserhahn kommt";;;;;;;"4 Teilchenmodell"
-;;;"W005";2;"Ausdehnung";3;"o12";"Warum findet man nach dem Winter oft Löcher im Asphalt?";"Beim Gefrieren dehnt sich Wasser unter der Straße aus";"dehnt sich aus";;;;;;;;;"5 Wärmeausbreitung"
-;;;"W006";1;"Temperatur und Thermometer";2;"o14";"Welche Temperaturskala wird in der Wissenschaft benutzt?";"Kelvin";"K";"Grad Kelvin";"Kelvinskala";;;;;;;
-;"Bei normalem Luftdruck (1020hPa)";;"W007";1;"Temperatur und Thermometer";1;"o13";"Welche Temperatur hat Wasser wenn es siedet?";"100°C";"100°Celsius";"373K";;;;;;;;
-"In das aufgeplusterte Gefieder passt mehr Luft";;;"W008";5;" Wärmeausbreitung";2;"u3o45";"Warum plustern sich Vögel im Winter auf ?";"Die Luft im Gefieder isoliert";"Die Luft im Gefieder ist ein schlechter Wärmeleiter";"Luft";"mehr";"isoliert";;;;;;
-"In der Wolle ist viel Luft";;;"W009";5;" Wärmeausbreitung";1;"u3o45";"Wieso wärmt ein Wollpullover im Winter ?";"Die Luft in der Wolle isoliert";"Die Luft in der Wolle ist ein schlecher Wärmeleiter";"Luft";"mehr";"isoliert";;;;;;
-"Die kurzen Haare des Sommerfells werden durch lange Haare ersetzt";;;"W010";5;" Wärmeausbreitung";2;"u3o45";"Wieso bekommen Tiere im Winter ein Winterfell ?";"Die Luft im Fell isoliert";"Die Luft im Fell ist ein schlechter Wärmeleiter";"Luft";"mehr";"isoliert";;;;;;
-;;;"W011";1;"Temperatur und Thermometer";1;"o12";"Wer hat unsere Temperaturskala erfunden ?";"Celsius";"Anders Celsius";;;;;;;;;
-;;;"W012";1;"Temperatur und Thermometer";1;"o12";"Welche Temperatur hat Eiswasser (Wasser in dem Eis schwimmt)?";"0°C";"0°Celsius";;;;;;;;;
-;;;"W013";3;"Anomalie des Wassers";1;"l3";"Warum platzen Wasserflaschen und Wasserleitungen, die im Winter für einige Zeit Frost ausgesetzt sind?";"Wasser dehnt sich beim Gefrieren aus";"Wasser zieht sich beim Gefrieren zusammen";"Das Glas und die Röhern gehen bei Kälte kaputt";;;;;;;;
-;;;"W014";2;"Ausdehnung";2;"o12";"Warum finden sich an den Enden von Brücken oft kammförmige Fugen? ";"damit die Brücke sich beim Erwärmen ausdehnen kann";"ausdehn";;;;;;;;;
-;;;"W015";2;"Ausdehnung";1;"u22o34";"Warum soll man nach dem Tanken das Auto nicht auf dem Parklatz in die Sonne stellen ?";"Weil sich das Benzin beim Erwärmen ausdehnt ";"ausdehnt";"Wärme";"warm";;;;;;;
-;;;"W016";1;"Temperatur und Thermometer";1;1;"Wie heißt das Messgerät mit dem man Temperaturen misst ?";"Thermometer";;;;;;;;;;
-;;;"W017";1;"Temperatur und Thermometer";1;"o12";"Welches ist der Gefrierpunkt von Wasser ?";"0°C";"0°Celsius";;;;;;;;;
-"Wenn im Winter Wasser unter dem Asphalt ist und dieses gefriert, dehnt es sich aus und der Asphalt platzt auf. Dadurch kann noch mehr Wasser eindringen.";;;"W018";3;"Anomalie des Wassers";3;"o23";"Warum wird beim Straßenbau immer zuerst ein Schotterbett aus Steinbrocken unter der zukünftigen Straße aufgeschüttet?";"Damit das Wasser unter der Straße versickern kann";"versickern";"weglaufen";;;;;;;;
-"Bei dieser Temperaturskala heißt der absolute Nullpunkt 0 K (Null Kelvin) – kälter geht nicht. Dieser liegt bei -273,15°C.";;"Es gibt folgende Temperaturskalen : Reaumur, Fahrenheit, Celsius und Kelvin.";"W019";1;"Temperatur und Thermometer";2;"o12";"Wie heißt die wissenschaftliche Temperatureinheit ?";"Kelvin";"Grad Kelvin";;;;;;;;;
-;;;"W020";1;"Temperatur und Thermometer";1;"1p1";"Wie nennt man so ein Gerät ?";"Thermometer";;;;;;;;;;
-"Da man Salz auf die Straßen streut um das Eis aufzutauen, sollte man meinen, die Temperatur würde steigen. Das stimmt aber nicht – Wasser + Salz ergibt Salzwasser und Salzwasser hat einen niedrigeren Gefriepunkt als reines Wasser. Da also Salzwasser entsteht und dieses bei der Temperatur auf der Straße noch nicht gefriert, taut das Eis auf.";;;"W021";1;"Temperatur und Thermometer";3;"o23";"Warum streut man bei Glatteis Salz auf die Straße?";"Das Eis taut auf";"taut";"schmilzt";;;;;;;;
-"Das ist ein Barometer. Man misst mit ihm den Luftdruck.";;;"W022";1;"Temperatur und Thermometer";1;"p4";"Bei welchem Gerät handelt es sich nicht um einen Thermometer?";;;;;;;;;;;
-"Der Begriff 'kochen' kommt aus der Küche. In der Naturwisseenschaft sagt man 'sieden'.";;;"W023";1;"Temperatur und Thermometer";1;"o12f45";"Was passiert mit Wasser bei 100°C?";"Es siedet";"siedet";;"kocht";;;;;;;
-;;;"W024";2;"Ausdehnung";1;"o24";"Wie verändert sich das Volumen eines Körpers, wenn sich der Körper erwärmt?";"Das Volumen wird größer";"größer";"mehr";"dehnt";;;;;;;
-;;;"W025";4;"Teilchenmodell";1;"o1";"Wie verändert sich die Geschwindigkeit der Teilchen, wenn es zu einer Temperaturerhöhung kommt?";"Die Teilchen werden schneller";"schneller";;;;;;;;;
-;;;"W026";2;"Ausdehnung";2;"o12";"Von welchem Koeffizienten hängt die Volumenänderung von Flüssigkeiten ab?";"Raumausdehnungskoeffizient";"ausdehnungskoeffizien";;;;;;;;;
-;;;"W027";3;"Anomalie des Wassers";1;"o12";"Bei wie viel Grad Celsius, hat Wasser das geringste Volumen?";"4°C";"4°Celsius";;;;;;;;;
-;;;"W028";2;"Ausdehnung";1;"a3";"Wo dehnt sich das Volumen bei einer Temperaturerhöhung am größten aus?";"feste Körper";"Flüssigkeiten";"Gase";;;;;;;;
-;;;"W029";3;"Anomalie des Wassers";1;"o12";"Wie verändert sich das Volumen von Wasser, wenn es auf unter 0° Celsius abkühlt?";"Das Volumen wird größer";"größer";"mehr";;;;;;;;
-;;;"W030";2;"Ausdehnung";1;1;"(Fast alle) feste körper dehnen sich aus, wenn sie .... werden";"erwärmt";;;;;;;;;;
-;;;"W031";2;"Ausdehnung";1;1;"(Fast alle) feste Körper ziehen sich zusammen, wenn sie ... werden.";"abgekühlt";;;;;;;;;;
-;;;"W032";5;" Wärmeausbreitung";1;1;"Nenne den Fachbegriff, wenn Wärme zusammen mit einem Stoff transportiert wird?";"Wärmeströmung";;;;;;;;;;
-;;;"W033";5;" Wärmeausbreitung";1;1;"Man spricht von ... wenn Stoffe Wärme weitergeben, ohne dass sie sich selbst mitbwegen.";"Wärmeleitung";;;;;;;;;;
-;;;"W034";5;" Wärmeausbreitung";1;"a4";"Welcher Stoff leitet Wärme am besten weiter?";"Messing";"Holz";"Glas";"Eis";;;;;;;
-;;;"W035";5;" Wärmeausbreitung";2;"a4";"Welcher Stoff leitet Wärme am besten weiter?";"Aluminium";"Stahl";"Messing";"Blei";;;;;;;
-;;;"W036";5;" Wärmeausbreitung";2;"a4";"Welcher Stoff leitet Wärme am besten weiter?";"Wasser";"Luft";"Holz";"Kunststoff";;;;;;;
-;;;"W037";5;" Wärmeausbreitung";1;"w";"Wahr oder falsch? Luft ist ein guter Wärmeleiter.";"falsch";;;;;;;;;;
-;;;"W038";5;" Wärmeausbreitung";1;"w";"Wahr oder falsch? Wasser ist ein guter Wärmeleiter.";"falsch";;;;;;;;;;
-;;;"W039";5;" Wärmeausbreitung";1;"w";"Wahr oder falsch? Silber ist ein guter Wärmeleiter.";"wahr";;;;;;;;;;
-;;;"W040";5;" Wärmeausbreitung";1;1;"Man spricht von ..., wenn sich Wärme ohne einen Stoff ausbreitet.";"Wärmestrahlung";;;;;;;;;;
-;;;"W041";5;" Wärmeausbreitung";2;1;"Wie nennt man die in der Medizin eingesetzte Wärmestrahlung noch?";"Infrarotstrahlung";;;;;;;;;;
-;;;"W042";5;" Wärmeausbreitung";1;"e246";"... Flächen nehmen mehr Strahlung auf als ... Flächen.";"Dunkle … helle";"dunkle";"schwarze";"helle";"weiße";"weisse";;;;;
-;;;"W043";1;"Temperatur und Thermometer";1;"u23";"Die niedrigste Temperatur beträgt -273,15 °Celsius. Nenne dafür den Fachbegriff.";"absoluter Nullpunkt";"absolute";"Nullpunkt";;;;;;;;
-;;;"W044";1;"Temperatur und Thermometer";1;1;"Für was steht ""°C""?";"Grad Celsius";;;;;;;;;;
-;;;"W045";1;"Temperatur und Thermometer";1;1;"Für was steht ""K""?";"Kelvin";;;;;;;;;;
-;;;"W046";1;"Temperatur und Thermometer";2;1;"Für was steht ""°F""?";"Fahrenheit";;;;;;;;;;
-;;;"W047";4;"Teilchenmodell";1;"w";"Wahr oder falsch? Die Teilchen in einem Gas haben eine höhere Bewegungsenergie als die Teilchen in einer Flüssigkeit.";"wahr";"wahr";"richtig";;;;;;;;
-;;;"W048";4;"Teilchenmodell";1;"w";"Wahr oder falsch? Die Bewegungenergie der Teilchenist  in Festkörpern ist höher als die Bewegungsenergie in Gasen.";"falsch";;;;;;;;;;
-;;;"W049";5;" Wärmeausbreitung";1;"w";"Wahr oder falsch? Helle Flächen erwärmen sich mehr als dunkle Flächen.";"falsch";;;;;;;;;;
-;;;"W050";5;" Wärmeausbreitung";1;"w";"Wahr oder falsch? Warme Luft steigt in einer kühlen Umgebung nach oben.";"wahr";;;;;;;;;;
-;;;"W051";2;"Ausdehnung";2;"w";"Wahr oder falsch? Aufgrund von extremen Temperaturunterschieden, können rriesige Fesblöcke auseinanderbrechen.";"wahr";;;;;;;;;;
-;"Bei normalem Luftdruck (1020hPa)";;"W052";1;"Temperatur und Thermometer";1;3;"Bei wieviel °Celsius liegt die Siedetemperatur von Wasser?";"100°Celsius";"100 Grad Celsius";"100°C";;;;;;;;
-"Wegen dieser Anomalie platzen Getränkeflaschen im Gefrierschrank";;;"W053";3;"Anomalie des Wassers";;"u24ou56";"Was versteht man unter der Anomalie des Wassers?";"Wasser dehnt sich beim Gefrieren aus";"Wasser";"4°C";"dehnt";"Wasser";"frier";"dehnt";;;;
+erklaerung;anmerkung;hilfe;lfd_nr;zeile;kapitel;schwierigkeit;typ;altertyp;frage;antwort;2;3;4;5;6;7;8;9;;
+Es ist die Siedetemperatur von Wasser und die Schmelztemperatur von Wasser;;;W003;1;Temperatur und Thermometer;1;(2o3)u(4o5);u23ou45;Bei welchen Temperaturen liegen die Fixpunkte der Celsiusskala?;0°C und 100°C;0°C;100°C;0°Celsius;100°Celsius;;;;;;1 Temperatur und Thermometer
+;Bei normalem Luftdruck (1020hPa);;W007;1;Temperatur und Thermometer;1;1o3;o13;Welche Temperatur hat Wasser wenn es siedet?;100°C;100°Celsius;373K;;;;;;;;2 Ausdehnung
+;;;W011;1;Temperatur und Thermometer;1;1o2;o12;Wer hat unsere Temperaturskala erfunden ?;Celsius;Anders Celsius;;;;;;;;;3 Anomalie des Wassers
+;;;W012;1;Temperatur und Thermometer;1;1o2;o12;Welche Temperatur hat Eiswasser (Wasser in dem Eis schwimmt)?;0°C;0°Celsius;;;;;;;;;4 Teilchenmodell
+;;;W016;1;Temperatur und Thermometer;1;1;1;Wie heißt das Messgerät mit dem man Temperaturen misst ?;Thermometer;;;;;;;;;;5 Wärmeausbreitung
+;;;W017;1;Temperatur und Thermometer;1;1o2;o12;Welches ist der Gefrierpunkt von Wasser ?;0°C;0°Celsius;;;;;;;;;
+;;;W020;1;Temperatur und Thermometer;1;1p1;1p1;Wie nennt man so ein Gerät ?;Thermometer;;;;;;;;;;
+Das ist ein Barometer. Man misst mit ihm den Luftdruck.;;;W022;1;Temperatur und Thermometer;1;p4;p4;Bei welchem Gerät handelt es sich nicht um einen Thermometer?;;;;;;;;;;;
+Der Begriff 'kochen' kommt aus der Küche. In der Naturwisseenschaft sagt man 'sieden'.;;;W023;1;Temperatur und Thermometer;1;1o2f(4o5);o12f45;Was passiert mit Wasser bei 100°C?;Es siedet;siedet;;kocht;;;;;;;
+;;;W043;1;Temperatur und Thermometer;1;2u3;u23;Die niedrigste Temperatur beträgt -273,15 °Celsius. Nenne dafür den Fachbegriff.;absoluter Nullpunkt;absolute;Nullpunkt;;;;;;;;
+;;;W044;1;Temperatur und Thermometer;1;1;1;"Für was steht ""°C""?";Grad Celsius;;;;;;;;;;
+;;;W045;1;Temperatur und Thermometer;1;1;1;"Für was steht ""K""?";Kelvin;;;;;;;;;;
+;Bei normalem Luftdruck (1020hPa);;W052;1;Temperatur und Thermometer;1;1o3;3;Bei wieviel °Celsius liegt die Siedetemperatur von Wasser?;100°Celsius;100 Grad Celsius;100°C;;;;;;;;
+;;;W015;2;Ausdehnung;1;2u(2o3);u22o34;Warum soll man nach dem Tanken das Auto nicht auf dem Parklatz in die Sonne stellen ?;Weil sich das Benzin beim Erwärmen ausdehnt ;ausdehnt;Wärme;warm;;;;;;;
+;;;W024;2;Ausdehnung;1;1o2o3o4;o24;Wie verändert sich das Volumen eines Körpers, wenn sich der Körper erwärmt?;Das Volumen wird größer;größer;mehr;dehnt;;;;;;;
+;;;W028;2;Ausdehnung;1;a3;a3;Wo dehnt sich das Volumen bei einer Temperaturerhöhung am größten aus?;feste Körper;Flüssigkeiten;Gase;;;;;;;;
+;;;W030;2;Ausdehnung;1;1;1;(Fast alle) feste körper dehnen sich aus, wenn sie .... werden;erwärmt;;;;;;;;;;
+;;;W031;2;Ausdehnung;1;1;1;(Fast alle) feste Körper ziehen sich zusammen, wenn sie ... werden.;abgekühlt;;;;;;;;;;
+;;;W013;3;Anomalie des Wassers;1;l3;l3;Warum platzen Wasserflaschen und Wasserleitungen, die im Winter für einige Zeit Frost ausgesetzt sind?;Wasser dehnt sich beim Gefrieren aus;Wasser zieht sich beim Gefrieren zusammen;Das Glas und die Röhern gehen bei Kälte kaputt;;;;;;;;
+;;;W027;3;Anomalie des Wassers;1;1o2;o12;Bei wie viel Grad Celsius, hat Wasser das geringste Volumen?;4°C;4°Celsius;;;;;;;;;
+;;;W029;3;Anomalie des Wassers;1;1o2;o12;Wie verändert sich das Volumen von Wasser, wenn es auf unter 0° Celsius abkühlt?;Das Volumen wird größer;größer;mehr;;;;;;;;
+Wegen dieser Anomalie platzen Getränkeflaschen im Gefrierschrank;;;W053;3;Anomalie des Wassers;1;(2u4)o(5u6);u24ou56;Was versteht man unter der Anomalie des Wassers?;Wasser dehnt sich beim Gefrieren aus;Wasser;4°C;dehnt;Wasser;frier;dehnt;;;;
+;;;W025;4;Teilchenmodell;1;1o2;o1;Wie verändert sich die Geschwindigkeit der Teilchen, wenn es zu einer Temperaturerhöhung kommt?;Die Teilchen werden schneller;schneller;;;;;;;;;
+;;;W047;4;Teilchenmodell;1;w;w;Wahr oder falsch? Die Teilchen in einem Gas haben eine höhere Bewegungsenergie als die Teilchen in einer Flüssigkeit.;wahr;wahr;richtig;;;;;;;;
+;;;W048;4;Teilchenmodell;1;w;w;Wahr oder falsch? Die Bewegungenergie der Teilchenist  in Festkörpern ist höher als die Bewegungsenergie in Gasen.;falsch;;;;;;;;;;
+In der Wolle ist viel Luft;;;W009;5; Wärmeausbreitung;1;3u(4o5);u3o45;Wieso wärmt ein Wollpullover im Winter ?;Die Luft in der Wolle isoliert;Die Luft in der Wolle ist ein schlecher Wärmeleiter;Luft;mehr;isoliert;;;;;;
+;;;W032;5; Wärmeausbreitung;1;1;1;Nenne den Fachbegriff, wenn Wärme zusammen mit einem Stoff transportiert wird?;Wärmeströmung;;;;;;;;;;
+;;;W033;5; Wärmeausbreitung;1;1;1;Man spricht von ... wenn Stoffe Wärme weitergeben, ohne dass sie sich selbst mitbwegen.;Wärmeleitung;;;;;;;;;;
+;;;W034;5; Wärmeausbreitung;1;a4;a4;Welcher Stoff leitet Wärme am besten weiter?;Messing;Holz;Glas;Eis;;;;;;;
+;;;W037;5; Wärmeausbreitung;1;w;w;Wahr oder falsch? Luft ist ein guter Wärmeleiter.;falsch;;;;;;;;;;
+;;;W038;5; Wärmeausbreitung;1;w;w;Wahr oder falsch? Wasser ist ein guter Wärmeleiter.;falsch;;;;;;;;;;
+;;;W039;5; Wärmeausbreitung;1;w;w;Wahr oder falsch? Silber ist ein guter Wärmeleiter.;wahr;;;;;;;;;;
+;;;W040;5; Wärmeausbreitung;1;1;1;Man spricht von ..., wenn sich Wärme ohne einen Stoff ausbreitet.;Wärmestrahlung;;;;;;;;;;
+;;;W042;5; Wärmeausbreitung;1;e246;e246;... Flächen nehmen mehr Strahlung auf als ... Flächen.;Dunkle … helle;dunkle;schwarze;helle;weiße;weisse;;;;;
+;;;W049;5; Wärmeausbreitung;1;w;w;Wahr oder falsch? Helle Flächen erwärmen sich mehr als dunkle Flächen.;falsch;;;;;;;;;;
+;;;W050;5; Wärmeausbreitung;1;w;w;Wahr oder falsch? Warme Luft steigt in einer kühlen Umgebung nach oben.;wahr;;;;;;;;;;
+Kälter geht es nicht.;;5;W001;1;Temperatur und Thermometer;2;1o4;o14f67;Bei welcher Temperatur liegt der absolute Nullpunkt?;-273°C;Null Kelvin;$0K;$-273,15°C;;;;;;;
+Da man Salz auf die Straßen streut um das Eis aufzutauen, sollte man meinen, die Temperatur würde steigen. Das stimmt aber nicht – Wasser + Salz ergibt Salzwasser und Salzwasser hat einen niedrigeren Gefriepunkt als reines Wasser. Da also Salzwasser entsteht und dieses bei der Temperatur auf der Straße noch nicht gefriert, taut das Eis auf – zum Auftauen wird Energie benötigt, daher sinkt die Temperatur.;;5;W002;1;Temperatur und Thermometer;2;1o3;o13;Wie ändert sich die Temperatur von Eis wenn man Salz darauf streut?;sie wird niedriger;sie fällt;sie sinkt;;;;;;;;
+;;;W006;1;Temperatur und Thermometer;2;1o4;o14;Welche Temperaturskala wird in der Wissenschaft benutzt?;Kelvin;K;Grad Kelvin;Kelvinskala;;;;;;;
+Bei dieser Temperaturskala heißt der absolute Nullpunkt 0 K (Null Kelvin) – kälter geht nicht. Dieser liegt bei -273,15°C.;;Es gibt folgende Temperaturskalen : Reaumur, Fahrenheit, Celsius und Kelvin.;W019;1;Temperatur und Thermometer;2;1o2;o12;Wie heißt die wissenschaftliche Temperatureinheit ?;Kelvin;Grad Kelvin;;;;;;;;;
+;;;W046;1;Temperatur und Thermometer;2;1;1;"Für was steht ""°F""?";Fahrenheit;;;;;;;;;;
+;;;W014;2;Ausdehnung;2;1o2;o12;Warum finden sich an den Enden von Brücken oft kammförmige Fugen? ;damit die Brücke sich beim Erwärmen ausdehnen kann;ausdehn;;;;;;;;;
+;;;W026;2;Ausdehnung;2;1o2;o12;Von welchem Koeffizienten hängt die Volumenänderung von Flüssigkeiten ab?;Raumausdehnungskoeffizient;ausdehnungskoeffizien;;;;;;;;;
+;;;W051;2;Ausdehnung;2;w;w;Wahr oder falsch? Aufgrund von extremen Temperaturunterschieden, können rriesige Fesblöcke auseinanderbrechen.;wahr;;;;;;;;;;
+in dieser Tiefe gefriert die Erde nicht;;;W004;3;Anomalie des Wassers;2;l41;l41;Warum müssen Wasserleitungen immer mindestens 80 cm tief im Erdboden eingegraben werden?;Damit sie im Winter nicht einfrieren.;Damit das Wasser im Sommer nicht so heiß wird und die Leitung nicht platzt;Damit sie beim Graben mit Bagerrn nicht kaputt gemacht werden.;Damit kaltes Wasser aus dem Kaltwasserhahn kommt;;;;;;;
+In das aufgeplusterte Gefieder passt mehr Luft;;;W008;5; Wärmeausbreitung;2;3u(4o5);u3o45;Warum plustern sich Vögel im Winter auf ?;Die Luft im Gefieder isoliert;Die Luft im Gefieder ist ein schlechter Wärmeleiter;Luft;mehr;isoliert;;;;;;
+Die kurzen Haare des Sommerfells werden durch lange Haare ersetzt;;;W010;5; Wärmeausbreitung;2;3u(4o5);u3o45;Wieso bekommen Tiere im Winter ein Winterfell ?;Die Luft im Fell isoliert;Die Luft im Fell ist ein schlechter Wärmeleiter;Luft;mehr;isoliert;;;;;;
+;;;W035;5; Wärmeausbreitung;2;a4;a4;Welcher Stoff leitet Wärme am besten weiter?;Aluminium;Stahl;Messing;Blei;;;;;;;
+;;;W036;5; Wärmeausbreitung;2;a4;a4;Welcher Stoff leitet Wärme am besten weiter?;Wasser;Luft;Holz;Kunststoff;;;;;;;
+;;;W041;5; Wärmeausbreitung;2;1;1;Wie nennt man die in der Medizin eingesetzte Wärmestrahlung noch?;Infrarotstrahlung;;;;;;;;;;
+Da man Salz auf die Straßen streut um das Eis aufzutauen, sollte man meinen, die Temperatur würde steigen. Das stimmt aber nicht – Wasser + Salz ergibt Salzwasser und Salzwasser hat einen niedrigeren Gefriepunkt als reines Wasser. Da also Salzwasser entsteht und dieses bei der Temperatur auf der Straße noch nicht gefriert, taut das Eis auf.;;;W021;1;Temperatur und Thermometer;3;2o3;o23;Warum streut man bei Glatteis Salz auf die Straße?;Das Eis taut auf;taut;schmilzt;;;;;;;;
+Wenn im Winter Wasser unter dem Asphalt ist und dieses gefriert, dehnt es sich aus und der Asphalt platzt auf. Dadurch kann noch mehr Wasser eindringen.;;;W018;1;Anomalie des Wassers;3;2o3;o23;Warum wird beim Straßenbau immer zuerst ein Schotterbett aus Steinbrocken unter der zukünftigen Straße aufgeschüttet?;Damit das Wasser unter der Straße versickern kann;versickern;weglaufen;;;;;;;;
+;;;W005;2;Ausdehnung;3;(2o3)u(4u5);o12;Warum findet man nach dem Winter oft Löcher im Asphalt?;Beim Gefrieren dehnt sich Wasser unter der Straße aus;Wasser;Eis;dehnt ;aus;;;;;;

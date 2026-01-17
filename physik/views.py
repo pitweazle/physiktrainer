@@ -1,12 +1,21 @@
 import random
 
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Count
 
+from .bewertung import bewerte_aufgabe
 from .models import ThemenBereich, Aufgabe, Kapitel
 
 def index(request):
+    # Nur resetten, wenn der Nutzer wirklich neu startet
+    if "aufgaben_ids" in request.session:
+        request.session.pop("aufgaben_ids", None)
+        request.session.pop("index", None)
+        request.session.pop("p_richtig", None)
+    ...
+
     themenbereiche = (
         ThemenBereich.objects
         .filter(eingeblendet=True)
@@ -53,7 +62,16 @@ def index(request):
     })
 
 def aufgaben(request):
-    # Wenn noch keine Serie existiert → neu erzeugen
+
+    # ---------------------------------------------------------
+    # 🔹 NEU: Wenn bereits eine Serie läuft → niemals neu starten
+    # ---------------------------------------------------------
+    if "aufgaben_ids" in request.session and request.GET:
+        return redirect("physik:aufgaben")
+
+    # ---------------------------------------------------------
+    # Serie starten, falls noch keine existiert
+    # ---------------------------------------------------------
     if "aufgaben_ids" not in request.session:
 
         tb_id = request.GET.get("tb")
@@ -83,7 +101,9 @@ def aufgaben(request):
     ids = request.session["aufgaben_ids"]
     index = request.session["index"]
 
-    # Wenn am Ende → Session löschen (später kommt hier Auswertung)
+    # ---------------------------------------------------------
+    # Serie beendet?
+    # ---------------------------------------------------------
     if index >= len(ids):
         del request.session["aufgaben_ids"]
         del request.session["index"]
@@ -91,21 +111,23 @@ def aufgaben(request):
 
     aufgabe = Aufgabe.objects.get(id=ids[index])
     bilder_anzeige = None
-    p_richtig = None
 
+    # ---------------------------------------------------------
+    # p-Typ (Bilder)
+    # ---------------------------------------------------------
     if aufgabe.typ.startswith("p"):
         bilder = list(aufgabe.bilder.order_by("position"))
 
         if bilder:
-            # OO-Regel: Bild mit Position 1 ist richtig
             p_richtig = bilder[0].id
-
             random.shuffle(bilder)
 
             bilder_anzeige = bilder
             request.session["p_richtig"] = p_richtig
 
+    # ---------------------------------------------------------
     # a3 vorbereiten
+    # ---------------------------------------------------------
     anzeigen = []
     if aufgabe.typ == "a3":
         anzeigen = [{"text": aufgabe.antwort, "richtig": True}]
@@ -114,20 +136,45 @@ def aufgaben(request):
             anzeigen.append({"text": o.text, "richtig": False})
         random.shuffle(anzeigen)
 
-    # Wenn „Weiter“ gedrückt wurde → zur nächsten Aufgabe
+    # ---------------------------------------------------------
+    # POST: Antwort auswerten + IMMER zur nächsten Aufgabe
+    # ---------------------------------------------------------
     if request.method == "POST":
-        # p-Typen auswerten
-        if aufgabe.typ.startswith("p"):
-            gewaehltes = request.POST.get("bild_antwort")
-            richtig = str(request.session.get("p_richtig"))
+        antwort = request.POST.get("antwort", "")
+        bild_antwort = request.POST.get("bild_antwort")
 
-            # hier später: speichern ob richtig/falsch
-            # z.B. request.session["letzte_ok"] = (gewaehltes == richtig)
+        # Skip-Fall
+        if not antwort and not bild_antwort:
+            messages.info(request, "Letzte Aufgabe übersprungen.")
+            request.session["index"] += 1
+            request.session.modified = True
+            return redirect("physik:aufgaben")
+
+        ergebnis = bewerte_aufgabe(
+            aufgabe,
+            text_antwort=antwort,
+            bild_antwort=bild_antwort,
+            session=request.session,
+        )
+
+        if ergebnis["richtig"]:
+            messages.success(
+                request,
+                ergebnis.get("hinweis", "Deine letzte Antwort war richtig.")
+            )
+        else:
+            messages.warning(
+                request,
+                ergebnis.get("hinweis", "Deine letzte Antwort war leider falsch.")
+            )
 
         request.session["index"] += 1
+        request.session.modified = True
         return redirect("physik:aufgaben")
 
-
+    # ---------------------------------------------------------
+    # GET: Aufgabe anzeigen
+    # ---------------------------------------------------------
     return render(request, "physik/aufgabe.html", {
         "aufgabe": aufgabe,
         "anzeigen": anzeigen,
@@ -135,7 +182,6 @@ def aufgaben(request):
         "fragenummer": index + 1,
         "anzahl": len(ids),
     })
-
 
 def call(request, lfd_nr):
     try:

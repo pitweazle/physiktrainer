@@ -68,7 +68,10 @@ class Aufgabe(models.Model):
     )
 
     antwort = models.CharField("Antwort", max_length=255, blank=True, help_text="Hier steht die offizielle Antwort.")
-
+    fuzzy_toleranz = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="0 = streng, 1 = kleine Fehler erlaubt, 2 = großzügiger"
+    )
     anmerkung = models.CharField("Anmerkung", max_length=255, blank=True, help_text="Optional, nur wenn gewünscht.")
     erklaerung = models.TextField("Erklärung",blank=True,
         help_text="Optional. Wird angezeigt, wenn auf »Lösung« geklickt wird oder eine falsche Eingabe gemacht wurde.",

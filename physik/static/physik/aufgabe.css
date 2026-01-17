@@ -78,3 +78,32 @@
 .task-image.selected {
   outline: 3px solid blue;
 }
+
+.task-message {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* GRÜN */
+.alert.success {
+    background: #e6ffe6;
+    color: #0f6b0f;
+    border: 1px solid #9ae79a;
+}
+
+/* ROT */
+.alert.error {
+    background: #ffe6e6;
+    color: #7a0b0b;
+    border: 1px solid #ffb2b2;
+}
+
+/* GELB */
+.alert.warning {
+    background: #fff6d6;
+    color: #7a5a05;
+    border: 1px solid #ffde7a;
+}

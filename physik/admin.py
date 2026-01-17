@@ -61,14 +61,12 @@ class AufgabeAdminForm(forms.ModelForm):
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
     inlines = [AufgabeOptionInline, AufgabeBildInline]    
-    list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
-    #list_editable = ("lfd_nr",)
+    list_display = ("frage", "fuzzy_toleranz", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
+    list_editable = ("fuzzy_toleranz", "typ")
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
     search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
     date_hierarchy = "erstellt"
-
-    readonly_fields = ("erstellt",)
 
     fieldsets = (
         (None, {"fields": ("thema", "kapitel", "schwierigkeit", "typ")}),
@@ -81,7 +79,7 @@ class AufgabeAdmin(admin.ModelAdmin):
             "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
         }),
 
-        ("Antwort", {"fields": ("antwort",)}),
+        ("Antwort", {"fields": ("antwort","fuzzy_toleranz")}),
 
         ("Zusatzinformationen", {
             "fields": ("anmerkung", "erklaerung", "hilfe"),
@@ -89,7 +87,7 @@ class AufgabeAdmin(admin.ModelAdmin):
         }),
 
         ("Admin", {
-            "fields": ("lfd_nr", "erstellt", "von"),
+            "fields": ("lfd_nr", ),
             "classes": ("collapse",),
         }),
     )
