@@ -315,9 +315,46 @@ def bewerte_bildauswahl(aufgabe, bild_antwort, session):
     return bild_antwort == richtiges
 
 def bewerte_wahr_falsch(aufgabe, norm):
-    loesung = normalisiere(aufgabe.antwort)
-    ok = norm == loesung
-    return {"richtig": ok, "hinweis": "Richtig!" if ok else "Falsch."}
+    """
+    Akzeptierte Eingaben (case-insensitiv, Leerzeichen egal):
+
+    WAHR:   w, wahr, ja, richtig, ok, stimmt
+    FALSCH: f, falsch, nein, n, stimmt nicht
+    """
+
+    # Normalisieren der User-Eingabe
+    t = (norm or "").strip().lower()
+
+    WAHR = {"w", "wahr", "ja", "richtig", "ok", "stimmt"}
+    FALSCH = {"f", "falsch", "nein", "n", "stimmt nicht"}
+
+    # Was ist die offizielle Lösung in der DB?
+    loesung = (aufgabe.antwort or "").strip().lower()
+
+    # 1) User sagt "wahr"
+    if t in WAHR:
+        ok = loesung in {"w", "wahr", "ja", "richtig"}
+        return {
+            "richtig": ok,
+            "hinweis": "Richtig!" if ok else "Falsch."
+        }
+
+    # 2) User sagt "falsch"
+    if t in FALSCH:
+        ok = loesung in {"f", "falsch", "nein"}
+        return {
+            "richtig": ok,
+            "hinweis": "Richtig!" if ok else "Falsch."
+        }
+
+    # 3) Alles andere → ungültige Eingabe
+    return {
+        "richtig": False,
+        "hinweis": (
+            "Bitte antworte mit: w/wahr/ja/richtig oder f/falsch/nein."
+        )
+    }
+
 
 def bewerte_liste(aufgabe, norm):
     return {"richtig": False, "hinweis": "Listenprüfung noch nicht implementiert."}
