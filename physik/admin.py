@@ -60,9 +60,14 @@ class AufgabeAdminForm(forms.ModelForm):
 
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
-    inlines = [AufgabeOptionInline, AufgabeBildInline]    
-    list_display = ("frage", "fuzzy_toleranz", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
-    list_editable = ("fuzzy_toleranz", "typ")
+    inlines = [AufgabeOptionInline, AufgabeBildInline]  
+    def get_readonly_fields(self, request, obj=None):
+        if obj:   # bestehendes Objekt → bearbeiten
+            return ("lfd_nr", "erstellt")
+        else:     # NEUE Aufgabe → anlegen
+            return ("lfd_nr", "erstellt", "von")
+    list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
+    list_editable = ("typ",)
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
     search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
@@ -79,7 +84,7 @@ class AufgabeAdmin(admin.ModelAdmin):
             "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
         }),
 
-        ("Antwort", {"fields": ("antwort","fuzzy_toleranz")}),
+        ("Antwort", {"fields": ("antwort",)}),
 
         ("Zusatzinformationen", {
             "fields": ("anmerkung", "erklaerung", "hilfe"),
@@ -87,7 +92,7 @@ class AufgabeAdmin(admin.ModelAdmin):
         }),
 
         ("Admin", {
-            "fields": ("lfd_nr", ),
+            "fields": ("lfd_nr","erstellt","von" ),
             "classes": ("collapse",),
         }),
     )
