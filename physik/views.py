@@ -55,15 +55,7 @@ def index(request):
     })
 
 def aufgaben(request):
-    # Wenn bereits eine Serie läuft → niemals neu starten
-    # ---------------------------------------------------------
-    if "aufgaben_ids" in request.session and request.GET:
-        return redirect("physik:aufgaben")
-
-    # ---------------------------------------------------------
-    # Serie starten, falls noch keine existiert
-    # ---------------------------------------------------------
-    if "aufgaben_ids" not in request.session:
+    if "aufgaben_ids" not in request.session and request.method == "GET":
 
         tb_id = request.GET.get("tb")
         level = request.GET.get("level")
@@ -72,19 +64,18 @@ def aufgaben(request):
 
         qs = Aufgabe.objects.filter(
             thema_id=tb_id,
-            schwierigkeit__lte=level,
+            schwierigkeit=level,
             kapitel__zeile__gte=start,
             kapitel__zeile__lte=end,
         )
+
         alle = list(qs)
-        if not alle:
-            return render(request, "physik/aufgabe.html", {
-                "aufgabe": None
-            })
         ziel = min(10, len(alle))
         serie = random.sample(alle, ziel)
+
         request.session["aufgaben_ids"] = [a.id for a in serie]
         request.session["index"] = 0
+
     ids = request.session["aufgaben_ids"]
     index = request.session["index"]
     # Serie beendet?
@@ -149,8 +140,14 @@ def aufgaben(request):
             )
 
         request.session["index"] += 1
+
+        # Sicherheitsbremse
+        if request.session["index"] > len(request.session["aufgaben_ids"]):
+            request.session["index"] = len(request.session["aufgaben_ids"])
+
         request.session.modified = True
         return redirect("physik:aufgaben")
+
 
     # ---------------------------------------------------------
     # GET: Aufgabe anzeigen
