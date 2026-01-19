@@ -14,27 +14,22 @@ def index(request):
         request.session.pop("aufgaben_ids", None)
         request.session.pop("index", None)
         request.session.pop("p_richtig", None)
-    ...
-
     themenbereiche = (
         ThemenBereich.objects
         .filter(eingeblendet=True)
         .prefetch_related("kapitel")
         .order_by("ordnung")
     )
-
     kapitel_map = {
         tb.id: [{"zeile": k.zeile, "name": k.kapitel} for k in tb.kapitel.all().order_by("zeile")]
         for tb in themenbereiche
     }
-
     qs = (
         Aufgabe.objects
         .filter(thema__in=themenbereiche)
         .values("thema_id", "kapitel_id", "schwierigkeit")
         .annotate(cnt=Count("id"))
     )
-
     counts = {}
     for r in qs:
         tb_id = r["thema_id"]
@@ -42,7 +37,6 @@ def index(request):
         s = str(r["schwierigkeit"])  # "1","2","3"
         counts.setdefault(tb_id, {}).setdefault(kap_id, {"1": 0, "2": 0, "3": 0})
         counts[tb_id][kap_id][s] = r["cnt"]
-
     # Summen pro Themenbereich (für die farbige Themenzeile)
     tb_totals = {}
     for tb in themenbereiche:
@@ -53,7 +47,6 @@ def index(request):
             tot["2"] += d["2"]
             tot["3"] += d["3"]
         tb_totals[tb.id] = tot
-
     return render(request, "physik/index.html", {
         "themenbereiche": themenbereiche,
         "kapitel_map": kapitel_map,
@@ -62,9 +55,7 @@ def index(request):
     })
 
 def aufgaben(request):
-
-    # ---------------------------------------------------------
-    # 🔹 NEU: Wenn bereits eine Serie läuft → niemals neu starten
+    # Wenn bereits eine Serie läuft → niemals neu starten
     # ---------------------------------------------------------
     if "aufgaben_ids" in request.session and request.GET:
         return redirect("physik:aufgaben")
@@ -81,27 +72,21 @@ def aufgaben(request):
 
         qs = Aufgabe.objects.filter(
             thema_id=tb_id,
-            schwierigkeit=level,
+            schwierigkeit__lte=level,
             kapitel__zeile__gte=start,
             kapitel__zeile__lte=end,
         )
-
         alle = list(qs)
         if not alle:
             return render(request, "physik/aufgabe.html", {
                 "aufgabe": None
             })
-
         ziel = min(10, len(alle))
         serie = random.sample(alle, ziel)
-
         request.session["aufgaben_ids"] = [a.id for a in serie]
         request.session["index"] = 0
-
     ids = request.session["aufgaben_ids"]
     index = request.session["index"]
-
-    # ---------------------------------------------------------
     # Serie beendet?
     # ---------------------------------------------------------
     if index >= len(ids):
@@ -117,14 +102,11 @@ def aufgaben(request):
     # ---------------------------------------------------------
     if aufgabe.typ.startswith("p"):
         bilder = list(aufgabe.bilder.order_by("position"))
-
         if bilder:
             p_richtig = bilder[0].id
             random.shuffle(bilder)
-
             bilder_anzeige = bilder
             request.session["p_richtig"] = p_richtig
-
     # ---------------------------------------------------------
     # a3 vorbereiten
     # ---------------------------------------------------------
@@ -135,7 +117,6 @@ def aufgaben(request):
         for o in opts:
             anzeigen.append({"text": o.text, "richtig": False})
         random.shuffle(anzeigen)
-
     # ---------------------------------------------------------
     # POST: Antwort auswerten + IMMER zur nächsten Aufgabe
     # ---------------------------------------------------------
@@ -149,7 +130,6 @@ def aufgaben(request):
             request.session["index"] += 1
             request.session.modified = True
             return redirect("physik:aufgaben")
-
         ergebnis = bewerte_aufgabe(
             aufgabe,
             text_antwort=antwort,
