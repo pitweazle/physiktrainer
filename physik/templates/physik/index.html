@@ -14,91 +14,117 @@
           <button type="button" id="toggle-profi">profi</button>
       </div>
 
-  <button type="button" id="openModal">Start</button>
-  {{ kapitel_map|json_script:"kapitel-data" }}
-  <div id="overlay" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="modal-header">
-        <div><strong>Wähle Themenbereich und Schwierigkeitsgrad</strong></div>
-        <button type="button" id="closeModal" class="modal-close">×</button>
-      </div>
-      <form method="get" action="{% url 'physik:aufgaben' %}">
-        <div class="modal-body">
-          <label>Themenbereich</label>
-          <select name="tb" id="tbSelect" required>
-            <option value="">– bitte wählen –</option>
-            {% for tb in themenbereiche %}
-              <option value="{{ tb.id }}">{{ tb.thema }}</option>
-            {% endfor %}
-          </select>
 
-          <label>Schwierigkeitsgrad</label>
-          <div class="radio-row">
-            <label><input type="radio" name="level" value="1" required> Einfach</label>
-            <label><input type="radio" name="level" value="2"> Mittel</label>
-            <label><input type="radio" name="level" value="3"> Profi</label>
+<button type="button" id="openModal">Start</button>
 
-          </div>
+{{ kapitel_map|json_script:"kapitel-data" }}
 
-          <hr>
-
-          <label>Start-Kapitel</label>
-          <select name="start" id="startSelect" required></select>
-
-          <label>End-Kapitel</label>
-          <select name="end" id="endSelect" required></select>
-        </div>
-
-        <div class="modal-footer">
-          <button type="submit">weiter</button>
-        </div>
-      </form>
+<div id="overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div><strong>Wähle Themenbereich und Schwierigkeitsgrad</strong></div>
+      <button type="button" id="closeModal" class="modal-close">×</button>
     </div>
+
+    <form method="get" action="{% url 'physik:aufgaben' %}">
+      <div class="modal-body">
+
+        <label>Themenbereich</label>
+        <select name="tb" id="tbSelect" required>
+          <option value="">– bitte wählen –</option>
+          {% for tb in themenbereiche %}
+            <option value="{{ tb.id }}">{{ tb.thema }}</option>
+          {% endfor %}
+        </select>
+
+        <label>Schwierigkeitsgrad (bis:)</label>
+        <div class="radio-row">
+          <label><input type="radio" name="level" value="1" required> Einfach</label>
+          <label><input type="radio" name="level" value="2"> Mittel</label>
+          <label><input type="radio" name="level" value="3"> Profi</label>
+        </div>
+
+        <hr>
+
+        <!-- 🔹 START: sichtbar, aber NICHT editierbar -->
+        <label>Start-Kapitel (fix)</label>
+        <select id="startSelectDisplay" disabled></select>
+
+        <!-- 🔹 versteckt: wird wirklich an den Server geschickt -->
+        <input type="hidden" name="start" id="startSelect">
+
+        <label>End-Kapitel</label>
+        <select name="end" id="endSelect" required></select>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit">weiter</button>
+      </div>
+    </form>
   </div>
-  <script>
-  (() => {
-    const overlay = document.getElementById("overlay");
-    const openBtn = document.getElementById("openModal");
-    const closeBtn = document.getElementById("closeModal");
+</div>
 
-    const tbSelect = document.getElementById("tbSelect");
-    const startSelect = document.getElementById("startSelect");
-    const endSelect = document.getElementById("endSelect");
+<script>
+(() => {
+  const overlay = document.getElementById("overlay");
+  const openBtn = document.getElementById("openModal");
+  const closeBtn = document.getElementById("closeModal");
 
-    const kapitelMap = JSON.parse(document.getElementById("kapitel-data").textContent);
+  const tbSelect = document.getElementById("tbSelect");
+  const startDisplay = document.getElementById("startSelectDisplay");
+  const startHidden = document.getElementById("startSelect");
+  const endSelect = document.getElementById("endSelect");
 
-    function fillKapitel(tbId) {
-      const list = kapitelMap[tbId] || [];
+  const kapitelMap = JSON.parse(
+    document.getElementById("kapitel-data").textContent
+  );
 
-      startSelect.innerHTML = "";
-      endSelect.innerHTML = "";
+  function fillKapitel(tbId) {
+    const list = kapitelMap[tbId] || [];
 
-      for (const k of list) {
-        const o1 = document.createElement("option");
-        o1.value = k.zeile;
-        o1.textContent = `${k.zeile}. ${k.name}`;
-        startSelect.appendChild(o1);
+    // Alte Optionen löschen
+    startDisplay.innerHTML = "";
+    startHidden.innerHTML = "";
+    endSelect.innerHTML = "";
 
-        const o2 = document.createElement("option");
-        o2.value = k.zeile;
-        o2.textContent = `${k.zeile}. ${k.name}`;
-        endSelect.appendChild(o2);
-      }
+    // Neue Optionen einfügen
+    for (const k of list) {
+      const opt = document.createElement("option");
+      opt.value = k.zeile;
+      opt.textContent = `${k.zeile}. ${k.name}`;
 
-      // Default: Start erstes, End letztes
-      if (list.length) {
-        startSelect.value = list[0].zeile;
-        endSelect.value = list[list.length - 1].zeile;
-      }
+      startDisplay.appendChild(opt);
+      startHidden.appendChild(opt.cloneNode(true));
+
+      const opt2 = opt.cloneNode(true);
+      endSelect.appendChild(opt2);
     }
 
-    openBtn.addEventListener("click", () => overlay.classList.remove("hidden"));
-    closeBtn.addEventListener("click", () => overlay.classList.add("hidden"));
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.add("hidden"); });
+    // Default-Werte setzen:
+    if (list.length) {
+      startDisplay.value = list[0].zeile;
+      startHidden.value = list[0].zeile;   // ← wichtig für den Server
+      endSelect.value = list[list.length - 1].zeile;
+    }
+  }
 
-    tbSelect.addEventListener("change", () => fillKapitel(tbSelect.value));
-  })();
-  </script>
+  openBtn.addEventListener("click", () => overlay.classList.remove("hidden"));
+  closeBtn.addEventListener("click", () => overlay.classList.add("hidden"));
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.classList.add("hidden");
+  });
+
+  tbSelect.addEventListener("change", () => {
+    fillKapitel(tbSelect.value);
+  });
+  if (tbSelect.value) {
+  fillKapitel(tbSelect.value);
+}
+})();
+</script>
+
   <div class="table-wrapper">
       <table class="physik-tabelle">
         <thead>
