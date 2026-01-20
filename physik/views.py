@@ -56,26 +56,21 @@ def index(request):
 
 def aufgaben(request):
     if "aufgaben_ids" not in request.session and request.method == "GET":
-
         tb_id = request.GET.get("tb")
         level = request.GET.get("level")
         start = request.GET.get("start")
         end = request.GET.get("end")
-
         qs = Aufgabe.objects.filter(
             thema_id=tb_id,
-            schwierigkeit=level,
+            schwierigkeit__lte=level,
             kapitel__zeile__gte=start,
             kapitel__zeile__lte=end,
         )
-
         alle = list(qs)
         ziel = min(10, len(alle))
         serie = random.sample(alle, ziel)
-
         request.session["aufgaben_ids"] = [a.id for a in serie]
         request.session["index"] = 0
-
     ids = request.session["aufgaben_ids"]
     index = request.session["index"]
     # Serie beendet?
@@ -87,68 +82,76 @@ def aufgaben(request):
 
     aufgabe = Aufgabe.objects.get(id=ids[index])
     bilder_anzeige = None
-
     # ---------------------------------------------------------
     # p-Typ (Bilder)
     # ---------------------------------------------------------
-    if aufgabe.typ.startswith("p"):
+    if "p" in aufgabe.typ:
         bilder = list(aufgabe.bilder.order_by("position"))
         if bilder:
-            p_richtig = bilder[0].id
+            # ---- Fall 1: echte Bildfrage ----
+            if aufgabe.typ == "p":
+                p_richtig = bilder[0].id
+                request.session["p_richtig"] = p_richtig
+            # ---- Fall 2: Bilder nur als Illustration ----
+            else:
+                request.session.pop("p_richtig", None)
             random.shuffle(bilder)
             bilder_anzeige = bilder
-            request.session["p_richtig"] = p_richtig
     # ---------------------------------------------------------
-    # a3 vorbereiten
+    # l vorbereiten
     # ---------------------------------------------------------
     anzeigen = []
-    if aufgabe.typ == "a3":
+    if aufgabe.typ == "l":
+        # 1 = richtige Antwort
         anzeigen = [{"text": aufgabe.antwort, "richtig": True}]
-        opts = list(aufgabe.optionen.order_by("position")[:2])
+        opts = list(aufgabe.optionen.order_by("position"))
         for o in opts:
             anzeigen.append({"text": o.text, "richtig": False})
         random.shuffle(anzeigen)
+
     # ---------------------------------------------------------
     # POST: Antwort auswerten + IMMER zur nächsten Aufgabe
     # ---------------------------------------------------------
     if request.method == "POST":
         antwort = request.POST.get("antwort", "")
         bild_antwort = request.POST.get("bild_antwort")
-
-        # Skip-Fall
+        # ========== SKIP-FALL ==========
         if not antwort and not bild_antwort:
             messages.info(request, "Letzte Aufgabe übersprungen.")
+
             request.session["index"] += 1
+            request.session["warte_auf_weiter"] = False
             request.session.modified = True
             return redirect("physik:aufgaben")
+        # ========== BEWERTEN ==========
         ergebnis = bewerte_aufgabe(
             aufgabe,
             text_antwort=antwort,
             bild_antwort=bild_antwort,
             session=request.session,
         )
-
         if ergebnis["richtig"]:
             messages.success(
                 request,
                 ergebnis.get("hinweis", "Deine letzte Antwort war richtig.")
             )
+            request.session["index"] += 1
+            request.session["warte_auf_weiter"] = False
+            request.session.pop("letzte_antwort", None)
+        elif ergebnis.get("ungueltig"):
+            messages.warning(request, ergebnis["hinweis"])
+            request.session["warte_auf_weiter"] = False
+            request.session["letzte_antwort"] = antwort
         else:
             messages.warning(
                 request,
                 ergebnis.get("hinweis", "Deine letzte Antwort war leider falsch.")
             )
-
-        request.session["index"] += 1
-
-        # Sicherheitsbremse
-        if request.session["index"] > len(request.session["aufgaben_ids"]):
-            request.session["index"] = len(request.session["aufgaben_ids"])
+            request.session["warte_auf_weiter"] = True
+            request.session["letzte_antwort"] = antwort
 
         request.session.modified = True
         return redirect("physik:aufgaben")
-
-
     # ---------------------------------------------------------
     # GET: Aufgabe anzeigen
     # ---------------------------------------------------------
@@ -158,6 +161,8 @@ def aufgaben(request):
         "bilder": bilder_anzeige,
         "fragenummer": index + 1,
         "anzahl": len(ids),
+        "warte_auf_weiter": request.session.get("warte_auf_weiter", False),
+        "letzte_antwort": request.session.get("letzte_antwort", ""),
     })
 
 def call(request, lfd_nr):

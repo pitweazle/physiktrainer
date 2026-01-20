@@ -34,22 +34,27 @@
 
             <!-- Antwortbereich -->
             <div class="task-antwort">
+              {% if aufgabe.typ == "l" %}
+                {% for a in anzeigen %}
+                <div class="task-option">
+                  <label>
+                    <input type="radio"
+                          name="antwort"
+                          value="{{ a.text }}"
+                          {% if warte_auf_weiter %}disabled{% endif %}>
+                    {{ a.text }}
+                  </label>
+                </div>
+                {% endfor %}
+              {% else %}
+                <input type="text"
+                      name="antwort"
+                      class="task-input"
+                      value="{{ letzte_antwort }}"
+                      {% if warte_auf_weiter %}disabled{% endif %}>
+                <span class="task-einheit">{{ aufgabe.einheit }}</span>
+              {% endif %}
 
-                {% if aufgabe.typ == "a3" %}
-                    {% for a in anzeigen %}
-                    <div class="task-option">
-                        <label>
-                        <input type="radio" name="antwort" value="{{ a.text }}">
-                        {{ a.text }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <input type="text" name="antwort" class="task-input">
-                    {% if aufgabe.einheit %}
-                    <span class="task-einheit">{{ aufgabe.einheit }}</span>
-                    {% endif %}
-                {% endif %}
             </div>
 
             <div id="solutionBox" style="display:none;" class="solution-box">
@@ -60,34 +65,33 @@
                 {{ aufgabe.erklaerung|linebreaks }}
             {% endif %}
             </div>
+            {% if bilder %}
+              {% with bilder_liste=bilder %}
+                <div class="task-images row1">
+                  {% for b in bilder_liste %}
+                    {% if forloop.counter <= 2 %}
+                      <img src="{{ b.bild.url }}"
+                          class="task-image clickable"
+                          data-id="{{ b.id }}">
+                    {% endif %}
+                  {% endfor %}
+                </div>
 
-{% if bilder %}
-  {% with bilder_liste=bilder %}
-    <div class="task-images row1">
-      {% for b in bilder_liste %}
-        {% if forloop.counter <= 2 %}
-          <img src="{{ b.bild.url }}"
-               class="task-image clickable"
-               data-id="{{ b.id }}">
-        {% endif %}
-      {% endfor %}
-    </div>
+                {% if bilder_liste|length > 2 %}
+                  <div class="task-images row2">
+                    {% for b in bilder_liste %}
+                      {% if forloop.counter > 2 %}
+                        <img src="{{ b.bild.url }}"
+                            class="task-image clickable"
+                            data-id="{{ b.id }}">
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endwith %}
 
-    {% if bilder_liste|length > 2 %}
-      <div class="task-images row2">
-        {% for b in bilder_liste %}
-          {% if forloop.counter > 2 %}
-            <img src="{{ b.bild.url }}"
-                 class="task-image clickable"
-                 data-id="{{ b.id }}">
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
-  <input type="hidden" name="bild_antwort" id="bild_antwort">
-{% endif %}
+              <input type="hidden" name="bild_antwort" id="bild_antwort">
+            {% endif %}
 
 
             <!-- Button-Leiste -->
@@ -103,25 +107,31 @@
             </div>
         </div>
     </form>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".task-image.clickable").forEach(img => {
-    img.addEventListener("click", function () {
-      document.getElementById("bild_antwort").value = this.dataset.id;
 
-      document.querySelectorAll(".task-image").forEach(i => i.classList.remove("selected"));
-      this.classList.add("selected");
-    });
+  <script>
+  const warte = {{ warte_auf_weiter|yesno:"true,false" }};
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!warte) {
+      document.querySelectorAll(".task-image.clickable").forEach(img => {
+        img.addEventListener("click", function () {
+          document.getElementById("bild_antwort").value = this.dataset.id;
+
+          document.querySelectorAll(".task-image")
+                  .forEach(i => i.classList.remove("selected"));
+
+          this.classList.add("selected");
+        });
+      });
+    }
   });
-});
-</script>
+  </script>
 
-<script>
-document.getElementById("showSolution").addEventListener("click", function () {
-  const box = document.getElementById("solutionBox");
-  box.style.display = (box.style.display === "none") ? "block" : "none";
-});
-</script>
+  <script>
+  document.getElementById("showSolution").addEventListener("click", function () {
+    const box = document.getElementById("solutionBox");
+    box.style.display = (box.style.display === "none") ? "block" : "none";
+  });
+  </script>
 
 
 {% endblock %}
