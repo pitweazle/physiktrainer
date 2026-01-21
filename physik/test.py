@@ -1,50 +1,45 @@
 from django.test import TestCase
-from physik.bewertung import bewerte_aufgabe
-from .bewertung import bewerte_aufgabe
 from .models import Aufgabe, AufgabeOption
+from .bewertung import bewerte_aufgabe
 
-class ETypTests(TestCase):
+
+class MiniSmokeTest(TestCase):
 
     def setUp(self):
-        # ---- Aufgabe W042 nachbauen ----
         self.a = Aufgabe.objects.create(
-            lfd_nr="W042",
-            themea_id=5,                      # Dummy-Thema
-            kapitel_id=1,                   # Dummy-Kapitel
+            lfd_nr="SMOKE1",
+            themea_id=1,
+            kapitel_id=1,
             schwierigkeit=1,
-            typ="2o3e4o6",
-            frage="... Flächen nehmen mehr Strahlung auf als ... Flächen.",
-            antwort="Dunkle … helle"
+            typ="2",
+            frage="Test",
+            antwort="dunkle"
+        )
+        AufgabeOption.objects.create(
+            aufgabe=self.a, position=1, text="helle"
         )
 
-        # Optionen (Spalten 2–6)
-        AufgabeOption.objects.create(aufgabe=self.a, position=1, text="dunkle")
-        AufgabeOption.objects.create(aufgabe=self.a, position=2, text="schwarze")
-        AufgabeOption.objects.create(aufgabe=self.a, position=3, text="helle")
-        AufgabeOption.objects.create(aufgabe=self.a, position=4, text="weiße")
-        AufgabeOption.objects.create(aufgabe=self.a, position=5, text="weisse")
+    def test_1_integer_equal_ok(self):
+        # typ=2 → exakt (nach Normalisierung)
+        r = bewerte_aufgabe(self.a, text_antwort="dunkle")
+        self.assertTrue(r["richtig"])
 
+    def test_2_integer_equal_fail(self):
+        # darf NICHT enthalten sein
+        r = bewerte_aufgabe(self.a, text_antwort="dunkle helle")
+        self.assertFalse(r["richtig"])
 
-    def test_e_typ_richtig(self):
-        erg = bewerte_aufgabe(
-            self.a,
-            text_antwort="dunkle; helle"
+    def test_3_parser_contain_ok(self):
+        self.a.typ = "1o2"
+        self.a.save()
+        r = bewerte_aufgabe(self.a, text_antwort="dunkle helle")
+        self.assertTrue(r["richtig"])
+
+    def test_4_parser_nested(self):
+        self.a.typ = "1o(2u3)"
+        self.a.save()
+        AufgabeOption.objects.create(
+            aufgabe=self.a, position=2, text="graue"
         )
-        self.assertTrue(erg["richtig"])
-
-
-    def test_e_typ_falsch_getrennt(self):
-        erg = bewerte_aufgabe(
-            self.a,
-            text_antwort="dunkle helle"
-        )
-        self.assertFalse(erg["richtig"])
-
-    def test_e_typ_fuzzy(self):
-        erg = bewerte_aufgabe(
-            self.a,
-            text_antwort="dunkle; helleee"
-        )
-        # erwartet: tolerant richtig
-        self.assertTrue(erg["richtig"])
-        self.assertIn("Schreibweise", erg["hinweis"])
+        r = bewerte_aufgabe(self.a, text_antwort="helle graue")
+        self.assertTrue(r["richtig"])

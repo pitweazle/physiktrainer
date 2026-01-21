@@ -35,17 +35,21 @@
             <!-- Antwortbereich -->
             <div class="task-antwort">
               {% if aufgabe.typ == "l" %}
-                {% for a in anzeigen %}
-                <div class="task-option">
-                  <label>
-                    <input type="radio"
-                          name="antwort"
-                          value="{{ a.text }}"
-                          {% if warte_auf_weiter %}disabled{% endif %}>
-                    {{ a.text }}
-                  </label>
-                </div>
-                {% endfor %}
+                <form method="post">
+                  {% csrf_token %}
+                  {% for a in anzeigen %}
+                    <div class="task-option">
+                      <label>
+                        <input type="radio"
+                              name="antwort"
+                              value="{{ a.text }}"
+                              {% if warte_auf_weiter %}disabled{% endif %}
+                              onchange="this.form.submit();">
+                        {{ a.text }}
+                      </label>
+                    </div>
+                  {% endfor %}
+                </form>
               {% else %}
                 <input type="text"
                       name="antwort"
@@ -109,22 +113,26 @@
     </form>
 
   <script>
-  const warte = {{ warte_auf_weiter|yesno:"true,false" }};
-  document.addEventListener("DOMContentLoaded", function () {
-    if (!warte) {
-      document.querySelectorAll(".task-image.clickable").forEach(img => {
-        img.addEventListener("click", function () {
-          document.getElementById("bild_antwort").value = this.dataset.id;
+    const warte = {{ warte_auf_weiter|yesno:"true,false" }};
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!warte) {
+        document.querySelectorAll(".task-image.clickable").forEach(img => {
+          img.addEventListener("click", function () {
+            document.getElementById("bild_antwort").value = this.dataset.id;
 
-          document.querySelectorAll(".task-image")
-                  .forEach(i => i.classList.remove("selected"));
+            document.querySelectorAll(".task-image")
+                    .forEach(i => i.classList.remove("selected"));
 
-          this.classList.add("selected");
+            this.classList.add("selected");
+
+            // 🔴 DAS FEHLTE
+            this.closest("form").submit();
+          });
         });
-      });
-    }
-  });
+      }
+    });
   </script>
+
 
   <script>
   document.getElementById("showSolution").addEventListener("click", function () {
