@@ -5,7 +5,13 @@ from difflib import SequenceMatcher
 # VERGLEICHE
 # ===========================================================
 
-def vergleich_streng(index, aufgabe, antwort_norm, antwort_original, case_sensitiv):
+def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
+                     case_sensitiv, modus):
+    """
+    modus:
+      - "equal"    -> exakt gleich (für typ=2, typ=3, ...)
+      - "contain"  -> enthalten sein (für 1o2, Parser)
+    """
     if index == 1:
         text = aufgabe.antwort
     else:
@@ -14,24 +20,18 @@ def vergleich_streng(index, aufgabe, antwort_norm, antwort_original, case_sensit
             return False, None
         text = opts[index - 1].text
 
-
     soll = "".join((text or "").split())
     ist_norm = "".join((antwort_norm or "").split())
     ist_orig = "".join((antwort_original or "").split())
 
-    print("------ VERGLEICH DEBUG ------")
-    print(f"soll roh        : {text!r}")
-    print(f"soll ohne LZ    : {soll!r}")
-    print(f"ist_norm        : {ist_norm!r}")
-    print(f"ist_orig        : {ist_orig!r}")
-    print(f"case_sensitiv   : {case_sensitiv}")
-    print("-----------------------------")
-
     if case_sensitiv:
         return (soll == ist_orig), None
 
-    ok = soll.upper() in ist_norm.upper()
-    return ok, None
+    if modus == "equal":
+        return (soll.upper() == ist_norm.upper()), None
+
+    # modus == "contain"
+    return (soll.upper() in ist_norm.upper()), None
 
 def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio_threshold):
     # Soll bestimmen
@@ -112,10 +112,15 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
     if typ.isdigit():
         max_index = int(typ)
 
-        # ---- 1) Streng prüfen ----
         for i in range(1, max_index + 1):
-            if vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv):
+            ok, _ = vergleich_streng(
+                i, aufgabe, norm, text_antwort,
+                case_sensitiv,
+                modus="equal"
+            )
+            if ok:
                 return {"richtig": True, "hinweis": "Richtig!"}
+
 
         # ---- 2) Fuzzy NUR wenn streng falsch ----
         if fuzzy_level > 0:
