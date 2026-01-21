@@ -5,13 +5,10 @@ from difflib import SequenceMatcher
 # VERGLEICHE
 # ===========================================================
 
-def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
-                     case_sensitiv, modus):
-    """
-    modus:
-      - "equal"    -> exakt gleich (für typ=2, typ=3, ...)
-      - "contain"  -> enthalten sein (für 1o2, Parser)
-    """
+def vergleich_streng(
+    index, aufgabe, antwort_norm, antwort_original,
+    case_sensitiv, contain
+):
     if index == 1:
         text = aufgabe.antwort
     else:
@@ -21,17 +18,16 @@ def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
         text = opts[index - 1].text
 
     soll = "".join((text or "").split())
-    ist_norm = "".join((antwort_norm or "").split())
-    ist_orig = "".join((antwort_original or "").split())
+    ist = "".join((antwort_original or "").split())
 
-    if case_sensitiv:
-        return (soll == ist_orig), None
+    if not case_sensitiv:
+        soll = soll.lower()
+        ist = ist.lower()
 
-    if modus == "equal":
-        return (soll.upper() == ist_norm.upper()), None
-
-    # modus == "contain"
-    return (soll.upper() in ist_norm.upper()), None
+    if contain:
+        return (soll in ist), None
+    else:
+        return (soll == ist), None
 
 def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio_threshold):
     # Soll bestimmen
@@ -116,10 +112,15 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
             ok, _ = vergleich_streng(
                 i, aufgabe, norm, text_antwort,
                 case_sensitiv,
-                modus="equal"
+                contain=False   # 🔴 HIER der Unterschied
             )
             if ok:
                 return {"richtig": True, "hinweis": "Richtig!"}
+
+    # fuzzy als zweite Chance (Y/Z)
+    if fuzzy_level > 0:
+        ...
+
 
 
         # ---- 2) Fuzzy NUR wenn streng falsch ----
@@ -160,17 +161,21 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
     # Ebene 4: u/o-Parser (komplexe Logik)
     # ==================================================
 
-    streng_ok, streng_hinweis = bewerte_booleschen_ausdruck(
+    streng_ok, _ = bewerte_booleschen_ausdruck(
         typ,
         aufgabe,
         norm,
         text_antwort,
-        lambda i, a, n, o: vergleich_streng(i, a, n, o, case_sensitiv)
+        lambda i, a, n, o: vergleich_streng(
+            i, a, n, o,
+            case_sensitiv,
+            contain=True    # 🔴 entscheidend
+        )
     )
 
-    # ❗️ENTSCHEIDENDER FIX: streng gewinnt IMMER zuerst
     if streng_ok:
         return {"richtig": True, "hinweis": "Richtig!"}
+
 
 
     # ==================================================
