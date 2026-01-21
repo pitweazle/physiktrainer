@@ -141,6 +141,18 @@
   });
   </script>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const textInput = document.querySelector(
+        'input[type="text"][name="antwort"]:not([disabled])'
+      );
+      if (textInput) {
+        textInput.focus();
+      }
+    });
+  </script>
+
+
 
 {% endblock %}
 
