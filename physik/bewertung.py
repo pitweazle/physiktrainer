@@ -19,8 +19,9 @@ def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
     ist = "".join((antwort_original or "").split())
 
     if not case_sensitiv:
-        soll = soll.lower()
-        ist = ist.lower()
+        soll = soll.casefold()
+        ist = ist.casefold()
+
 
     return (soll in ist if contain else soll == ist), None
 
@@ -31,12 +32,18 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
     else:
         text = aufgabe.optionen.order_by("position")[index-2].text
 
-    soll = "".join(text.split()).lower()
-    ist = "".join((antwort_original or "").split()).lower()
+    soll = "".join((text or "").split()).casefold()
+    ist = "".join((antwort_original or "").split()).casefold()
 
     if SequenceMatcher(None, soll, ist).ratio() >= ratio:
         return True, "Fast richtig – achte auf die Schreibweise."
+
+    if soll in ist or ist in soll:
+        if SequenceMatcher(None, soll, ist).ratio() >= ratio * 0.9:
+            return True, "Fast richtig – achte auf die Schreibweise."
+
     return False, None
+
 
 
 # ===========================================================
@@ -211,13 +218,72 @@ def bewerte_e_typ(typ, aufgabe, antwort, vergleich):
     ok2, _ = bewerte_booleschen_ausdruck(rechts, aufgabe, b, b, vergleich)
     return ok1 and ok2, None
 
-def pruefe_verbotene_begriffe(aufgabe, norm, text):
-    typ = aufgabe.typ
+def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
+    typ = (aufgabe.typ or "").strip()
+
     if "f" not in typ:
         return True, ""
+
     _, verbot = typ.split("f", 1)
-    ok, _ = bewerte_booleschen_ausdruck(
-        verbot, aufgabe, norm, text,
-        lambda i, a, n, o: vergleich_streng(i, a, n, o, False, True)
+    if not verbot:
+        return True, ""
+
+    # prüfen, ob verbotener Ausdruck zutrifft
+    kommt_vor, _ = bewerte_booleschen_ausdruck(
+        verbot,
+        aufgabe,
+        norm,
+        text_antwort,
+        lambda i, a, n, o: vergleich_streng(
+            i, a, n, o,
+            case_sensitiv=False,
+            contain=True
+        )
     )
-    return (not ok), ("Verbotener Begriff verwendet." if ok else "")
+
+    if not kommt_vor:
+        return True, ""
+
+    # konkreten Begriff bestimmen
+    verbotener_begriff = None
+    i = 0
+    indices = []
+    while i < len(verbot):
+        if verbot[i].isdigit():
+            j = i
+            while j < len(verbot) and verbot[j].isdigit():
+                j += 1
+            indices.append(int(verbot[i:j]))
+            i = j
+        else:
+            i += 1
+
+    for k in indices:
+        ok, _ = vergleich_streng(
+            k, aufgabe, norm, text_antwort,
+            case_sensitiv=False,
+            contain=True
+        )
+        if ok:
+            if k == 1:
+                verbotener_begriff = aufgabe.antwort
+            else:
+                opts = list(aufgabe.optionen.order_by("position"))
+                if k - 2 < len(opts):
+                    verbotener_begriff = opts[k - 2].text
+            break
+
+    if not verbotener_begriff:
+        verbotener_begriff = text_antwort
+
+    begruendung = getattr(aufgabe, "begruendung", "").strip()
+    if begruendung:
+        hinweis = (
+            f"Das ist hier falsch: „{verbotener_begriff}“\n\n"
+            f"Begründung: {begruendung}"
+        )
+    else:
+        hinweis = f"Das ist hier falsch: „{verbotener_begriff}“"
+
+    return False, hinweis
+
