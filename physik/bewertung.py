@@ -43,22 +43,18 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio_thresh
     soll = "".join(text.split()).lower()
     ist_raw = antwort_original or ""
     ist = "".join(ist_raw.split()).lower()
-
     # 1) direkter Vergleich
     if soll in ist or ist in soll:
         ratio = SequenceMatcher(None, soll, ist).ratio()
         if ratio >= ratio_threshold:
             return True, "Fast richtig – achte auf die Schreibweise."
-
     # 2) Wortweise prüfen
     for teil in ist_raw.split():
         teil_clean = "".join(teil.split()).lower()
         ratio = SequenceMatcher(None, soll, teil_clean).ratio()
         if ratio >= ratio_threshold:
             return True, "Fast richtig – achte auf die Schreibweise."
-
     return False, None
-
 
 # ===========================================================
 # HAUPTFUNKTION
