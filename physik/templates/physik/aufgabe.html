@@ -40,12 +40,16 @@
                   {% for a in anzeigen %}
                     <div class="task-option">
                       <label>
-                        <input type="radio"
-                              name="antwort"
-                              value="{{ a.text }}"
-                              {% if warte_auf_weiter %}disabled{% endif %}
-                              onchange="this.form.submit();">
-                        {{ a.text }}
+                        {% for index, text in auswahl_optionen %}
+                          <label>
+                            <input type="radio" 
+                                  name="user_antwort" 
+                                  value="{{ index }}"
+                                  {% if warte_auf_weiter %}disabled{% endif %}
+                                  onchange="this.form.submit();"> 
+                            {{ text }}
+                          </label><br>
+                        {% endfor %}
                       </label>
                     </div>
                   {% endfor %}
@@ -132,7 +136,6 @@
       }
     });
   </script>
-
 
   <script>
   document.getElementById("showSolution").addEventListener("click", function () {

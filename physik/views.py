@@ -8,7 +8,6 @@ from django.db.models import Count
 from .bewertung import bewerte_aufgabe
 from .models import ThemenBereich, Aufgabe
 
-
 def index(request):
     # kompletter Reset beim echten Neustart
     for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
@@ -57,7 +56,6 @@ def index(request):
         "tb_totals": tb_totals,
     })
 
-
 def aufgaben(request):
     # -------- Serie starten --------
     if "aufgaben_ids" not in request.session and request.method == "GET":
@@ -104,15 +102,17 @@ def aufgaben(request):
 
     # -------- Liste --------
     anzeigen = []
-    if aufgabe.typ == "l":
-        anzeigen = [{"text": aufgabe.antwort, "richtig": True}]
-        for o in aufgabe.optionen.order_by("position"):
-            anzeigen.append({"text": o.text, "richtig": False})
-        random.shuffle(anzeigen)
+    # Wir bauen eine Liste aus (Index, Text) Paaren
+    optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
+    for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
+        optionen_liste.append((i, o.text))
 
-    # -------- POST --------
+    random.shuffle(optionen_liste)
+
+# -------- POST --------
     if request.method == "POST":
-        antwort = request.POST.get("antwort", "")
+        # Wir holen die Antwort. Bei Radio-Buttons heißt das Feld im Template "user_antwort"
+        antwort = request.POST.get("user_antwort") or request.POST.get("antwort", "")
         bild_antwort = request.POST.get("bild_antwort")
 
         # ---- Skip ----
@@ -122,7 +122,7 @@ def aufgaben(request):
             request.session["warte_auf_weiter"] = False
             request.session.pop("letzte_antwort", None)
             return redirect("physik:aufgaben")
-
+        
         ergebnis = bewerte_aufgabe(
             aufgabe,
             text_antwort=antwort,
