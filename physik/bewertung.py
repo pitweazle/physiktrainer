@@ -187,8 +187,65 @@ def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, ve
         return False, None
 
     return expr()
+def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, vergleich):
+    tokens = []
+    i = 0
+    while i < len(typ):
+        if typ[i].isdigit():
+            j = i
+            while j < len(typ) and typ[j].isdigit():
+                j += 1
+            tokens.append(("NUM", int(typ[i:j])))
+            i = j
+        elif typ[i] in "ou()":
+            tokens.append((typ[i], typ[i]))
+            i += 1
+        else:
+            i += 1
 
+    pos = 0
 
+    def peek():
+        return tokens[pos] if pos < len(tokens) else None
+
+    def eat(k):
+        nonlocal pos
+        if peek() and peek()[0] == k:
+            pos += 1
+
+    def expr():
+        ok, _ = term()
+        while peek() and peek()[0] == "o":
+            eat("o")
+            ok2, _ = term()
+            ok = ok or ok2
+        return ok, None
+
+    def term():
+        ok, _ = factor()
+        while peek() and peek()[0] == "u":
+            eat("u")
+            ok2, _ = factor()
+            ok = ok and ok2
+        return ok, None
+
+    def factor():
+        tok = peek()
+        if not tok:
+            return False, None
+        if tok[0] == "(":
+            eat("(")
+            ok, _ = expr()
+            eat(")")
+            return ok, None
+        if tok[0] == "NUM":
+            eat("NUM")
+            ok, _ = vergleich(tok[1], aufgabe, antwort_norm, antwort_original)
+            return ok, None    # <--- wichtig: nur Bool weitergeben
+        return False, None
+
+    ergebnis, _ = expr()
+    return bool(ergebnis), None
 # ===========================================================
 # HILFSFUNKTIONEN
 # ===========================================================
