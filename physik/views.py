@@ -101,14 +101,16 @@ def aufgaben(request):
             bilder_anzeige = bilder
 
     # -------- Liste --------
+    optionen_liste = []
     anzeigen = []
-    # Wir bauen eine Liste aus (Index, Text) Paaren
-    optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
-    for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
-        optionen_liste.append((i, o.text))
+    if "l" in aufgabe.typ:
+        # Wir bauen eine Liste aus (Index, Text) Paaren
+        optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
+        for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
+            optionen_liste.append((i, o.text))
 
-    random.shuffle(optionen_liste)
-
+        random.shuffle(optionen_liste)
+        
 # -------- POST --------
     if request.method == "POST":
         # Wir holen die Antwort. Bei Radio-Buttons heißt das Feld im Template "user_antwort"
@@ -156,6 +158,7 @@ def aufgaben(request):
         "aufgabe": aufgabe,
         "anzeigen": anzeigen,
         "bilder": bilder_anzeige,
+        "auswahl_optionen": optionen_liste,
         "fragenummer": index + 1,
         "anzahl": len(ids),
         "warte_auf_weiter": request.session.get("warte_auf_weiter", False),

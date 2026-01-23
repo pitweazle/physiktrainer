@@ -34,34 +34,28 @@
 
             <!-- Antwortbereich -->
             <div class="task-antwort">
-              {% if aufgabe.typ == "l" %}
-                <form method="post">
-                  {% csrf_token %}
-                  {% for a in anzeigen %}
+              <div class="task-antwort">
+                {% if "l" in aufgabe.typ %}
+                  {% for index, text in auswahl_optionen %}
                     <div class="task-option">
                       <label>
-                        {% for index, text in auswahl_optionen %}
-                          <label>
-                            <input type="radio" 
-                                  name="user_antwort" 
-                                  value="{{ index }}"
-                                  {% if warte_auf_weiter %}disabled{% endif %}
-                                  onchange="this.form.submit();"> 
-                            {{ text }}
-                          </label><br>
-                        {% endfor %}
+                        <input type="radio" 
+                              name="user_antwort" 
+                              value="{{ index }}"
+                              {% if warte_auf_weiter %}disabled{% endif %}
+                              onchange="this.form.submit();"> 
+                        {{ text }}
                       </label>
                     </div>
                   {% endfor %}
-                </form>
-              {% else %}
-                <input type="text"
-                      name="antwort"
-                      class="task-input"
-                      value="{{ letzte_antwort }}"
-                      {% if warte_auf_weiter %}disabled{% endif %}>
-                <span class="task-einheit">{{ aufgabe.einheit }}</span>
-              {% endif %}
+                {% else %}
+                  <input type="text"
+                        name="antwort"
+                        class="task-input"
+                        value="{{ letzte_antwort }}"
+                        {% if warte_auf_weiter %}disabled{% endif %}>
+                  <span class="task-einheit">{{ aufgabe.einheit }}</span>
+                {% endif %}
 
             </div>
 
@@ -100,7 +94,6 @@
 
               <input type="hidden" name="bild_antwort" id="bild_antwort">
             {% endif %}
-
 
             <!-- Button-Leiste -->
             <div class="task-buttons">
