@@ -143,6 +143,20 @@
   </script>
 
   <script>
+    document.getElementById("showSolution").addEventListener("click", function (e) {
+        e.preventDefault(); // Verhindert Neuladen
+        document.getElementById("solutionBox").style.display = "block";
+        
+        // Felder sperren
+        const input = document.querySelector('input[name="antwort"]');
+        if(input) input.disabled = true;
+        
+        const radios = document.querySelectorAll('input[name="user_antwort"]');
+        radios.forEach(r => r.disabled = true);
+    });
+  </script>
+
+  <script>
     document.addEventListener("DOMContentLoaded", function () {
       const textInput = document.querySelector(
         'input[type="text"][name="antwort"]:not([disabled])'
