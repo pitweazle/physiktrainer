@@ -24,7 +24,7 @@ def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
         # casefold() ist besser als upper()/lower() für Sonderzeichen wie °
         soll = soll.casefold()
         ist = ist.casefold()
-
+    #print(f"   -> Vergleiche: '{soll}' mit '{ist}' (Ergebnis: {soll in ist})")
     # Logik: Entweder Teilstring-Suche (contain) oder exakter Vergleich
     if contain:
         return (soll in ist), None
@@ -55,82 +55,81 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
 # HAUPTFUNKTION
 # ===========================================================
 
-def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None):
-    typ_roh = (aufgabe.typ or "").strip()
-    norm = normalisiere(text_antwort)
+# def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None):
+#     typ_roh = (aufgabe.typ or "").strip()
+#     norm = normalisiere(text_antwort)
 
-    case_sensitiv = "X" in typ_roh
-    # Y=Level 1 (0.85), Z=Level 2 (0.70)
-    fuzzy_level = 1 if "Y" in typ_roh else 2 if "Z" in typ_roh else 0
+#     case_sensitiv = "X" in typ_roh
+#     # Y=Level 1 (0.85), Z=Level 2 (0.70)
+#     fuzzy_level = 1 if "Y" in typ_roh else 2 if "Z" in typ_roh else 0
     
-    # Reinigungs-Logik für den Typ-String
-    typ = typ_roh.replace("X", "").replace("Y", "").replace("Z", "")
+#     # Reinigungs-Logik für den Typ-String
+#     typ = typ_roh.replace("X", "").replace("Y", "").replace("Z", "")
 
-    # ---- Bildtyp (p) ----
-    if typ == "p":
-        ok = bewerte_bildauswahl(aufgabe, bild_antwort, session)
-        return {"richtig": ok, "hinweis": "Richtig!" if ok else "Falsches Bild."}
+#     # ---- Bildtyp (p) ----
+#     if typ == "p":
+#         ok = bewerte_bildauswahl(aufgabe, bild_antwort, session)
+#         return {"richtig": ok, "hinweis": "Richtig!" if ok else "Falsches Bild."}
 
-    # ---- Wahr/Falsch (w) ----
-    if typ == "w":
-        return bewerte_wahr_falsch(aufgabe, norm)
+#     # ---- Wahr/Falsch (w) ----
+#     if typ == "w":
+#         return bewerte_wahr_falsch(aufgabe, norm)
 
-    # ---- Listen (l) ----
-    if typ.startswith("l"):
-        return bewerte_liste(aufgabe, norm)
+#     # ---- Listen (l) ----
+#     if typ.startswith("l"):
+#         return bewerte_liste(aufgabe, norm)
 
-    # ---- Verbotene Begriffe (f) ----
-    if "f" in typ:
-        ok, hinweis = pruefe_verbotene_begriffe(aufgabe, norm, text_antwort)
-        if not ok:
-            return {"richtig": False, "hinweis": hinweis}
+#     # ---- Verbotene Begriffe (f) ----
+#     if "f" in typ:
+#         ok, hinweis = pruefe_verbotene_begriffe(aufgabe, norm, text_antwort)
+#         if not ok:
+#             return {"richtig": False, "hinweis": hinweis}
 
-    # ---- REINER ZAHLENTYP (z.B. "3") ----
-    # PRÜFUNG: Exakter Vergleich (==) von Feld 1 bis N
-    if typ.isdigit():
-        max_index = int(typ)
-        for i in range(1, max_index + 1):
-            # contain=False bewirkt den exakten Vergleich (soll == ist)
-            ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
-            if ok:
-                return {"richtig": True, "hinweis": "Richtig!"}
+#     # ---- REINER ZAHLENTYP (z.B. "3") ----
+#     # PRÜFUNG: Exakter Vergleich (==) von Feld 1 bis N
+#     if typ.isdigit():
+#         max_index = int(typ)
+#         for i in range(1, max_index + 1):
+#             # contain=False bewirkt den exakten Vergleich (soll == ist)
+#             ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
+#             if ok:
+#                 return {"richtig": True, "hinweis": "Richtig!"}
 
-        if fuzzy_level:
-            ratio = 0.85 if fuzzy_level == 1 else 0.70
-            for i in range(1, max_index + 1):
-                ok, hinw = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
-                if ok:
-                    return {"richtig": True, "hinweis": hinw}
+#         if fuzzy_level:
+#             ratio = 0.85 if fuzzy_level == 1 else 0.70
+#             for i in range(1, max_index + 1):
+#                 ok, hinw = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
+#                 if ok:
+#                     return {"richtig": True, "hinweis": hinw}
 
-        return {"richtig": False, "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.antwort}"}
+#         return {"richtig": False, "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.antwort}"}
 
-    # ---- E-TYP (Getrennte Felder) ----
-    if "e" in typ:
-            # Hier definieren wir den Standard-Vergleich für die Einzelbegriffe
-            def e_vergleich(idx, aufg, n, o):
-                return vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
+#     # ---- E-TYP (Getrennte Felder) ----
+#     if "e" in typ:
+#             # Hier definieren wir den Standard-Vergleich für die Einzelbegriffe
+#             def e_vergleich(idx, aufg, n, o):
+#                 return vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
                 
-            ok, hinweis = bewerte_e_typ(typ, aufgabe, text_antwort, e_vergleich)
-            return {"richtig": ok, "hinweis": hinweis}
+#             ok, hinweis = bewerte_e_typ(typ, aufgabe, text_antwort, e_vergleich)
+#             return {"richtig": ok, "hinweis": hinweis}
 
-    # ---- O/U-PARSER (Logische Verknüpfungen) ----
-    # Hier wird contain=True genutzt (Teilstring-Suche)
-    streng_ok, _ = bewerte_booleschen_ausdruck(
-        typ, aufgabe, norm, text_antwort,
-        lambda i, a, n, o: vergleich_streng(i, a, n, o, case_sensitiv, True)
-    )
+#     # ---- O/U-PARSER (Logische Verknüpfungen) ----
+#     # Hier wird contain=True genutzt (Teilstring-Suche)
+#     streng_ok, _ = bewerte_booleschen_ausdruck(
+#         typ, aufgabe, norm, text_antwort,
+#         lambda i, a, n, o: vergleich_streng(i, a, n, o, case_sensitiv, True)
+#     )
 
-    if streng_ok:
-        return {"richtig": True, "hinweis": "Richtig!"}
+#     if streng_ok:
+#         return {"richtig": True, "hinweis": "Richtig!"}
 
-    # Wenn streng falsch, aber Fuzzy erlaubt
+#     # Wenn streng falsch, aber Fuzzy erlaubt
 
 # ===========================================================
 # PARSER
 # ===========================================================
 
 def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, vergleich):
-    # 1. Tokenizer: Zerlegt den String in Einheiten (Zahlen, Operatoren, Klammern)
     tokens = []
     i = 0
     while i < len(typ):
@@ -158,52 +157,61 @@ def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, ve
             return True
         return False
 
-    # expr handles 'o' (lowest precedence)
     def expr():
         res_ok, res_hinweis = term()
         while peek() and peek()[0] == "o":
             eat("o")
             ok2, hinw2 = term()
             res_ok = res_ok or ok2
-            # Bei ODER nehmen wir den Hinweis der ersten richtigen Komponente
             if ok2 and not res_hinweis:
                 res_hinweis = hinw2
         return res_ok, res_hinweis
 
-    # term handles 'u'
     def term():
         res_ok, res_hinweis = factor()
         while peek() and peek()[0] == "u":
             eat("u")
             ok2, hinw2 = factor()
             res_ok = res_ok and ok2
-            # Bei UND sammeln wir Hinweise, falls etwas fehlt
-            if hinw2:
-                res_hinweis = hinw2
+            if not ok2: res_hinweis = hinw2
         return res_ok, res_hinweis
 
-    # factor handles Parentheses and Numbers
     def factor():
+        nonlocal pos
         tok = peek()
-        if not tok:
-            return False, None
+        if not tok: return False, None
         
         if tok[0] == "(":
             eat("(")
-            res = expr() # Rekursion: fängt wieder bei ODER an
+            res = expr()
             eat(")")
             return res
         
         if tok[0] == "NUM":
-            num = tok[1]
+            num1 = tok[1]
             eat("NUM")
-            # Führt den Vergleich (streng oder fuzzy) für die Zahl aus
-            return vergleich(num, aufgabe, antwort_norm, antwort_original)
+            
+            # PRÜFUNG: Folgt ein 'o' und eine weitere NUM? (Bereichs-Check)
+            if peek() and peek()[0] == "o":
+                # Schauen, ob das Token nach dem 'o' eine Zahl ist
+                if pos + 1 < len(tokens) and tokens[pos+1][0] == "NUM":
+                    eat("o") # 'o' essen
+                    num2 = tokens[pos][1]
+                    eat("NUM") # zweite Zahl essen
+                    
+                    #print(f" !!! BEREICH GEFUNDEN: {num1} bis {num2}")
+                    for n in range(num1, num2 + 1):
+                        ok, hinw = vergleich(n, aufgabe, antwort_norm, antwort_original)
+                        if ok: return True, hinw
+                    return False, None
+
+            # Normalfall
+            #print(f" -> Einzelvergleich NUM {num1}")
+            return vergleich(num1, aufgabe, antwort_norm, antwort_original)
         
         return False, None
 
     return expr()
-
 # ===========================================================
 # BEWERTUNGSLOGIK (Die Brücke zwischen Parser und Vergleich)
 # ===========================================================
