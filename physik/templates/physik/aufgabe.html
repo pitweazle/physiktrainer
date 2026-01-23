@@ -56,17 +56,22 @@
                         {% if warte_auf_weiter %}disabled{% endif %}>
                   <span class="task-einheit">{{ aufgabe.einheit }}</span>
                 {% endif %}
-
+                {% if anmerkung %}
+                    <div class="task-anmerkung" style="font-style: italic; color: #666; margin-bottom: 8px;">
+                        {{ anmerkung }}
+                    </div>
+                {% endif %}
             </div>
 
             <div id="solutionBox" style="display:none;" class="solution-box">
-            <strong>Lösung:</strong><br>
-            {{ aufgabe.antwort }}<br><br>
+              <strong>Lösung:</strong><br>
+              {{ aufgabe.antwort }}<br><br>
 
-            {% if aufgabe.erklaerung %}
-                {{ aufgabe.erklaerung|linebreaks }}
-            {% endif %}
+              {% if aufgabe.erklaerung %}
+                  {{ aufgabe.erklaerung|linebreaks }}
+              {% endif %}
             </div>
+
             {% if bilder %}
               {% with bilder_liste=bilder %}
                 <div class="task-images row1">

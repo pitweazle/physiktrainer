@@ -1,4 +1,5 @@
 from difflib import SequenceMatcher
+import re
 
 # ===========================================================
 # VERGLEICHE
@@ -105,9 +106,12 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
 
     # ---- E-TYP (Getrennte Felder) ----
     if "e" in typ:
-        ok, hinw = bewerte_e_typ(typ, aufgabe, text_antwort, 
-                                 lambda i, a, n, o: vergleich_streng(i, a, n, o, case_sensitiv, True))
-        return {"richtig": ok, "hinweis": hinw or "Richtig!"}
+            # Hier definieren wir den Standard-Vergleich für die Einzelbegriffe
+            def e_vergleich(idx, aufg, n, o):
+                return vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
+                
+            ok, hinweis = bewerte_e_typ(typ, aufgabe, text_antwort, e_vergleich)
+            return {"richtig": ok, "hinweis": hinweis}
 
     # ---- O/U-PARSER (Logische Verknüpfungen) ----
     # Hier wird contain=True genutzt (Teilstring-Suche)
@@ -317,17 +321,37 @@ def bewerte_liste(aufgabe, antwort):
         "richtig": False,
         "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.antwort}"
     }
-    
-def bewerte_e_typ(typ, aufgabe, antwort, vergleich):
-    links, rechts = typ.split("e", 1)
-    if ";" in antwort:
-        a, b = [x.strip() for x in antwort.split(";")]
-    else:
-        return False, "Bitte zwei Begriffe mit ';' trennen."
 
-    ok1, _ = bewerte_booleschen_ausdruck(links, aufgabe, a, a, vergleich)
-    ok2, _ = bewerte_booleschen_ausdruck(rechts, aufgabe, b, b, vergleich)
-    return ok1 and ok2, None
+def bewerte_e_typ(typ, aufgabe, antwort, vergleich):
+    # Typ am 'e' splitten
+    links, rechts = typ.split("e", 1)
+    
+    # Trennung bei ';' oder '...' (Regulärer Ausdruck)
+    # Das fängt "Begriff1;Begriff2" und "Begriff1...Begriff2" ab
+    teile = re.split(r';|\.\.\.', antwort)
+    
+    if len(teile) >= 2:
+        a = teile[0].strip()
+        b = teile[1].strip()
+    else:
+        return False, "Bitte zwei Begriffe mit ';' oder '...' trennen."
+
+    # WICHTIG: Wir übergeben die normalisierten Teil-Strings an den Parser
+    norm_a = normalisiere(a)
+    norm_b = normalisiere(b)
+
+    ok1, _ = bewerte_booleschen_ausdruck(links, aufgabe, norm_a, a, vergleich)
+    ok2, _ = bewerte_booleschen_ausdruck(rechts, aufgabe, norm_b, b, vergleich)
+    
+    # Präzises Feedback für den User
+    if ok1 and ok2:
+        return True, "Beide Begriffe sind richtig!"
+    if ok1:
+        return False, "Der erste Begriff ist richtig, der zweite fehlt oder ist falsch."
+    if ok2:
+        return False, "Der zweite Begriff ist richtig, der erste fehlt oder ist falsch."
+    
+    return False, "Beide Begriffe sind leider falsch."
 
 def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
     typ = (aufgabe.typ or "").strip()

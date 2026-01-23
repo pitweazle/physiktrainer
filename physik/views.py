@@ -87,6 +87,7 @@ def aufgaben(request):
         return redirect("physik:index")
 
     aufgabe = Aufgabe.objects.get(id=ids[index])
+    anmerkung_fuer_template = aufgabe.anmerkung
 
     # -------- Bilder --------
     bilder_anzeige = None
@@ -108,8 +109,18 @@ def aufgaben(request):
         optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
         for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
             optionen_liste.append((i, o.text))
-
         random.shuffle(optionen_liste)
+
+        # Spezialfall: Überschreibe für Typ 'e'
+        if "e" in (aufgabe.typ or "").lower():
+            anmerkung_fuer_template = "Bitte beide Begriffe mit ';' oder '...' trennen."
+
+        # ... beim Render-Aufruf einfach mitgeben ...
+        return render(request, "physik/aufgabe.html", {
+            "aufgabe": aufgabe,
+            "anmerkung": anmerkung_fuer_template,
+            # ... andere Variablen ...
+        })
         
 # -------- POST --------
     if request.method == "POST":
@@ -156,6 +167,7 @@ def aufgaben(request):
     # -------- GET anzeigen --------
     return render(request, "physik/aufgabe.html", {
         "aufgabe": aufgabe,
+        "anmerkung": anmerkung_fuer_template,
         "anzeigen": anzeigen,
         "bilder": bilder_anzeige,
         "auswahl_optionen": optionen_liste,
