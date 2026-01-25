@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms 
 from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption, AufgabeBild
+from .models import FehlerLog, Protokoll
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):
@@ -102,7 +103,16 @@ class AufgabeAdmin(admin.ModelAdmin):
             obj.von = request.user
         super().save_model(request, obj, form, change)
 
-from .models import FehlerLog
+@admin.register(Protokoll)
+class ProtokollAdmin(admin.ModelAdmin):
+    # Diese Spalten werden in der Übersicht angezeigt
+    list_display = ('user', 'aufgabe', 'get_thema', 'fach', )
+    # Filter am rechten Rand
+    list_filter = ('user', 'fach', 'aufgabe__schwierigkeit', 'aufgabe__thema')
+    
+    def get_thema(self, obj):
+        return obj.aufgabe.thema
+    get_thema.short_description = 'Thema'
 
 @admin.register(FehlerLog)
 class FehlerLogAdmin(admin.ModelAdmin):
