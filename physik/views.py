@@ -89,54 +89,6 @@ def index(request):
             "kapitel_map": kapitel_map,
         })
 
-# def index(request):
-#     # kompletter Reset beim echten Neustart
-#     for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
-#         request.session.pop(k, None)
-
-#     themenbereiche = (
-#         ThemenBereich.objects
-#         .filter(eingeblendet=True)
-#         .prefetch_related("kapitel")
-#         .order_by("ordnung")
-#     )
-
-#     kapitel_map = {
-#         tb.id: [{"zeile": k.zeile, "name": k.kapitel} for k in tb.kapitel.all().order_by("zeile")]
-#         for tb in themenbereiche
-#     }
-
-#     qs = (
-#         Aufgabe.objects
-#         .filter(thema__in=themenbereiche)
-#         .values("thema_id", "kapitel_id", "schwierigkeit")
-#         .annotate(cnt=Count("id"))
-#     )
-
-#     counts = {}
-#     for r in qs:
-#         tb = r["thema_id"]
-#         kap = r["kapitel_id"]
-#         s = str(r["schwierigkeit"])
-#         counts.setdefault(tb, {}).setdefault(kap, {"1": 0, "2": 0, "3": 0})
-#         counts[tb][kap][s] = r["cnt"]
-
-#     tb_totals = {}
-#     for tb in themenbereiche:
-#         tot = {"1": 0, "2": 0, "3": 0}
-#         for kap in tb.kapitel.all():
-#             d = counts.get(tb.id, {}).get(kap.id, {"1": 0, "2": 0, "3": 0})
-#             for k in tot:
-#                 tot[k] += d[k]
-#         tb_totals[tb.id] = tot
-
-#     return render(request, "physik/index.html", {
-#         "themenbereiche": themenbereiche,
-#         "kapitel_map": kapitel_map,
-#         "counts": counts,
-#         "tb_totals": tb_totals,
-#     })
-
 def aufgaben(request):
     # -------- Serie starten --------
     if "aufgaben_ids" not in request.session and request.method == "GET":
@@ -195,10 +147,11 @@ def aufgaben(request):
     elif "e" in (aufgabe.typ or "").lower():
         anmerkung_fuer_template = "Bitte beide Begriffe mit ';' oder '...' trennen."
 
-# -------- POST --------
+    # -------- POST --------
     if request.method == "POST":
-        # Wir holen die Antwort. Bei Radio-Buttons heißt das Feld im Template "user_antwort"
+        # Hier definierst du 'antwort'
         antwort = request.POST.get("user_antwort") or request.POST.get("antwort", "")
+        ergebnis = bewerte_aufgabe(request, aufgabe, antwort)
         bild_antwort = request.POST.get("bild_antwort")
 
         # ---- Skip ----
@@ -210,7 +163,9 @@ def aufgaben(request):
             return redirect("physik:aufgaben")
         
         ergebnis = bewerte_aufgabe(
+            request,
             aufgabe,
+            antwort,
             text_antwort=antwort,
             bild_antwort=bild_antwort,
             session=request.session,

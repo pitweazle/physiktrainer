@@ -1,5 +1,6 @@
 from difflib import SequenceMatcher
 import re
+from .models import Protokoll
 
 # ===========================================================
 # VERGLEICHE
@@ -54,7 +55,7 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
 # ===========================================================
 # HAUPTFUNKTION
 # ===========================================================
-def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None):
+def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antwort=None, session=None):
     # 1. Initialisierung
     ergebnis = None
     typ_roh = (aufgabe.typ or "").strip()
@@ -143,7 +144,24 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
     # -----------------------------------------------------------
     # C. FINALE & LOGGING
     # -----------------------------------------------------------
+    if request.user.is_authenticated:
+        from .models import Protokoll # Import hier, falls oben Probleme
+        protokoll, created = Protokoll.objects.get_or_create(
+            user=request.user, 
+            aufgabe=aufgabe
+        )
 
+        if ergebnis:
+            if protokoll.fach < 4:
+                protokoll.fach += 1
+            ergebnis = {"richtig": True, "hinweis": "Super, das war richtig!"}
+        else:
+            protokoll.fach = 2 # Zurück in den Lernvorrat
+            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
+            
+        protokoll.save()
+        print(f"Protokoll aktualisiert: Aufgabe {aufgabe.id} jetzt in Fach {protokoll.fach}")
+    
     # Wenn bis hierhin nichts gegriffen hat
     if not ergebnis:
         ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
