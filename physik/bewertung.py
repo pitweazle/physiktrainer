@@ -54,11 +54,119 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
 # ===========================================================
 # HAUPTFUNKTION
 # ===========================================================
+def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None):
+    # 1. Initialisierung
+    ergebnis = None
+    typ_roh = (aufgabe.typ or "").strip()
+    norm = normalisiere(text_antwort) if text_antwort else ""
+    
+    # Flags extrahieren
+    case_sensitiv = "X" in typ_roh
+    fuzzy_level = 1 if "Y" in typ_roh else 2 if "Z" in typ_roh else 0
+    typ = typ_roh.replace("X", "").replace("Y", "").replace("Z", "")
+
+    # -----------------------------------------------------------
+    # A. SPEZIAL-TYPEN (Priorität vor Text-Parsing)
+    # -----------------------------------------------------------
+
+    # 1. Bilderauswahl (p)
+    if "p" in typ:
+        # Hier nutzen wir die session, um die ID des richtigen Bildes zu vergleichen
+        ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
+
+    # 2. Wahr/Falsch (w)
+    elif "w" in typ:
+        ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
+
+    # 3. Auswahl-Liste / Multiple Choice (a)
+    elif "a" in typ:
+        ergebnis = bewerte_liste(aufgabe, text_antwort)
+
+    # 4. Einheiten-Spezialfall (e)
+    elif "e" in typ:
+        ergebnis = bewerte_e_typ(aufgabe, text_antwort)
+
+    # -----------------------------------------------------------
+    # B. TEXT-PARSER (Nur wenn oben noch nichts entschieden wurde)
+    # -----------------------------------------------------------
+
+    # 1. Vorab-Prüfung: f (Verbotene Begriffe)
+    if not ergebnis and "f" in typ:
+        ok, hinweis = pruefe_verbotene_begriffe(aufgabe, norm, text_antwort)
+        if not ok:
+            ergebnis = {"richtig": False, "hinweis": hinweis}
+
+    # 2. Sonderfall: Reiner Zahlentyp (1, 2, 3...)
+    if not ergebnis and typ.isdigit():
+        max_idx = int(typ)
+        found = False
+        # Streng
+        for i in range(1, max_idx + 1):
+            ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
+            if ok: 
+                ergebnis = {"richtig": True, "hinweis": "Richtig!"}
+                found = True
+                break
+        
+        # Fuzzy (falls nötig)
+        if not found and fuzzy_level:
+            r = 0.85 if fuzzy_level == 1 else 0.7
+            for i in range(1, max_idx + 1):
+                ok, h = vergleich_fuzzy(i, aufgabe, norm, text_antwort, r)
+                if ok: 
+                    ergebnis = {"richtig": True, "hinweis": h}
+                    found = True
+                    break
+        
+        if not found:
+            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
+
+    # 3. Haupt-Parser: Streng
+    if not ergebnis:
+        streng_ok, hinweis = bewerte_booleschen_ausdruck(
+            typ, aufgabe, norm, text_antwort,
+            lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
+        )
+        if streng_ok:
+            ergebnis = {"richtig": True, "hinweis": "Richtig!"}
+
+    # 4. Haupt-Parser: Fuzzy
+    if not ergebnis and fuzzy_level:
+        ratio = 0.85 if fuzzy_level == 1 else 0.7
+        fuzzy_ok, fuzzy_hinweis = bewerte_booleschen_ausdruck(
+            typ, aufgabe, norm, text_antwort,
+            lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio)
+        )
+        if fuzzy_ok:
+            ergebnis = {"richtig": True, "hinweis": fuzzy_hinweis}
+
+    # -----------------------------------------------------------
+    # C. FINALE & LOGGING
+    # -----------------------------------------------------------
+
+    # Wenn bis hierhin nichts gegriffen hat
+    if not ergebnis:
+        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
+
+    # Sahnehäubchen: Fehlerlogging
+    if not ergebnis.get("richtig") and text_antwort:
+        # Hier prüfen wir, ob wir nicht bei 'w' oder 'a' sind, falls du nur Freitext loggen willst
+        # Aber meistens ist es gut, alles Falsche zu sehen
+        from .models import FehlerLog
+        FehlerLog.objects.get_or_create(
+            aufgabe=aufgabe,
+            eingegebene_antwort=text_antwort.strip()
+        )
+
+    return ergebnis
+
+# ===========================================================
+# BEWERTUNGSLOGIK (Die Brücke zwischen Parser und Vergleich)
+# ===========================================================
 
 # ===========================================================
 # PARSER
 # ===========================================================
-
 def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, vergleich):
     tokens = []
     i = 0
@@ -140,88 +248,7 @@ def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, ve
             return vergleich(num1, aufgabe, antwort_norm, antwort_original)
         
         return False, None
-
     return expr()
-# ===========================================================
-# BEWERTUNGSLOGIK (Die Brücke zwischen Parser und Vergleich)
-# ===========================================================
-
-def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None):
-    # 1. Initialisierung
-    ergebnis = None  # <--- Hier wird die Variable "geboren"
-    typ_roh = (aufgabe.typ or "").strip()
-    norm = normalisiere(text_antwort)
-    
-    # Flags extrahieren
-    case_sensitiv = "X" in typ_roh
-    fuzzy_level = 1 if "Y" in typ_roh else 2 if "Z" in typ_roh else 0
-    typ = typ_roh.replace("X", "").replace("Y", "").replace("Z", "")
-
-    # 2. Vorab-Prüfung: f (Verbotene Begriffe)
-    if "f" in typ:
-        ok, hinweis = pruefe_verbotene_begriffe(aufgabe, norm, text_antwort)
-        if not ok:
-            ergebnis = {"richtig": False, "hinweis": hinweis}
-
-    # 3. Sonderfall: Reiner Zahlentyp
-    # WICHTIG: Alle 'return' durch 'ergebnis =' ersetzen!
-    if not ergebnis and typ.isdigit():
-        max_idx = int(typ)
-        found = False
-        for i in range(1, max_idx + 1):
-            ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
-            if ok: 
-                ergebnis = {"richtig": True, "hinweis": "Richtig!"}
-                found = True
-                break
-        
-        if not found and fuzzy_level:
-            r = 0.85 if fuzzy_level == 1 else 0.7
-            for i in range(1, max_idx + 1):
-                ok, h = vergleich_fuzzy(i, aufgabe, norm, text_antwort, r)
-                if ok: 
-                    ergebnis = {"richtig": True, "hinweis": h}
-                    found = True
-                    break
-        
-        if not found:
-            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
-
-    # 4. Haupt-Parser: Streng
-    if not ergebnis:
-        streng_ok, hinweis = bewerte_booleschen_ausdruck(
-            typ, aufgabe, norm, text_antwort,
-            lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
-        )
-        if streng_ok:
-            ergebnis = {"richtig": True, "hinweis": "Richtig!"}
-
-    # 5. Haupt-Parser: Fuzzy
-    if not ergebnis and fuzzy_level:
-        ratio = 0.85 if fuzzy_level == 1 else 0.7
-        fuzzy_ok, fuzzy_hinweis = bewerte_booleschen_ausdruck(
-            typ, aufgabe, norm, text_antwort,
-            lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio)
-        )
-        if fuzzy_ok:
-            ergebnis = {"richtig": True, "hinweis": fuzzy_hinweis}
-
-    # 6. Finale Auffangstation
-    if not ergebnis:
-        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
-
-    # ===========================================================
-    # SAHNEHÄUBCHEN: Jetzt kommt er hier IMMER vorbei
-    # ===========================================================
-    if not ergebnis.get("richtig") and text_antwort:
-        from .models import FehlerLog
-        # Hugo wird jetzt endlich gespeichert!
-        FehlerLog.objects.get_or_create(
-            aufgabe=aufgabe,
-            eingegebene_antwort=text_antwort.strip()
-        )
-
-    return ergebnis # Der einzige Ausgang!
 
 # ===========================================================
 # HILFSFUNKTIONEN

@@ -9,7 +9,6 @@
     <form method="post">
     {% csrf_token %}
         <div class="task-dialog">
-
             <!-- Kopfzeile -->
             <div class="task-header">
               <div class="task-title">
@@ -34,83 +33,82 @@
 
             <!-- Antwortbereich -->
             <div class="task-antwort">
-              <div class="task-antwort">
-                {% if "l" in aufgabe.typ %}
-                  {% for index, text in auswahl_optionen %}
-                    <div class="task-option">
-                      <label>
-                        <input type="radio" 
-                              name="user_antwort" 
-                              value="{{ index }}"
-                              {% if warte_auf_weiter %}disabled{% endif %}
-                              onchange="this.form.submit();"> 
-                        {{ text }}
-                      </label>
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  <input type="text"
-                        name="antwort"
-                        class="task-input"
-                        value="{{ letzte_antwort }}"
-                        {% if warte_auf_weiter %}disabled{% endif %}>
-                  <span class="task-einheit">{{ aufgabe.einheit }}</span>
-                {% endif %}
-                {% if anmerkung %}
-                    <div class="task-anmerkung" style="font-style: italic; color: #666; margin-bottom: 8px;">
-                        {{ anmerkung }}
-                    </div>
-                {% endif %}
-            </div>
-
-            <div id="solutionBox" style="display:none;" class="solution-box">
-              <strong>Lösung:</strong><br>
-              {{ aufgabe.antwort }}<br><br>
-
-              {% if aufgabe.erklaerung %}
-                  {{ aufgabe.erklaerung|linebreaks }}
+              {% if "a" in aufgabe.typ %}
+                {% for index, text in auswahl_optionen %}
+                  <div class="task-option">
+                    <label>
+                      <input type="radio" 
+                            name="user_antwort" 
+                            value="{{ index }}"
+                            {% if warte_auf_weiter %}disabled{% endif %}
+                            onchange="this.form.submit();"> 
+                      {{ text }}
+                    </label>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <input type="text"
+                      name="antwort"
+                      class="task-input"
+                      value="{{ letzte_antwort }}"
+                      {% if warte_auf_weiter %}disabled{% endif %}>
+                <span class="task-einheit">{{ aufgabe.einheit }}</span>
               {% endif %}
-            </div>
+              {% if anmerkung %}
+                  <div class="task-anmerkung" style="font-style: italic; color: #666; margin-bottom: 8px;">
+                      {{ anmerkung }}
+                  </div>
+              {% endif %}
+          </div>
 
-            {% if bilder %}
-              {% with bilder_liste=bilder %}
-                <div class="task-images row1">
+          <div id="solutionBox" style="display:none;" class="solution-box">
+            <strong>Lösung:</strong><br>
+            {{ aufgabe.antwort }}<br><br>
+
+            {% if aufgabe.erklaerung %}
+                {{ aufgabe.erklaerung|linebreaks }}
+            {% endif %}
+          </div>
+
+          {% if bilder %}
+            {% with bilder_liste=bilder %}
+              <div class="task-images row1">
+                {% for b in bilder_liste %}
+                  {% if forloop.counter <= 2 %}
+                    <img src="{{ b.bild.url }}"
+                        class="task-image clickable"
+                        data-id="{{ b.id }}">
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              {% if bilder_liste|length > 2 %}
+                <div class="task-images row2">
                   {% for b in bilder_liste %}
-                    {% if forloop.counter <= 2 %}
+                    {% if forloop.counter > 2 %}
                       <img src="{{ b.bild.url }}"
                           class="task-image clickable"
                           data-id="{{ b.id }}">
                     {% endif %}
                   {% endfor %}
                 </div>
+              {% endif %}
+            {% endwith %}
 
-                {% if bilder_liste|length > 2 %}
-                  <div class="task-images row2">
-                    {% for b in bilder_liste %}
-                      {% if forloop.counter > 2 %}
-                        <img src="{{ b.bild.url }}"
-                            class="task-image clickable"
-                            data-id="{{ b.id }}">
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              {% endwith %}
+            <input type="hidden" name="bild_antwort" id="bild_antwort">
+          {% endif %}
 
-              <input type="hidden" name="bild_antwort" id="bild_antwort">
-            {% endif %}
-
-            <!-- Button-Leiste -->
-            <div class="task-buttons">
-                <button type="button" onclick="location.href='/'">Stop</button>
-                {% if aufgabe.hilfe %}
-                    <button type="button" onclick="alert('{{ aufgabe.hilfe|escapejs }}')">
-                    Hilfe
-                    </button>
-                {% endif %}
-                <button type="button" id="showSolution">Lösung anzeigen</button>
-                <button type="submit">Weiter</button>
-            </div>
+          <!-- Button-Leiste -->
+          <div class="task-buttons">
+              <button type="button" onclick="location.href='/'">Stop</button>
+              {% if aufgabe.hilfe %}
+                  <button type="button" onclick="alert('{{ aufgabe.hilfe|escapejs }}')">
+                  Hilfe
+                  </button>
+              {% endif %}
+              <button type="button" id="showSolution">Lösung anzeigen</button>
+              <button type="submit">Weiter</button>
+          </div>
         </div>
     </form>
 
@@ -127,7 +125,6 @@
 
             this.classList.add("selected");
 
-            // 🔴 DAS FEHLTE
             this.closest("form").submit();
           });
         });
@@ -166,8 +163,5 @@
       }
     });
   </script>
-
-
-
 {% endblock %}
 

@@ -102,27 +102,19 @@ def aufgaben(request):
             random.shuffle(bilder)
             bilder_anzeige = bilder
 
-    # -------- Liste --------
     optionen_liste = []
     anzeigen = []
-    if "l" in aufgabe.typ:
+    if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
         optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
         for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
             optionen_liste.append((i, o.text))
         random.shuffle(optionen_liste)
 
-        # Spezialfall: Überschreibe für Typ 'e'
-        if "e" in (aufgabe.typ or "").lower():
-            anmerkung_fuer_template = "Bitte beide Begriffe mit ';' oder '...' trennen."
+    # Spezialfall: Überschreibe für Typ 'e'
+    elif "e" in (aufgabe.typ or "").lower():
+        anmerkung_fuer_template = "Bitte beide Begriffe mit ';' oder '...' trennen."
 
-        # ... beim Render-Aufruf einfach mitgeben ...
-        return render(request, "physik/aufgabe.html", {
-            "aufgabe": aufgabe,
-            "anmerkung": anmerkung_fuer_template,
-            # ... andere Variablen ...
-        })
-        
 # -------- POST --------
     if request.method == "POST":
         # Wir holen die Antwort. Bei Radio-Buttons heißt das Feld im Template "user_antwort"
@@ -192,7 +184,6 @@ def call(request, lfd_nr):
 
     return redirect("physik:aufgaben")
 
-@user_passes_test(lambda u: u.is_superuser)
 @user_passes_test(lambda u: u.is_superuser)
 def fehler_liste(request):
     # Basis-Queryset
