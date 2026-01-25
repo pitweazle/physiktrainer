@@ -291,9 +291,8 @@ def fehler_edit(request, log_id):
                     opt_id = key.split("_")[1]
                     option = AufgabeOption.objects.get(id=opt_id)
                     
-                    if value.strip(): # Falls Text vorhanden: Update
+                    if value.strip(): 
                         option.text = value.strip()
-                        option.position = request.POST.get(f"pos_{opt_id}") or 0
                         option.save()
                     else: # Falls Text leer: Weg damit
                         option.delete()
@@ -301,17 +300,23 @@ def fehler_edit(request, log_id):
             # 3. Neue Optionen anlegen (die 3 leeren Felder)
             for i in range(1, 4):
                 new_text = request.POST.get(f"new_opt_{i}")
-                new_pos = request.POST.get(f"new_pos_{i}")
                 
                 if new_text and new_text.strip():
+                    # Wir ignorieren new_pos aus dem POST und berechnen es selbst:
+                    # Suche die höchste vorhandene Position für diese Aufgabe
+                    last_opt = AufgabeOption.objects.filter(aufgabe=aufgabe).order_by('-position').first()
+                    
+                    # Start bei 2, wenn noch nichts da ist (wegen offizieller Antwort = 1)
+                    next_pos = (last_opt.position + 1) if last_opt else 2
+                    
                     AufgabeOption.objects.create(
                         aufgabe=aufgabe,
                         text=new_text.strip(),
-                        position=new_pos if new_pos else 0
+                        position=next_pos
                     )
 
-            # Erst wenn alles gespeichert ist, löschen wir den Fehler-Log
-            log.delete()
+        # Erst wenn alles gespeichert ist, löschen wir den Fehler-Log
+        log.delete()
 
         return redirect('physik:fehler_liste')
 

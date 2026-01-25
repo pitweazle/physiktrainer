@@ -50,18 +50,28 @@
                     <tbody>
                         {% for opt in log.aufgabe.optionen.all %}
                         <tr>
-                            <td><input type="number" name="pos_{{ opt.id }}" class="form-control form-control-sm text-center" value="{{ opt.position }}"></td>
-                            <td><input type="text" name="opt_{{ opt.id }}" class="form-control form-control-sm" value="{{ opt.text }}"></td>
+                            <td>
+                                <span class="badge bg-secondary">{{ opt.position }}</span>
+                            <td>
+                                <input type="text" name="opt_{{ opt.id }}" 
+                                    class="form-control form-control-sm" 
+                                    value="{{ opt.text }}">
+                            </td>
                         </tr>
                         {% endfor %}
-                        
+
                         <tr style="background-color: #f0f8ff;">
                             <td colspan="2" class="p-1 px-3 small text-muted fw-bold">NEUE OPTIONEN ERGÄNZEN:</td>
                         </tr>
+
                         {% for i in "123" %}
                         <tr style="background-color: #f0f8ff;">
-                            <td><input type="number" name="new_pos_{{ forloop.counter }}" class="form-control form-control-sm text-center" placeholder="+"></td>
-                            <td><input type="text" name="new_opt_{{ forloop.counter }}" class="form-control form-control-sm" placeholder="Neues Schlagwort..."></td>
+                            <td class="text-center text-muted">+</td>
+                            <td>
+                                <input type="text" name="new_opt_{{ forloop.counter }}" 
+                                    class="form-control form-control-sm" 
+                                    placeholder="Neues Schlagwort...">
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

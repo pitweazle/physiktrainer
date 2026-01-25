@@ -27,9 +27,18 @@ class AufgabeBildInline(admin.TabularInline):
 
 class AufgabeOptionInline(admin.TabularInline):
     model = AufgabeOption
-    extra = 3
-    fields = ("position", "text")
-    ordering = ("position",)
+    readonly_fields = ('position',) # Jetzt schreibgeschützt
+    extra = 1
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk: 
+            # Wir filtern nach 'position'
+            last_opt = AufgabeOption.objects.filter(aufgabe=obj.aufgabe).order_by('-position').first()
+            if last_opt:
+                obj.position = last_opt.position + 1
+            else:
+                obj.position = 2 
+        super().save_model(request, obj, form, change)
 
 class AufgabeAdminForm(forms.ModelForm):
     class Meta:
