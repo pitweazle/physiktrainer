@@ -150,19 +150,16 @@ def bewerte_aufgabe(aufgabe, text_antwort=None, bild_antwort=None, session=None)
 
     # Sahnehäubchen: Fehlerlogging
     if not ergebnis.get("richtig") and text_antwort:
-        # Hier prüfen wir, ob wir nicht bei 'w' oder 'a' sind, falls du nur Freitext loggen willst
-        # Aber meistens ist es gut, alles Falsche zu sehen
-        from .models import FehlerLog
-        FehlerLog.objects.get_or_create(
-            aufgabe=aufgabe,
-            eingegebene_antwort=text_antwort.strip()
-        )
+        reine_auswahl_typen = ['p', 'a', 'w']
+        if typ not in reine_auswahl_typen:
+            from .models import FehlerLog
+            # Wir speichern nur echte Texteingaben (auch wenn ein Bild 'p104' dabei steht)
+            FehlerLog.objects.get_or_create(
+                aufgabe=aufgabe,
+                eingegebene_antwort=text_antwort.strip()
+            )
 
     return ergebnis
-
-# ===========================================================
-# BEWERTUNGSLOGIK (Die Brücke zwischen Parser und Vergleich)
-# ===========================================================
 
 # ===========================================================
 # PARSER

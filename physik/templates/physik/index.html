@@ -7,257 +7,219 @@
 {% endblock %}
 
 {% block content %}
-  <div class="page-container">
-      <h1>Physiktrainer</h1>
-      <div class="table-controls">
-          <button type="button" id="toggle-mittel">mittel und profi</button>
-          <button type="button" id="toggle-profi">profi</button>
-      </div>
-
-
-<button type="button" id="openModal">Start</button>
-
-{{ kapitel_map|json_script:"kapitel-data" }}
-
-<div id="overlay" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <div><strong>Wähle Themenbereich und Schwierigkeitsgrad</strong></div>
-      <button type="button" id="closeModal" class="modal-close">×</button>
-    </div>
-
-    <form method="get" action="{% url 'physik:aufgaben' %}">
-      <div class="modal-body">
-
-        <label>Themenbereich</label>
-        <select name="tb" id="tbSelect" required>
-          <option value="">– bitte wählen –</option>
-          {% for tb in themenbereiche %}
-            <option value="{{ tb.id }}">{{ tb.thema }}</option>
-          {% endfor %}
-        </select>
-
-        <label>Schwierigkeitsgrad (bis:)</label>
-        <div class="radio-row">
-          <label><input type="radio" name="level" value="1" required> Einfach</label>
-          <label><input type="radio" name="level" value="2"> Mittel</label>
-          <label><input type="radio" name="level" value="3"> Profi</label>
+    <div class="page-container">
+        <h1>Physiktrainer</h1>
+        <div class="table-controls">
+            <button type="button" id="toggle-mittel">mittel und profi</button>
+            <button type="button" id="toggle-profi">profi</button>
         </div>
 
-        <hr>
+        <button type="button" id="openModal">Start</button>
 
-        <!-- 🔹 START: sichtbar, aber NICHT editierbar -->
-        <label>Start-Kapitel (fix)</label>
-        <select id="startSelectDisplay" disabled></select>
+        <div id="overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <div><strong>Wähle Themenbereich und Schwierigkeitsgrad</strong></div>
+                    <button type="button" id="closeModal" class="modal-close">×</button>
+                </div>
+                <form method="get" action="{% url 'physik:aufgaben' %}">
+                    <div class="modal-body">
+                        <label>Themenbereich</label>
+                        <select name="tb" id="tbSelect" required>
+                            <option value="">– bitte wählen –</option>
+                            {% for tb in themenbereiche %}
+                                <option value="{{ tb.id }}">{{ tb.thema }}</option>
+                            {% endfor %}
+                        </select>
+                        <label>Schwierigkeitsgrad (bis:)</label>
+                        <div class="radio-row">
+                            <label><input type="radio" name="level" value="1" required> Einfach</label>
+                            <label><input type="radio" name="level" value="2"> Mittel</label>
+                            <label><input type="radio" name="level" value="3"> Profi</label>
+                        </div>
+                        <hr>
+                        <label>Start-Kapitel (fix)</label>
+                        <select id="startSelectDisplay" disabled></select>
+                        <input type="hidden" name="start" id="startSelect">
+                        <label>End-Kapitel</label>
+                        <select name="end" id="endSelect" required></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit">weiter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        <!-- 🔹 versteckt: wird wirklich an den Server geschickt -->
-        <input type="hidden" name="start" id="startSelect">
+        <div class="table-wrapper">
+            <table class="physik-tabelle">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Thema / Kapitel</th>
+                        <th class="spacer" rowspan="2"></th>
+                        <th colspan="5">einfach</th>
+                        <th class="spacer" rowspan="2"></th>
+                        <th colspan="5" class="col-mittel">mittel</th>
+                        <th rowspan="2" class="col-mittel">Σ<br>E+M</th>
+                        <th class="spacer" rowspan="2"></th>
+                        <th colspan="5" class="col-profi">profi</th>
+                        <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
+                    </tr>
+                    <tr>
+                        {# Umbenennung auf 1, 2, 3, Archiv (4) #}
+                        <th>1</th><th>2</th><th>3</th><th>Archiv</th><th>Σ</th>
+                        <th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Archiv</th><th class="col-mittel">Σ</th>
+                        <th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Archiv</th><th class="col-profi">Σ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tb in themenbereiche %}
+                        <tr class="themenbereich thementitel" style="background: {{ tb.farbe }}; cursor: pointer;" data-target="tb-{{ tb.id }}">
+                            <td class="tb-title">{{ tb.thema }}</td>
+                            <td class="spacer"></td>
+                            <td colspan="5"></td>
+                            <td class="spacer col-mittel"></td>
+                            <td colspan="6" class="col-mittel"></td>
+                            <td class="spacer col-profi"></td>
+                            <td colspan="6" class="col-profi"></td>
+                        </tr>
 
-        <label>End-Kapitel</label>
-        <select name="end" id="endSelect" required></select>
+                        {% for kap in tb.kapitel.all %}
+                        {% with tb_map=counts|get_item:tb.id %}
+                            {% with kap_data=tb_map|get_item:kap.id %}
+                            {% if kap_data %}
+                                <tr class="kapitel tb-{{ tb.id }}">
+                                    <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
+                                    <td class="spacer"></td>
 
-      </div>
+                                    {# --- EINFACH (Level 1) --- #}
+                                    {% with s1=kap_data|get_item:"1" %}
+                                        <td class="box">{{ s1|get_item:0|default:0 }}</td>
+                                        <td class="box">{{ s1|get_item:1|default:0 }}</td>
+                                        <td class="box">{{ s1|get_item:2|default:0 }}</td>
+                                        <td class="box">{{ s1|get_item:3|default:0 }}</td>
+                                        <td class="summe" style="background: {{ tb.farbe }};">
+                                            {{ s1|get_item:"total"|default:0 }}
+                                        </td>
+                                    {% endwith %}
 
-      <div class="modal-footer">
-        <button type="submit">weiter</button>
-      </div>
-    </form>
-  </div>
-</div>
+                                    <td class="spacer"></td>
 
-<script>
-(() => {
-  const overlay = document.getElementById("overlay");
-  const openBtn = document.getElementById("openModal");
-  const closeBtn = document.getElementById("closeModal");
+                                    {# --- MITTEL (Level 2) --- #}
+                                    {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" %}
+                                        <td class="box col-mittel">{{ s2|get_item:0|default:0 }}</td>
+                                        <td class="box col-mittel">{{ s2|get_item:1|default:0 }}</td>
+                                        <td class="box col-mittel">{{ s2|get_item:2|default:0 }}</td>
+                                        <td class="box col-mittel">{{ s2|get_item:3|default:0 }}</td>
+                                        <td class="summe col-mittel" style="background: {{ tb.farbe }};">
+                                            {{ s2|get_item:"total"|default:0 }}
+                                        </td>
+                                        <td class="summe col-mittel" style="background: {{ tb.farbe }};">
+                                            {% with t1=s1|get_item:"total"|default:0 t2=s2|get_item:"total"|default:0 %}
+                                                {{ t1|add:t2 }}
+                                            {% endwith %}
+                                        </td>
+                                    {% endwith %}
 
-  const tbSelect = document.getElementById("tbSelect");
-  const startDisplay = document.getElementById("startSelectDisplay");
-  const startHidden = document.getElementById("startSelect");
-  const endSelect = document.getElementById("endSelect");
+                                    <td class="spacer col-mittel"></td>
 
-  const kapitelMap = JSON.parse(
-    document.getElementById("kapitel-data").textContent
-  );
-
-  function fillKapitel(tbId) {
-    const list = kapitelMap[tbId] || [];
-
-    // Alte Optionen löschen
-    startDisplay.innerHTML = "";
-    startHidden.innerHTML = "";
-    endSelect.innerHTML = "";
-
-    // Neue Optionen einfügen
-    for (const k of list) {
-      const opt = document.createElement("option");
-      opt.value = k.zeile;
-      opt.textContent = `${k.zeile}. ${k.name}`;
-
-      startDisplay.appendChild(opt);
-      startHidden.appendChild(opt.cloneNode(true));
-
-      const opt2 = opt.cloneNode(true);
-      endSelect.appendChild(opt2);
-    }
-
-    // Default-Werte setzen:
-    if (list.length) {
-      startDisplay.value = list[0].zeile;
-      startHidden.value = list[0].zeile;   // ← wichtig für den Server
-      endSelect.value = list[list.length - 1].zeile;
-    }
-  }
-
-  openBtn.addEventListener("click", () => overlay.classList.remove("hidden"));
-  closeBtn.addEventListener("click", () => overlay.classList.add("hidden"));
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) overlay.classList.add("hidden");
-  });
-
-  tbSelect.addEventListener("change", () => {
-    fillKapitel(tbSelect.value);
-  });
-  if (tbSelect.value) {
-  fillKapitel(tbSelect.value);
-}
-})();
-</script>
-
-  <div class="table-wrapper">
-      <table class="physik-tabelle">
-        <thead>
-          <tr>
-          <th rowspan="2">Thema / Kapitel</th>
-
-          <th class="spacer" rowspan="2"></th>
-          <th colspan="5">einfach</th>
-
-          <th class="spacer" rowspan="2"></th>
-
-          <th colspan="5" class="col-mittel">mittel</th>
-          <th rowspan="2" class="col-mittel">Σ<br>E+M</th>
-
-          <th class="spacer" rowspan="2"></th>
-
-          <th colspan="5" class="col-profi">profi</th>
-          <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
-          </tr>
-
-          <tr>
-          <th>0</th><th>1</th><th>2</th><th>3</th><th>Σ</th>
-          <th class="col-mittel">0</th><th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Σ</th>
-          <th class="col-profi">0</th><th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Σ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for tb in themenbereiche %}
-            {% with d=tb_totals|get_item:tb.id %}
-            {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
-            <!-- Themenbereich -->
-            <tr class="themenbereich thementitel" style="background: {{ tb.farbe }};" data-target="tb-{{ tb.id }}">
-              <td class="tb-title">{{ tb.thema }}</td>
-
-              <td class="spacer"></td>
-              <!-- einfach -->
-              <td></td> <td></td> <td></td> <td></td> <td class="summe">{{ e }}</td>
-
-              <td class="spacer col-mittel"></td>
-              <!-- mittel -->
-              <td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td><td class="col-mittel"></td>
-              <td class="summe col-mittel" >{{ m }}</td>
-              <td class="summe col-mittel">{{ e|add:m }}</td>
-
-              <td class="spacer col-profi"></td>
-              <!-- profi -->
-              <td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td><td class="col-profi"></td>
-              <td class="summe col-profi">{{ p }}</td>
-              <!-- Σ gesamt -->
-              <td class="summe col-profi">{{ e|add:m|add:p }}</td>
-            </tr>
-            {% endwith %}
-            {% endwith %}
-            <!-- Kapitel -->
-            {% for kap in tb.kapitel.all %}
-              {% with tb_map=counts|get_item:tb.id %}
-              {% with d=tb_map|get_item:kap.id %}
-              {# d kann None sein, wenn es keine Aufgaben gibt #}
-              {% with e=d|get_item:"1"|default:0 m=d|get_item:"2"|default:0 p=d|get_item:"3"|default:0 %}
-                  {% if e|add:m|add:p > 0 %}
-                  <tr class="kapitel tb-{{ tb.id }}">
-                      <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
-                      <td class="spacer"></td>
-                      <!-- einfach -->
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer"></td>
-                      <td class="box leer" style="background: {{ tb.farbe }};">{{ e}}</td>
-
-                      <td class="spacer"></td>
-                      <!-- mittel -->
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="box leer col-mittel"></td>
-                      <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ m }}</td>
-                      <!-- Σ einfach + mittel -->
-                      <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ e|add:m }}</td>
-
-                      <td class="spacer col-mittel"></td>
-                      <!-- profi -->
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="box leer col-profi"></td>
-                      <td class="summe col-mittel" style="background: {{ tb.farbe }};">{{ p }}</td>
-                      <!-- Σ gesamt -->
-                      <td class="summe col-profi" style="background: {{ tb.farbe }};">{{ p|add:e|add:m }}</td>
-                  </tr>
-                {% endif %}
-              {% endwith %}
-              {% endwith %}
-              {% endwith %}
-            {% endfor %}
-          {% endfor %}
-        </tbody>
-      </table>
+                                    {# --- PROFI (Level 3) --- #}
+                                    {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" s3=kap_data|get_item:"3" %}
+                                        <td class="box col-profi">{{ s3|get_item:0|default:0 }}</td>
+                                        <td class="box col-profi">{{ s3|get_item:1|default:0 }}</td>
+                                        <td class="box col-profi">{{ s3|get_item:2|default:0 }}</td>
+                                        <td class="box col-profi">{{ s3|get_item:3|default:0 }}</td>
+                                        <td class="summe col-profi" style="background: {{ tb.farbe }};">
+                                            {{ s3|get_item:"total"|default:0 }}
+                                        </td>
+                                        <td class="summe col-profi" style="background: {{ tb.farbe }};">
+                                            {% with t1=s1|get_item:"total"|default:0 t2=s2|get_item:"total"|default:0 t3=s3|get_item:"total"|default:0 %}
+                                                {{ t1|add:t2|add:t3 }}
+                                            {% endwith %}
+                                        </td>
+                                    {% endwith %}
+                                </tr>
+                            {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
-  <script>
-      document.addEventListener("DOMContentLoaded", () => {
-      const body = document.body;
 
-      // Themenbereich-Kapitel toggeln (dein vorhandenes bleibt wie es ist)
+    {{ kapitel_map|json_script:"kapitel-data" }}
 
-      document.getElementById("toggle-mittel")?.addEventListener("click", () => {
-          body.classList.toggle("hide-mittel");
-          // wenn mittel aus -> profi automatisch aus
-          if (body.classList.contains("hide-mittel")) body.classList.add("hide-profi");
-      });
+    <script>
+        (function() {
+            document.addEventListener("DOMContentLoaded", function() {
+                // Erst jetzt ist sichergestellt, dass "kapitel-data" existiert
+                var dataTag = document.getElementById("kapitel-data");
+                if (!dataTag) {
+                    console.error("Datentopf nicht gefunden");
+                    return;
+                }
 
-      document.getElementById("toggle-profi")?.addEventListener("click", () => {
-          // profi darf nur an, wenn mittel sichtbar ist
-          if (body.classList.contains("hide-mittel")) {
-          body.classList.add("hide-profi");
-          return;
-          }
-          body.classList.toggle("hide-profi");
-      });
-      });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-    // Kapitel ein-/ausklappen (hast du schon)
-    document.querySelectorAll(".thementitel").forEach(function (row) {
-      row.addEventListener("click", function () {
-        const target = row.dataset.target;
-        document.querySelectorAll("." + target).forEach(function (tr) {
-          tr.classList.toggle("hidden");
-        });
-      });
-    });
-  });
-  </script>
+                var kapitelMap = {};
+                try {
+                    kapitelMap = JSON.parse(dataTag.textContent);
+                    console.log("Kapitel geladen:", Object.keys(kapitelMap));
+                } catch (e) {
+                    console.error("JSON Error", e);
+                }
+
+                var tbSelect = document.getElementById("tbSelect");
+                var openBtn = document.getElementById("openModal");
+                var overlay = document.getElementById("overlay");
+                var startDisplay = document.getElementById("startSelectDisplay");
+                var startHidden = document.getElementById("startSelect");
+                var endSelect = document.getElementById("endSelect");
+
+                function fill(tbId) {
+                    var liste = kapitelMap[tbId] || [];
+                    if (startDisplay && endSelect) {
+                        startDisplay.innerHTML = "";
+                        endSelect.innerHTML = "";
+                        liste.forEach(function(k) {
+                            var opt = new Option(k.zeile + ". " + k.name, k.zeile);
+                            startDisplay.add(opt.cloneNode(true));
+                            endSelect.add(opt);
+                        });
+
+                        if (liste.length > 0) {
+                            startDisplay.value = liste[0].zeile;
+                            if(startHidden) startHidden.value = liste[0].zeile;
+                            endSelect.value = liste[liste.length - 1].zeile;
+                        }
+                    }
+                }
+
+                if (openBtn) {
+                    openBtn.onclick = function() {
+                        overlay.classList.remove("hidden");
+                        if (tbSelect.value) fill(tbSelect.value);
+                    };
+                }
+
+                if (tbSelect) {
+                    tbSelect.onchange = function(e) { fill(e.target.value); };
+                }
+                
+                document.getElementById("closeModal").onclick = function() { 
+                    overlay.classList.add("hidden"); 
+                };
+
+                // Einklapp-Logik
+                document.querySelectorAll(".thementitel").forEach(function(balken) {
+                    balken.onclick = function() {
+                        var target = this.getAttribute("data-target");
+                        document.querySelectorAll("." + target).forEach(function(row) {
+                            row.classList.toggle("hidden");
+                        });
+                    };
+                });
+            });
+        })();
+    </script>
 {% endblock %}

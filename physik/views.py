@@ -9,53 +9,133 @@ from django.contrib.auth.decorators import user_passes_test
 from .bewertung import bewerte_aufgabe
 from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption
 
+from django.db.models import Count, Q
+from .models import ThemenBereich, Aufgabe, Protokoll
+
 def index(request):
-    # kompletter Reset beim echten Neustart
+    # Reset Session
     for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
         request.session.pop(k, None)
 
-    themenbereiche = (
-        ThemenBereich.objects
-        .filter(eingeblendet=True)
-        .prefetch_related("kapitel")
-        .order_by("ordnung")
-    )
+    themenbereiche = ThemenBereich.objects.filter(eingeblendet=True).prefetch_related("kapitel").order_by("ordnung")
 
+    # 1. Die kapitel_map für das JavaScript-Modal
     kapitel_map = {
-        tb.id: [{"zeile": k.zeile, "name": k.kapitel} for k in tb.kapitel.all().order_by("zeile")]
-        for tb in themenbereiche
-    }
+            str(tb.id): [{"zeile": k.zeile, "name": k.kapitel} for k in tb.kapitel.all().order_by("zeile")]
+            for tb in themenbereiche
+        }
 
-    qs = (
-        Aufgabe.objects
-        .filter(thema__in=themenbereiche)
+    # 2. Alle Aufgaben zählen (Gesamtbestand)
+    qs_gesamt = (
+        Aufgabe.objects.filter(thema__in=themenbereiche)
         .values("thema_id", "kapitel_id", "schwierigkeit")
         .annotate(cnt=Count("id"))
     )
 
-    counts = {}
-    for r in qs:
-        tb = r["thema_id"]
-        kap = r["kapitel_id"]
-        s = str(r["schwierigkeit"])
-        counts.setdefault(tb, {}).setdefault(kap, {"1": 0, "2": 0, "3": 0})
-        counts[tb][kap][s] = r["cnt"]
+    # 3. Lernstand des Users abrufen (nur wenn eingeloggt)
+    user_protokoll = {}
+    if request.user.is_authenticated:
+        qp = (
+            Protokoll.objects.filter(user=request.user, aufgabe__thema__in=themenbereiche)
+            .values("aufgabe__thema_id", "aufgabe__kapitel_id", "aufgabe__schwierigkeit", "fach")
+            .annotate(cnt=Count("id"))
+        )
+        for r in qp:
+            t_id = r["aufgabe__thema_id"]
+            k_id = r["aufgabe__kapitel_id"]
+            s = str(r["aufgabe__schwierigkeit"])
+            f = r["fach"]
+            user_protokoll.setdefault(t_id, {}).setdefault(k_id, {}).setdefault(s, {})
+            user_protokoll[t_id][k_id][s][f] = r["cnt"]
 
+    # 4. Counts-Dict aufbauen (mit Differenzrechnung für Fach 0)
+    counts = {}
+    for r in qs_gesamt:
+        t_id = r["thema_id"]
+        k_id = r["kapitel_id"]
+        s = str(r["schwierigkeit"])
+        gesamt = r["cnt"]
+
+        p_data = user_protokoll.get(t_id, {}).get(k_id, {}).get(s, {})
+        f2 = p_data.get(2, 0)
+        f3 = p_data.get(3, 0)
+        f4 = p_data.get(4, 0)
+
+        f0 = gesamt - (f2 + f3 + f4)
+
+        counts.setdefault(t_id, {}).setdefault(k_id, {})
+        counts[t_id][k_id][s] = {
+            '0': f0,
+            '1': f2,
+            '2': f3,
+            '3': f4,
+            'total': gesamt
+        }
+
+    # 5. tb_totals berechnen (Summen für die farbigen Themen-Balken)
     tb_totals = {}
     for tb in themenbereiche:
-        tot = {"1": 0, "2": 0, "3": 0}
+        # Wir summieren hier die 'total' Werte pro Schwierigkeit (1, 2, 3)
+        t_sum = {"1": 0, "2": 0, "3": 0}
         for kap in tb.kapitel.all():
-            d = counts.get(tb.id, {}).get(kap.id, {"1": 0, "2": 0, "3": 0})
-            for k in tot:
-                tot[k] += d[k]
-        tb_totals[tb.id] = tot
+            kap_counts = counts.get(tb.id, {}).get(kap.id, {})
+            for s in ["1", "2", "3"]:
+                t_sum[s] += kap_counts.get(s, {}).get('total', 0)
+        tb_totals[tb.id] = t_sum
 
     return render(request, "physik/index.html", {
-        "themenbereiche": themenbereiche,
-        "kapitel_map": kapitel_map,
-        "counts": counts,
-        "tb_totals": tb_totals,
-    })
+            "themenbereiche": themenbereiche,
+            "counts": counts,
+            "kapitel_map": kapitel_map,
+        })
+
+# def index(request):
+#     # kompletter Reset beim echten Neustart
+#     for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
+#         request.session.pop(k, None)
+
+#     themenbereiche = (
+#         ThemenBereich.objects
+#         .filter(eingeblendet=True)
+#         .prefetch_related("kapitel")
+#         .order_by("ordnung")
+#     )
+
+#     kapitel_map = {
+#         tb.id: [{"zeile": k.zeile, "name": k.kapitel} for k in tb.kapitel.all().order_by("zeile")]
+#         for tb in themenbereiche
+#     }
+
+#     qs = (
+#         Aufgabe.objects
+#         .filter(thema__in=themenbereiche)
+#         .values("thema_id", "kapitel_id", "schwierigkeit")
+#         .annotate(cnt=Count("id"))
+#     )
+
+#     counts = {}
+#     for r in qs:
+#         tb = r["thema_id"]
+#         kap = r["kapitel_id"]
+#         s = str(r["schwierigkeit"])
+#         counts.setdefault(tb, {}).setdefault(kap, {"1": 0, "2": 0, "3": 0})
+#         counts[tb][kap][s] = r["cnt"]
+
+#     tb_totals = {}
+#     for tb in themenbereiche:
+#         tot = {"1": 0, "2": 0, "3": 0}
+#         for kap in tb.kapitel.all():
+#             d = counts.get(tb.id, {}).get(kap.id, {"1": 0, "2": 0, "3": 0})
+#             for k in tot:
+#                 tot[k] += d[k]
+#         tb_totals[tb.id] = tot
+
+#     return render(request, "physik/index.html", {
+#         "themenbereiche": themenbereiche,
+#         "kapitel_map": kapitel_map,
+#         "counts": counts,
+#         "tb_totals": tb_totals,
+#     })
 
 def aufgaben(request):
     # -------- Serie starten --------
@@ -188,7 +268,15 @@ def call(request, lfd_nr):
 def fehler_liste(request):
     # Basis-Queryset
     logs = FehlerLog.objects.all().select_related('aufgabe__thema', 'aufgabe__kapitel')
+    # --- NEU: Sortierung ---
+    sort = request.GET.get('sort', '-id')  # Standard: Neueste Fehlermeldungen oben
+    if sort == 'fachlich':
+        # Sortiert nach Thema-Reihenfolge -> Kapitel-Reihenfolge -> Aufgabennummer
+        #logs = logs.order_by('aufgabe__thema__ordnung', 'aufgabe__kapitel__ordnung', 'aufgabe__lfd_nr')
+        logs = logs.order_by('aufgabe__thema__ordnung', 'aufgabe__lfd_nr')
 
+    else:
+        logs = logs.order_by('-id')
     # 1. Suche (lfd_nr oder Frage)
     q = request.GET.get('q')
     if q:
@@ -220,6 +308,7 @@ def fehler_liste(request):
         's_thema': int(thema_id) if thema_id else None,
         's_kapitel': int(kapitel_id) if kapitel_id else None,
         'query': q or '',
+        'sort': sort,
     }
     return render(request, 'physik/fehler_liste.html', context)
 
@@ -269,6 +358,6 @@ def fehler_edit(request, log_id):
             # Erst wenn alles gespeichert ist, löschen wir den Fehler-Log
             log.delete()
 
-        return redirect('fehler_liste')
+        return redirect('physik:fehler_liste')
 
     return render(request, 'physik/fehler_edit.html', {'log': log})

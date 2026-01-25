@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 
+from django.contrib.auth.models import User
+
 class ThemenBereich(models.Model):
     ordnung = models.PositiveSmallIntegerField(unique=True)
     kurz = models.CharField(max_length=2, default="", blank=True)
@@ -143,6 +145,25 @@ class AufgabeBild(models.Model):
             )["m"] or 0
             self.position = max_pos + 1
         super().save(*args, **kwargs)
+
+class Protokoll(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    aufgabe = models.ForeignKey('Aufgabe', on_delete=models.CASCADE)
+    
+    # "Fächer" 2, 3 und 4 (Archiv)
+    fach = models.IntegerField(default=2)
+    
+    # Für die Zeitbegrenzung
+    letzte_bearbeitung = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # Sorgt dafür, dass jeder User pro Aufgabe nur einen Lernstand hat
+        unique_together = ('user', 'aufgabe')
+        verbose_name = "Lernkärtchen-Protokoll"
+        verbose_name_plural = "Lernkärtchen-Protokolle"
+
+    def __str__(self):
+        return f"{self.user.username}: {self.aufgabe.lfd_nr} -> Fach {self.fach}"
 
 class FehlerLog(models.Model):
     aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="fehler_logs")

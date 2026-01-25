@@ -11,9 +11,13 @@
 
 <div class="container-fluid">
     <div class="bg-light border p-2 mb-3 shadow-sm d-flex flex-wrap gap-2 align-items-center">
+
         <form method="GET" class="d-flex flex-wrap gap-2 w-100">
             <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm" style="width: 250px;" placeholder="Suche (Nr, Frage, Antwort)...">
-            
+            <select name="sort" class="form-select form-select-sm" style="width: 160px;" onchange="this.form.submit()">
+                <option value="-id" {% if sort == '-id' %}selected{% endif %}>🕒 Neueste zuerst</option>
+                <option value="fachlich" {% if sort == 'fachlich' %}selected{% endif %}>📚 Nach Reihenfolge</option>
+            </select>            
             <select name="thema" class="form-select form-select-sm" style="width: 180px;" onchange="this.form.submit()">
                 <option value="">-- Alle Themen --</option>
                 {% for t in themen %}
@@ -29,7 +33,7 @@
             </select>
 
             <button type="submit" class="btn btn-sm btn-secondary">Filtern</button>
-            <a href="{% url 'fehler_liste' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
+            <a href="{% url 'physik:fehler_liste' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
         </form>
     </div>
 
@@ -47,7 +51,7 @@
                 {% for log in logs %}
                 <tr>
                     <td>
-                        <a href="{% url 'fehler_edit' log.id %}" class="task-link">{{ log.aufgabe.frage|truncatechars:100 }}</a>
+                        <a href="{% url 'physik:fehler_edit' log.id %}" class="task-link">{{ log.aufgabe.frage|truncatechars:100 }}</a>
                         <span class="error-preview">→ "{{ log.eingegebene_antwort }}"</span>
                     </td>
                     <td><span class="text-muted fw-bold">{{ log.aufgabe.lfd_nr }}</span></td>
