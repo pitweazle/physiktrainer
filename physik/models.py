@@ -143,3 +143,11 @@ class AufgabeBild(models.Model):
             )["m"] or 0
             self.position = max_pos + 1
         super().save(*args, **kwargs)
+
+class FehlerLog(models.Model):
+    aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="fehler_logs")
+    eingegebene_antwort = models.TextField()
+    zeitpunkt = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-zeitpunkt']

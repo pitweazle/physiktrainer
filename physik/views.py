@@ -1,12 +1,13 @@
 import random
 
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Count
+from django.contrib.auth.decorators import user_passes_test
 
 from .bewertung import bewerte_aufgabe
-from .models import ThemenBereich, Aufgabe
+from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption
 
 def index(request):
     # kompletter Reset beim echten Neustart
@@ -178,7 +179,6 @@ def aufgaben(request):
             if request.session.get("warte_auf_weiter") else "",
     })
 
-
 def call(request, lfd_nr):
     try:
         aufgabe = Aufgabe.objects.get(lfd_nr=lfd_nr)
@@ -191,3 +191,93 @@ def call(request, lfd_nr):
     request.session.pop("letzte_antwort", None)
 
     return redirect("physik:aufgaben")
+
+@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_superuser)
+def fehler_liste(request):
+    # Basis-Queryset
+    logs = FehlerLog.objects.all().select_related('aufgabe__thema', 'aufgabe__kapitel')
+
+    # 1. Suche (lfd_nr oder Frage)
+    q = request.GET.get('q')
+    if q:
+        logs = logs.filter(
+            Q(aufgabe__lfd_nr__icontains=q) | 
+            Q(aufgabe__frage__icontains=q) |
+            Q(eingegebene_antwort__icontains=q)
+        )
+
+    # 2. Filter nach Thema
+    thema_id = request.GET.get('thema')
+    if thema_id:
+        logs = logs.filter(aufgabe__thema_id=thema_id)
+
+    # 3. Filter nach Kapitel
+    kapitel_id = request.GET.get('kapitel')
+    if kapitel_id:
+        logs = logs.filter(aufgabe__kapitel_id=kapitel_id)
+
+    # Daten für die Dropdowns
+    themen = ThemenBereich.objects.all().order_by('ordnung')
+    # Kapitel nur für das gewählte Thema (optional, für bessere UX)
+    kapitel = Kapitel.objects.filter(thema_id=thema_id) if thema_id else Kapitel.objects.all()
+
+    context = {
+        'logs': logs,
+        'themen': themen,
+        'kapitel': kapitel,
+        's_thema': int(thema_id) if thema_id else None,
+        's_kapitel': int(kapitel_id) if kapitel_id else None,
+        'query': q or '',
+    }
+    return render(request, 'physik/fehler_liste.html', context)
+
+@user_passes_test(lambda u: u.is_superuser)
+def fehler_edit(request, log_id):
+    log = get_object_or_404(FehlerLog, id=log_id)
+    aufgabe = log.aufgabe
+
+    if request.method == "POST":
+        if "just_delete" in request.POST:
+            log.delete()
+        else:
+            # 1. Hauptfelder der Aufgabe speichern
+            aufgabe.typ = request.POST.get("typ")
+            aufgabe.frage = request.POST.get("frage")
+            aufgabe.antwort = request.POST.get("antwort")
+            aufgabe.anmerkung = request.POST.get("anmerkung")
+            aufgabe.erklaerung = request.POST.get("erklaerung")
+            aufgabe.hilfe = request.POST.get("hilfe")
+            aufgabe.save()
+
+            # 2. Bestehende Optionen aktualisieren oder löschen
+            for key, value in request.POST.items():
+                if key.startswith("opt_"):
+                    opt_id = key.split("_")[1]
+                    option = AufgabeOption.objects.get(id=opt_id)
+                    
+                    if value.strip(): # Falls Text vorhanden: Update
+                        option.text = value.strip()
+                        option.position = request.POST.get(f"pos_{opt_id}") or 0
+                        option.save()
+                    else: # Falls Text leer: Weg damit
+                        option.delete()
+
+            # 3. Neue Optionen anlegen (die 3 leeren Felder)
+            for i in range(1, 4):
+                new_text = request.POST.get(f"new_opt_{i}")
+                new_pos = request.POST.get(f"new_pos_{i}")
+                
+                if new_text and new_text.strip():
+                    AufgabeOption.objects.create(
+                        aufgabe=aufgabe,
+                        text=new_text.strip(),
+                        position=new_pos if new_pos else 0
+                    )
+
+            # Erst wenn alles gespeichert ist, löschen wir den Fehler-Log
+            log.delete()
+
+        return redirect('fehler_liste')
+
+    return render(request, 'physik/fehler_edit.html', {'log': log})

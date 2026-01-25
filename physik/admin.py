@@ -67,7 +67,7 @@ class AufgabeAdmin(admin.ModelAdmin):
         else:     # NEUE Aufgabe → anlegen
             return ("lfd_nr", "erstellt", "von")
     list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
-    list_editable = ("typ",)
+    #list_editable = ("typ",)
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
     search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
@@ -102,4 +102,10 @@ class AufgabeAdmin(admin.ModelAdmin):
             obj.von = request.user
         super().save_model(request, obj, form, change)
 
+from .models import FehlerLog
 
+@admin.register(FehlerLog)
+class FehlerLogAdmin(admin.ModelAdmin):
+    list_display = ('zeitpunkt', 'aufgabe', 'eingegebene_antwort')
+    list_filter = ('aufgabe__thema', 'zeitpunkt')
+    search_fields = ('eingegebene_antwort', 'aufgabe__lfd_nr')
