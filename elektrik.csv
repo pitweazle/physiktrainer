@@ -1,14 +1,14 @@
 "erklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"schwierigkeit";"kapitel";"typ";"frage";"antwort";2;3;4;5;6;7;8;9;;
-;;;"E012";1;1;"Magnete";1;"Was passiert mit den Polen eines Magneten wenn man ihn auseinander bricht?";"Die beiden Stücke haben jeweils wieder einen Nord- und Südpol";;;;;;;;;;"1 Magnete"
-;;;"E013";1;1;"Magnete";3;"Welche Stoffe werden von einem Magneten angezogen";"Eisen, Kobald und Nickel";"ferromagnetische Stoffe";"ferromagnetische Materialien";;;;;;;;"2 Elektrostatik und Atombau"
-;;;"E014";2;1;"Elektrostatik und Atombau";"u13";"Aus welchen drei Elementarteilchen besteht ein Atom normalerweise?  ";"Proton, Elektron und Neutron";"Proton";"Neutron";"Elektron";;;;;;;"3 einfacher  Stromkreis"
-;;;"E015";2;1;"Elektrostatik und Atombau";2;"Was versteht man unter einem Ion?";"elektrisch geladenes Teilchen";"elektrisch geladen";;;;;;;;;"4 Spannungserzeugung"
-;;;"E016";2;1;"Elektrostatik und Atombau";3;"Welche elektrische Ladung hat ein Anion? ";"negativ";"Minus";"-";;;;;;;;"5 Wirkungen des el. Stromes"
-;;;"E017";2;1;"Elektrostatik und Atombau";3;"Welche elektrische Ladung hat ein Kathion?";"positiv";"Plus";"+";;;;;;;;"6 Spannung, Stromstärke, Widerstand und ohmsches Gesetz"
-;;;"E018";2;1;"Elektrostatik und Atombau";1;"Welche elektrische Ladungen ziehen sich an?";"ungleichnamige";;;;;;;;;;"7 Parallel- und Reihenschaltung"
-;;;"E019";2;1;"Elektrostatik und Atombau";1;"Welche elektrische Ladungen stoßen sich ab?";"gleichnamige";;;;;;;;;;"8 Kirchhoffsche Regeln"
+;;;"E012";1;1;"Magnete";"1Z";"Was passiert mit den Polen eines Magneten wenn man ihn auseinander bricht?";"Die beiden Stücke haben jeweils wieder einen Nord- und Südpol";;;;;;;;;;"1 Magnete"
+;;;"E013";1;1;"Magnete";"1o3Z";"Welche Stoffe werden von einem Magneten angezogen";"Eisen, Kobald und Nickel";"ferromagnetische Stoffe";"ferromagnetische Materialien";;;;;;;;"2 Elektrostatik und Atombau"
+;;;"E014";2;1;"Elektrostatik und Atombau";"1o(2u4)";"Aus welchen drei Elementarteilchen besteht ein Atom normalerweise?  ";"Proton, Elektron und Neutron";"Proton";"Neutron";"Elektron";;;;;;;"3 einfacher  Stromkreis"
+;;;"E015";2;1;"Elektrostatik und Atombau";"1o2Y";"Was versteht man unter einem Ion?";"elektrisch geladenes Teilchen";"elektrisch geladen";;;;;;;;;"4 Spannungserzeugung"
+;;;"E016";2;1;"Elektrostatik und Atombau";"1o3";"Welche elektrische Ladung hat ein Anion? ";"negativ";"Minus";"-";;;;;;;;"5 Wirkungen des el. Stromes"
+;;;"E017";2;1;"Elektrostatik und Atombau";"1o3";"Welche elektrische Ladung hat ein Kathion?";"positiv";"Plus";"+";;;;;;;;"6 Spannung, Stromstärke, Widerstand und ohmsches Gesetz"
+;;;"E018";2;1;"Elektrostatik und Atombau";"1o3";"Welche elektrische Ladungen ziehen sich an?";"ungleichnamige";"plus und minus";"minus und plus";;;;;;;;"7 Parallel- und Reihenschaltung"
+;;;"E019";2;1;"Elektrostatik und Atombau";"1o3";"Welche elektrische Ladungen stoßen sich ab?";"gleichnamige";"plus und plus";"minus und minus";;;;;;;;"8 Kirchhoffsche Regeln"
 ;;;"E020";2;1;"Elektrostatik und Atombau";1;"Welche Atomteilchen sind für den elektrischen Strom verantwortlich?";"Elektronen";"Elektronen";;;;;;;;;"9 Induktion"
-;;;"E024";2;1;"Elektrostatik und Atombau";"o11";"Welche Teilchen befinden sich in der Atomhülle?";"Elektronen";"Elektronen";;;;;;;;;
+;;;"E024";2;1;"Elektrostatik und Atombau";1;"Welche Teilchen befinden sich in der Atomhülle?";"Elektronen";"Elektronen";;;;;;;;;
 ;;;"E001";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie ist das Symbol des Widerstandes (Das Symbol - nicht die Einheit   !";"R";;;;;;;;;;
 ;;;"E002";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie heißt die Einheit des elektrischen Widerstandes (Ausgeschrieben - nicht die Abkürzung!)?";"Ohm";;;;;;;;;;
 ;;;"E003";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie heißt die Einheit der Stromstärke (Ausgeschrieben - nicht die Abkürzung !)?";"Ampere";;;;;;;;;;
@@ -16,10 +16,10 @@
 ;;;"E005";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie kürzt man die Einheit der Stromstärke ab ?";"A";;;;;;;;;;
 ;;;"E006";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie heißt die Einheit der Spannung (Ausgeschrieben - nicht die Abkürzung !)?";"Volt";;;;;;;;;;
 ;;;"E007";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";1;"Wie ist das Symbol der Spannung (Das Symbol - nicht die Einheit !)?";"U";;;;;;;;;;
-;;;"E008";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";3;"Welchen Widerstand hat eine Lampe mit der Aufschrift : 12Volt und 0,2A ?";"60Ohm";"60Ω";"60 Ohm";;;;;;;;
-;;;"E009";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";2;"Welche Stromstärke fließt durch einen 100 Ohm Widerstand, wenn eine Spannung von 5 Volt anliegt?";"0,05A";"50mA";;;;;;;;;
-;;;"E010";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";3;"Wie lautet das ohmsche Gesetz als Formel?";"U=R*1";"R=U/I";"R=U:I";;;;;;;;
-;;;"E011";6;2;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"u14";"Wovon hängt der Widerstand eines Drahtes ab?";"Länge, Querschnitt, Material und Temperatur";"Länge";"Temperatur";"Querschnitt";"Material";"Querschnittsfläche";;;;;
-;;;"E021";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"o22p1";"Das gelbe ist eine Lampe. Ist das Spannungsmessgerät das grüne oder das blaue ?";"das grüne";"grün";;;;;;;;;
-;;;"E022";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"o22p1";"Das gelbe ist eine Lampe. Ist das Stromstärkemessgerät das grüne oder das blaue ?";"das blaue";"blau";;;;;;;;;
-;;;"E023";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"o12p2";"Die Lampen haben alle die gleichen Werte und auch die Spannungen sind gleich. Welche Lampe leuchtet am hellsten ?";"4";"4.";4;;;;;;;;
+;;;"E008";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"1o3";"Welchen Widerstand hat eine Lampe mit der Aufschrift : 12Volt und 0,2A ?";"60Ohm";"60Ω";"60 Ohm";;;;;;;;
+;;;"E009";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"1o2";"Welche Stromstärke fließt durch einen 100 Ohm Widerstand, wenn eine Spannung von 5 Volt anliegt?";"0,05A";"50mA";;;;;;;;;
+;;;"E010";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"1o3";"Wie lautet das ohmsche Gesetz als Formel?";"U=R*1";"R=U/I";"R=U:I";;;;;;;;
+;;;"E011";6;2;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"(2u4)u(5o6)";"Wovon hängt der Widerstand eines Drahtes ab?";"Länge, Querschnitt, Material und Temperatur";"Länge";"Temperatur";"Material";"Querschnitt";"Querschnittsfläche";;;;;
+;;;"E021";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"p1o2f3";"Das gelbe ist eine Lampe. Ist das Spannungsmessgerät das grüne oder das blaue ?";"das grüne";"grün";"blau";;;;;;;;
+;;;"E022";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"p1o2f3";"Das gelbe ist eine Lampe. Ist das Stromstärkemessgerät das grüne oder das blaue ?";"das blaue";"blau";"blau";;;;;;;;
+;;;"E023";6;1;"Spannung, Stromstärke, Widerstand und ohmsches Gesetz";"p1";"Die Lampen haben alle die gleichen Werte und auch die Spannungen sind gleich. Welche Lampe leuchtet am hellsten ?";"4";;;;;;;;;;

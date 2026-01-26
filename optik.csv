@@ -1,26 +1,26 @@
-erklaerung;anmerkung;hilfe;lfd_nr;zeile;schwierigkeit;kapitel;typ;altertyp;frage;antwort;2;3;4;5;6;7;8;9;;
-;;;O0001;1;1;Licht und Schatten;1;1;Wie heißt die Konvexlinse auf deutsch?;Sammellinse;;;;;;;;;;1 Licht und Schatten
-„Anziehen“ würde bedeuten, dass die Lichtstahlen von ihrem geraden Weg abwichen.;;;O0002;1;1;Licht und Schatten;(1o2)o(3u4)f(5o6);u23o012f456;Warum werden dunkle Körper in der Sonne schneller warm?         Ergänze: Weil sie das Sonnenlicht … ;absorbieren;schlucken;nicht;reflektieren;anzieht;anziehen;;;;;2 Reflektion
-;;;O0003;1;1;Licht und Schatten;1o2;o01;Wie breitet sich Licht aus?;geradlinig;gerade;;;;;;;;;3 Brechung
-;;;O0004;4;1;Linsen;1o2;1;Wenn eine Lichtquelle  einen undurchsichtigen Körper beleuchtet, entsteht hinter dem Körper ein...;Schatten;Kernschatten;;;;;;;;;4 Linsen
-;;;O0005;2;1;Reflektion;a2;a2;Wie erhältst du einen möglichst großen Schatten?;Der Gegenstand muss nah an der Lichtquelle stehen.;Der Gegenstand muss von der Lichtquelle weit entfernt stehen.;;;;;;;;;5 Abbildungen
-;;;O0006;1;1;Licht und Schatten;1u3;u13;Wie heißen die beiden Schattenbereiche, die entstehen, wenn Licht aus zwei Lichtquellen auf einen lichtundurchlässigen Körper trifft?;Kernschatten und Halbschatten;Kern;Halb;schatten;;;;;;;6 optische Geräte
-;;;O0007;1;1;Licht und Schatten;1o4;o04;Wie lange braucht die Erde um sich einmal um die eigene Achse zu drehen?;24 Stunden;24h;25 Stunden;25h;;;;;;;
-;;;O0008;1;1;Licht und Schatten;1o3;o03;Wie lange braucht der Mond um sich einmal um die Erde zu drehen?;1 Monat;27 Tage;27d;;;;;;;;
-;;;O0009;1;1;Licht und Schatten;1o3;o03;Wie lange braucht die Erde um sich einmal um die Sonne zu drehen?;1 Jahr;365,25d;365 Tage 6 Stunden;;;;;;;;
-;;;O0010;1;1;Licht und Schatten;a3;a3;Was steht bei einer Sonnenfinsternis in der Mitte?;Mond;Erde;Sonne;;;;;;;;
-;;;O0011;1;1;Licht und Schatten;a3;a3;Was steht bei einer Mondfinsternis in der Mitte?;Erde;Mond;Sonne;;;;;;;;
-;;;O0012;2;2;Reflektion;b1o2;b1;Dunkle Flächen ... das Licht.;absorbieren;schlucken;;;;;;;;;
-;;;O0013;2;1;Reflektion;b1;b1;Helle Flächen ... das Licht besser als dunkle Flächen.;reflektieren;;;;;;;;;;
-;;;O0014;4;1;Linsen;1;1;Wie heißt die Konkavlinse auf deutsch?;Zerstreuungslinse;;;;;;;;;;
-;;;O0015;2;2;Reflektion;l42;l42;Das Bild eines nach außen gewölbter Spiegel ist …;verkleinert;aufrecht;vergrößert;umgekehrt;;;;;;;
-;;;O0016;2;2;Reflektion;l42;l42;Das Bild eines nach innen gewölbter Spiegel ist …;vergrößert;umgekehrt;verkleinert;aufrecht;;;;;;;
-;;;O0017;4;1;Linsen;1;1;Wie heißt die Stelle hinter einer Sammellinse, bei der parallele Lichtstrahlen vereinigt werden?;Brennpunkt;;;;;;;;;;
-;;;O0018;6;1;optische Geräte;a2;a2;Wer kurzsichtig ist, sieht...;Nahes scharf und Fernes unscharf;Fernes scharf und Nahes unscharf;;;;;;;;;
-;;;O0019;6;1;optische Geräte;a2;a2;Wer weitsichtig ist, sieht...;Nahes scharf und Fernes unscharf;;;;;;;;;;
-;;;O0020;3;1;Brechung;e1234578;e1234578;Wenn Sonnenlicht durch ein Prisma zerlegt wird entstehen die Spektralfarben. Zähle diese auf (Nur die sichtbaren). Beginne mit rot:;rot, orange, gelb, grün, blau, violett;rot;orange;gelb;grün;blau;indigo;violett;lila;;
-;;;O0021;3;1;Brechung;a2;a2;Warum wird weißes Licht in einem Prisma in die Spektralfarben zerlegt?;In einem Prisma werden die Spektralfarben unterschiedlich stark gebrochen.;Im Prisma werden die Spektralfarben zum weißen Licht dazugemischt.;;;;;;;;;
-;;;O0022;1;1;Licht und Schatten;w;w;Der Mond ist ein selbstleuchtender Körper. (wahr/falsch);falsch;;;;;;;;;;
-;;;O0023;2;1;Reflektion;w;w;Spiegel absorbieren das Licht. (wahr/falsch);falsch;;;;;;;;;;
-;;;O0024;1;1;Licht und Schatten;w;w;Der Mond erzeugt kein Licht. (wahr/falsch);wahr;;;;;;;;;;
-;;;O0025;1;1;Licht und Schatten;w;w;Das Auge ist ein Lichtempfänger. (wahr/falsch);wahr;;;;;;;;;;
+"erklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"schwierigkeit";"kapitel";"typ";"frage";"antwort";2;3;4;5;6;7;8;9;;
+;;;"O0001";1;1;"Licht und Schatten";1;"Wie heißt die Konvexlinse auf deutsch?";"Sammellinse";;;;;;;;;;"1 Licht und Schatten"
+"„Anziehen“ würde bedeuten, dass die Lichtstahlen von ihrem geraden Weg abwichen.";;;"O0002";1;1;"Licht und Schatten";"(1o2)o(3u4)f5";"Warum werden dunkle Körper in der Sonne schneller warm?         Ergänze: Weil sie das Sonnenlicht … ";"absorbieren";"schlucken";"nicht";"reflektieren";"anzieh";;;;;;"2 Reflektion"
+;;;"O0003";1;1;"Licht und Schatten";"1o2";"Wie breitet sich Licht aus?";"geradlinig";"gerade";;;;;;;;;"3 Brechung"
+;;;"O0004";4;1;"Linsen";"1o2";"Wenn eine Lichtquelle  einen undurchsichtigen Körper beleuchtet, entsteht hinter dem Körper ein...";"Schatten";"Kernschatten";;;;;;;;;"4 Linsen"
+;;;"O0005";2;1;"Reflektion";"a";"Wie erhältst du einen möglichst großen Schatten?";"Der Gegenstand muss nah an der Lichtquelle stehen.";"Der Gegenstand muss von der Lichtquelle weit entfernt stehen.";;;;;;;;;"5 Abbildungen"
+;;;"O0006";1;1;"Licht und Schatten";"1o(2u4)";"Wie heißen die beiden Schattenbereiche, die entstehen, wenn Licht aus zwei Lichtquellen auf einen lichtundurchlässigen Körper trifft?";"Kernschatten und Halbschatten";"Kern";"Halb";"schatten";;;;;;;"6 optische Geräte"
+;;;"O0007";1;1;"Licht und Schatten";"1o4";"Wie lange braucht die Erde um sich einmal um die eigene Achse zu drehen?";"24 Stunden";"24h";"25 Stunden";"25h";;;;;;;
+;;;"O0008";1;1;"Licht und Schatten";"1o3";"Wie lange braucht der Mond um sich einmal um die Erde zu drehen?";"1 Monat";"27 Tage";"27d";;;;;;;;
+;;;"O0009";1;1;"Licht und Schatten";"1o3";"Wie lange braucht die Erde um sich einmal um die Sonne zu drehen?";"1 Jahr";"365,25d";"365 Tage 6 Stunden";;;;;;;;
+;;;"O0010";1;1;"Licht und Schatten";"a";"Was steht bei einer Sonnenfinsternis in der Mitte?";"Mond";"Erde";"Sonne";;;;;;;;
+;;;"O0011";1;1;"Licht und Schatten";"a";"Was steht bei einer Mondfinsternis in der Mitte?";"Erde";"Mond";"Sonne";;;;;;;;
+;;;"O0012";2;2;"Reflektion";"e1o2";"Dunkle Flächen ... das Licht.";"absorbieren";"schlucken";;;;;;;;;
+;;;"O0013";2;1;"Reflektion";"e1";"Helle Flächen ... das Licht besser als dunkle Flächen.";"reflektieren";;;;;;;;;;
+;;;"O0014";4;1;"Linsen";1;"Wie heißt die Konkavlinse auf deutsch?";"Zerstreuungslinse";;;;;;;;;;
+;;;"O0015";2;2;"Reflektion";"l(1o3)f(4o5)";"Das Bild eines nach außen gewölbter Spiegel ist …";"aufrecht, verkleinert";"aufrecht";"kleiner";"umgekehrt";"vergrößert";;;;;;
+;;;"O0016";2;2;"Reflektion";"l(1o3)f(4o5)";"Das Bild eines nach innen gewölbter Spiegel ist …";"vergrößert, umgekehrt";"umgekehrt";"gößer";"aufrecht";"verkleinert";;;;;;
+;;;"O0017";4;1;"Linsen";1;"Wie heißt die Stelle hinter einer Sammellinse, bei der parallele Lichtstrahlen vereinigt werden?";"Brennpunkt";;;;;;;;;;
+;;;"O0018";6;1;"optische Geräte";"a";"Wer kurzsichtig ist, sieht...";"Nahes scharf und Fernes unscharf";"Fernes scharf und Nahes unscharf";;;;;;;;;
+;;;"O0019";6;1;"optische Geräte";"a";"Wer weitsichtig ist, sieht...";"Nahes scharf und Fernes unscharf";;;;;;;;;;
+"benutze anstelle von „lila“ den Namen „violett“";;;"O0020";3;1;"Brechung";"1o(2u7)f8";"Wenn Sonnenlicht durch ein Prisma zerlegt wird entstehen die Spektralfarben. Zähle diese auf (Nur die sichtbaren). Beginne mit rot:";"rot, orange, gelb, grün, blau, violett";"rot";"orange";"gelb";"grün";"blau";"violett";"lila";;;
+;;;"O0021";3;1;"Brechung";"a";"Warum wird weißes Licht in einem Prisma in die Spektralfarben zerlegt?";"In einem Prisma werden die Spektralfarben unterschiedlich stark gebrochen.";"Im Prisma werden die Spektralfarben zum weißen Licht dazugemischt.";;;;;;;;;
+;;;"O0022";1;1;"Licht und Schatten";"w";"Der Mond ist ein selbstleuchtender Körper. (wahr/falsch)";"falsch";;;;;;;;;;
+;;;"O0023";2;1;"Reflektion";"w";"Spiegel absorbieren das Licht. (wahr/falsch)";"falsch";;;;;;;;;;
+;;;"O0024";1;1;"Licht und Schatten";"w";"Der Mond erzeugt kein Licht. (wahr/falsch)";"wahr";;;;;;;;;;
+;;;"O0025";1;1;"Licht und Schatten";"w";"Das Auge ist ein Lichtempfänger. (wahr/falsch)";"wahr";;;;;;;;;;

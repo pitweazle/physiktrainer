@@ -1,6 +1,6 @@
-erklaerung;anmerkung;hilfe;lfd_nr;zeile;schwierigkeit;kapitel;typ;altertyp;frage;antwort;2;3;4;5;6;7;8;9;;
-;;;D001;1;1;Druck;$1o2;o12;Wie lautet die Definition  für den Druck?;Druck=Kraft/Fläche;Druck=Kraft:Fläche;;;;;;;;;1 Druck
-;;;D002;1;1;Druck;$1;1;Wie lautet die Definition des Drucks als Formel?;p=F/A;;;;;;;;;;2 hydraulische Maschinen
-;;;D003;1;1;Druck;$1;1;Welcher Buchstabe ist das Symbol für den Druck?;p;;;;;;;;;;3 Druck in Flüssigkeiten
-;;;D004;1;1;Druck;$1o2;o12;Wie heißen die Einheiten des Drucks?;Pascal und Bar;$Pascal;$Bar;;;;;;;;4 Auftrieb
-;;;D005;1;1;Druck;1p1;1p1;Wie nennt man so ein Gerät ?;Barometer;;;;;;;;;;5 Fliegen
+"erklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"schwierigkeit";"kapitel";"typ";"frage";"antwort";2;3;4;5;6;7;8;9;;
+;;;"D001";1;1;"Druck";"1o3Y";"Wie lautet die Definition  für den Druck?";"Druck=Kraft/Fläche";"Druck=Kraft:Fläche";;;;;;;;;"1 Druck"
+;;;"D002";1;1;"Druck";"1X";"Wie lautet die Definition des Drucks als Formel?";"p=F/A";;;;;;;;;;"2 hydraulische Maschinen"
+;;;"D003";1;1;"Druck";"1X";"Welcher Buchstabe ist das Symbol für den Druck?";"p";;;;;;;;;;"3 Druck in Flüssigkeiten"
+;;;"D004";1;1;"Druck";"1u(2o3)";"Wie heißen die Einheiten des Drucks?";"Pascal und Bar";"Pascal";"Bar";;;;;;;;"4 Auftrieb"
+;;;"D005";1;1;"Druck";"p1";"Wie nennt man so ein Gerät ?";"Barometer";;;;;;;;;;"5 Fliegen"
