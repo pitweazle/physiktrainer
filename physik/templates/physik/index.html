@@ -31,18 +31,26 @@
                                 <option value="{{ tb.id }}">{{ tb.thema }}</option>
                             {% endfor %}
                         </select>
+                        <label>Start-Kapitel (fix)</label>
+                            <select id="startSelectDisplay" disabled></select>
+                            <input type="hidden" name="start" id="startSelect">
+                            <label>End-Kapitel</label>
+                        <select name="end" id="endSelect" required></select>
+                        <hr>
                         <label>Schwierigkeitsgrad (bis:)</label>
                         <div class="radio-row">
                             <label><input type="radio" name="level" value="1" required> Einfach</label>
                             <label><input type="radio" name="level" value="2"> Mittel</label>
                             <label><input type="radio" name="level" value="3"> Profi</label>
                         </div>
-                        <hr>
-                        <label>Start-Kapitel (fix)</label>
-                        <select id="startSelectDisplay" disabled></select>
-                        <input type="hidden" name="start" id="startSelect">
-                        <label>End-Kapitel</label>
-                        <select name="end" id="endSelect" required></select>
+                        <label>welches Fach</label>
+                            <div class="radio-row">
+                                <label><input type="radio" name="fach" value="1" required checked> Fach 1</label>
+                                <label><input type="radio" name="fach" value="2"> Fach 2</label>
+                                <label><input type="radio" name="fach" value="3"> Fach 3</label>
+                            </div>
+                            <p class="small text-muted mt-1">Hinweis: Fach 4 (Archiv) kann nicht gezielt geübt werden.</p>
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit">weiter</button>

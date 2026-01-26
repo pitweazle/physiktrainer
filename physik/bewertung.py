@@ -122,7 +122,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         if not found:
             ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
 
-    # 3. Haupt-Parser: Streng
+    # 3. Haupt-Parser: 
     if not ergebnis:
         streng_ok, hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
@@ -144,23 +144,34 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # -----------------------------------------------------------
     # C. FINALE & LOGGING
     # -----------------------------------------------------------
-    if request.user.is_authenticated:
-        from .models import Protokoll # Import hier, falls oben Probleme
-        protokoll, created = Protokoll.objects.get_or_create(
-            user=request.user, 
-            aufgabe=aufgabe
-        )
+    if ergebnis is None:
+        ergebnis = {"richtig": False, "hinweis": "Es gab ein Problem bei der Auswertung."}
 
-        if ergebnis:
-            if protokoll.fach < 4:
-                protokoll.fach += 1
-            ergebnis = {"richtig": True, "hinweis": "Super, das war richtig!"}
+    if request.user.is_authenticated:
+       
+        # Wir holen das Protokoll, falls es existiert
+        protokoll = Protokoll.objects.filter(user=request.user, aufgabe=aufgabe).first()
+
+        # WICHTIG: Wir prüfen das Feld "richtig" im Dictionary
+        if ergebnis.get("richtig") == True:
+            if not protokoll:
+                # Aufgabe war neu -> jetzt in Fach 2
+                Protokoll.objects.create(user=request.user, aufgabe=aufgabe, fach=2)
+                print(f"Neu: Aufgabe {aufgabe.id} -> Fach 2")
+            else:
+                # Aufgabe existierte schon -> ein Fach höher (max 4)
+                if protokoll.fach < 4:
+                    protokoll.fach += 1
+                    protokoll.save()
+                print(f"Update: Aufgabe {aufgabe.id} -> Fach {protokoll.fach}")
+        
         else:
-            protokoll.fach = 2 # Zurück in den Lernvorrat
-            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
-            
-        protokoll.save()
-        print(f"Protokoll aktualisiert: Aufgabe {aufgabe.id} jetzt in Fach {protokoll.fach}")
+            # FALSCH beantwortet -> Zurück in Fach 1 (durch Löschen des Protokolls)
+            if protokoll:
+                protokoll.delete()
+                print(f"Falsch: Protokoll für Aufgabe {aufgabe.id} gelöscht (zurück in Fach 1)")
+            else:
+                print(f"Falsch: Aufgabe {aufgabe.id} war schon in Fach 1 (kein Protokoll vorhanden)")
     
     # Wenn bis hierhin nichts gegriffen hat
     if not ergebnis:

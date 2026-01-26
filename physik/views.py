@@ -90,38 +90,69 @@ def index(request):
         })
 
 def aufgaben(request):
-    # -------- Serie starten --------
-    if "aufgaben_ids" not in request.session and request.method == "GET":
+    anmerkung_fuer_template = ""
+    if "aufgaben_ids" not in request.session:
+        # 1. Parameter aus GET holen
         tb_id = request.GET.get("tb")
-        level = request.GET.get("level")
-        start = request.GET.get("start")
-        end = request.GET.get("end")
+        level = int(request.GET.get("level", 3))
+        start_kap = int(request.GET.get("start", 0))
+        end_kap = int(request.GET.get("end", 999))
+        fach_int = int(request.GET.get("fach", 1))
 
-        qs = Aufgabe.objects.filter(
+        # 2. Grundfilterung der Aufgaben (Thema, Kapitel, Schwierigkeit)
+        aufgaben_qs = Aufgabe.objects.filter(
             thema_id=tb_id,
-            schwierigkeit__lte=level,
-            kapitel__zeile__gte=start,
-            kapitel__zeile__lte=end,
+            kapitel__zeile__gte=start_kap,
+            kapitel__zeile__lte=end_kap,
+            schwierigkeit__lte=level
         )
 
-        serie = random.sample(list(qs), min(10, qs.count()))
-        request.session["aufgaben_ids"] = [a.id for a in serie]
-        request.session["index"] = 0
-        request.session["warte_auf_weiter"] = False
-        request.session.pop("letzte_antwort", None)
+        # 3. Spezifische Fach-Filterung (WICHTIG: distinct() wegen des Joins zum Protokoll)
+        if fach_int == 1:   
+            # Fach 1: 
+            # Aufgaben, die ENTWEDER ein Protokoll für diesen User mit Fach 1 haben
+            # ODER die überhaupt kein Protokoll für diesen User haben
+            aufgaben_qs = aufgaben_qs.filter(
+                Q(protokoll__user=request.user, protokoll__fach=1) | 
+                ~Q(protokoll__user=request.user) # Das ~ Symbol bedeutet "NOT"
+            ).distinct()
+        else:
+            # Fach 2 oder 3: Exakter Match
+            aufgaben_qs = aufgaben_qs.filter(
+                protokoll__user=request.user, 
+                protokoll__fach=fach_int
+            )
 
-    ids = request.session["aufgaben_ids"]
-    index = request.session["index"]
+        # 4. IDs extrahieren
+        all_ids = list(aufgaben_qs.values_list("id", flat=True))
+        
+        # 5. Check: Wenn leer, zurück zur Index
+        if not all_ids:
+            messages.info(request, f"In Fach {fach_int} gibt es momentan keine Aufgaben für diesen Bereich.")
+            return redirect('physik:index')
 
-    # -------- Serie beendet --------
-    if index >= len(ids):
+        # 6. Serie initialisieren (nur wenn wir nicht schon mitten drin sind)
+        if "aufgaben_ids" not in request.session:
+            random.shuffle(all_ids)
+            selektierte_ids = all_ids[:10]
+            request.session["aufgaben_ids"] = selektierte_ids
+            request.session["index"] = 0
+            request.session["warte_auf_weiter"] = False
+            request.session.pop("letzte_antwort", None)
+
+    # 7. Aktuellen Stand aus der Session holen
+    ids_in_session = request.session.get("aufgaben_ids", [])
+    index = request.session.get("index", 0)
+
+    # 8. Check: Serie beendet?
+    if index >= len(ids_in_session):
         for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
             request.session.pop(k, None)
         return redirect("physik:index")
 
-    aufgabe = Aufgabe.objects.get(id=ids[index])
-    anmerkung_fuer_template = aufgabe.anmerkung
-
+    # 9. Aktuelle Aufgabe laden
+    aufgabe = Aufgabe.objects.get(id=ids_in_session[index])
+    
     # -------- Bilder --------
     bilder_anzeige = None
     if "p" in aufgabe.typ:
@@ -151,7 +182,6 @@ def aufgaben(request):
     if request.method == "POST":
         # Hier definierst du 'antwort'
         antwort = request.POST.get("user_antwort") or request.POST.get("antwort", "")
-        ergebnis = bewerte_aufgabe(request, aufgabe, antwort)
         bild_antwort = request.POST.get("bild_antwort")
 
         # ---- Skip ----
@@ -200,7 +230,7 @@ def aufgaben(request):
         "bilder": bilder_anzeige,
         "auswahl_optionen": optionen_liste,
         "fragenummer": index + 1,
-        "anzahl": len(ids),
+        "anzahl": len(ids_in_session),
         "warte_auf_weiter": request.session.get("warte_auf_weiter", False),
         "letzte_antwort": request.session.get("letzte_antwort", "") 
             if request.session.get("warte_auf_weiter") else "",
