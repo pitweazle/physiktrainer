@@ -1,6 +1,6 @@
 "erklaerung";"anmerkung";"hilfe";"lfd_nr";"zeile";"schwierigkeit";"kapitel";"typ";"frage";"antwort";2;3;4;5;6;7;8;9;;
 ;;;"O0001";1;1;"Licht und Schatten";1;"Wie heißt die Konvexlinse auf deutsch?";"Sammellinse";;;;;;;;;;"1 Licht und Schatten"
-"„Anziehen“ würde bedeuten, dass die Lichtstahlen von ihrem geraden Weg abwichen.";;;"O0002";1;1;"Licht und Schatten";"(1o2)o(3u4)f5";"Warum werden dunkle Körper in der Sonne schneller warm?         Ergänze: Weil sie das Sonnenlicht … ";"absorbieren";"schlucken";"nicht";"reflektieren";"anzieh";;;;;;"2 Reflektion"
+"„Anziehen“ würde bedeuten, dass die Lichtstahlen von ihrem geraden Weg abwichen.";;;"O0002";1;1;"Licht und Schatten";"(1o3)o(3u4)f5";"Warum werden dunkle Körper in der Sonne schneller warm?         Ergänze: Weil sie das Sonnenlicht … ";"absorbieren";"schlucken";"absorbier";"nicht";"reflektieren";"anzieh";;;;;"2 Reflektion"
 ;;;"O0003";1;1;"Licht und Schatten";"1o2";"Wie breitet sich Licht aus?";"geradlinig";"gerade";;;;;;;;;"3 Brechung"
 ;;;"O0004";4;1;"Linsen";"1o2";"Wenn eine Lichtquelle  einen undurchsichtigen Körper beleuchtet, entsteht hinter dem Körper ein...";"Schatten";"Kernschatten";;;;;;;;;"4 Linsen"
 ;;;"O0005";2;1;"Reflektion";"a";"Wie erhältst du einen möglichst großen Schatten?";"Der Gegenstand muss nah an der Lichtquelle stehen.";"Der Gegenstand muss von der Lichtquelle weit entfernt stehen.";;;;;;;;;"5 Abbildungen"
@@ -17,7 +17,7 @@
 ;;;"O0016";2;2;"Reflektion";"l(1o3)f(4o5)";"Das Bild eines nach innen gewölbter Spiegel ist …";"vergrößert, umgekehrt";"umgekehrt";"gößer";"aufrecht";"verkleinert";;;;;;
 ;;;"O0017";4;1;"Linsen";1;"Wie heißt die Stelle hinter einer Sammellinse, bei der parallele Lichtstrahlen vereinigt werden?";"Brennpunkt";;;;;;;;;;
 ;;;"O0018";6;1;"optische Geräte";"a";"Wer kurzsichtig ist, sieht...";"Nahes scharf und Fernes unscharf";"Fernes scharf und Nahes unscharf";;;;;;;;;
-;;;"O0019";6;1;"optische Geräte";"a";"Wer weitsichtig ist, sieht...";"Nahes scharf und Fernes unscharf";;;;;;;;;;
+;;;"O0019";6;1;"optische Geräte";"a";"Wer weitsichtig ist, sieht...";"Fernes scharf und Nahes unscharf";"Nahes scharf und Fernes unscharf";;;;;;;;;
 "benutze anstelle von „lila“ den Namen „violett“";;;"O0020";3;1;"Brechung";"1o(2u7)f8";"Wenn Sonnenlicht durch ein Prisma zerlegt wird entstehen die Spektralfarben. Zähle diese auf (Nur die sichtbaren). Beginne mit rot:";"rot, orange, gelb, grün, blau, violett";"rot";"orange";"gelb";"grün";"blau";"violett";"lila";;;
 ;;;"O0021";3;1;"Brechung";"a";"Warum wird weißes Licht in einem Prisma in die Spektralfarben zerlegt?";"In einem Prisma werden die Spektralfarben unterschiedlich stark gebrochen.";"Im Prisma werden die Spektralfarben zum weißen Licht dazugemischt.";;;;;;;;;
 ;;;"O0022";1;1;"Licht und Schatten";"w";"Der Mond ist ein selbstleuchtender Körper. (wahr/falsch)";"falsch";;;;;;;;;;

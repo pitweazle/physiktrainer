@@ -145,7 +145,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # C. FINALE & LOGGING
     # -----------------------------------------------------------
     if ergebnis is None:
-        ergebnis = {"richtig": False, "hinweis": "Es gab ein Problem bei der Auswertung."}
+        ergebnis = {"richtig": False,}
 
     if request.user.is_authenticated:
        

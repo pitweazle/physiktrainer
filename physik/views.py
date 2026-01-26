@@ -1,6 +1,7 @@
 import random
 
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Count
@@ -92,6 +93,9 @@ def index(request):
 def aufgaben(request):
     anmerkung_fuer_template = ""
     if "aufgaben_ids" not in request.session:
+        storage = get_messages(request)
+        for message in storage:
+            pass  # Das bloße Iterieren markiert sie als gelesen/gelöscht
         # 1. Parameter aus GET holen
         tb_id = request.GET.get("tb")
         level = int(request.GET.get("level", 3))
