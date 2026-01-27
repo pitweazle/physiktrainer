@@ -100,24 +100,86 @@
                                     <td class="kapitel-name">{{ kap.zeile }}. {{ kap.kapitel }}</td>
                                     <td class="spacer"></td>
 
-                                    {# --- EINFACH (Level 1) --- #}
-                                    {% with s1=kap_data|get_item:"1" %}
-                                        <td class="box">{{ s1|get_item:0|default:0 }}</td>
-                                        <td class="box">{{ s1|get_item:1|default:0 }}</td>
-                                        <td class="box">{{ s1|get_item:2|default:0 }}</td>
-                                        <td class="box">{{ s1|get_item:3|default:0 }}</td>
-                                        <td class="summe" style="background: {{ tb.farbe }};">
-                                            {{ s1|get_item:"total"|default:0 }}
-                                        </td>
-                                    {% endwith %}
+                                {# --- EINFACH (Level 1) --- #}
+                                {% with s1=kap_data|get_item:"1" %}
+                                    {# Fach 1 (Index 0) #}
+                                    <td class="box">
+                                        {% with f_anzahl=s1|get_item:0|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=1" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
 
-                                    <td class="spacer"></td>
+                                    {# Fach 2 (Index 1) #}
+                                    <td class="box">
+                                        {% with f_anzahl=s1|get_item:1|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=2" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
 
-                                    {# --- MITTEL (Level 2) --- #}
-                                    {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" %}
-                                        <td class="box col-mittel">{{ s2|get_item:0|default:0 }}</td>
-                                        <td class="box col-mittel">{{ s2|get_item:1|default:0 }}</td>
-                                        <td class="box col-mittel">{{ s2|get_item:2|default:0 }}</td>
+                                    {# Fach 3 (Index 2) #}
+                                    <td class="box">
+                                        {% with f_anzahl=s1|get_item:2|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=3" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+                                    {# Fach 4 (Index 3) - Meist ohne Link, da "Archiv" #}
+                                    <td class="box">{{ s1|get_item:3|default:0 }}</td>
+
+                                    {# Summe Level 1 #}
+                                    <td class="summe" style="background: {{ tb.farbe }};">
+                                        {{ s1|get_item:"total"|default:0 }}
+                                    </td>
+                                {% endwith %}
+
+                                <td class="spacer"></td>
+
+                                {# --- MITTEL (Level 2) --- #}
+                                {% with s2=kap_data|get_item:"2" %}
+                                    {# Fach 1 #}
+                                    <td class="box col-mittel">
+                                        {% with f_anzahl=s2|get_item:0|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=1" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+                                    {# Fach 2 #}
+                                    <td class="box col-mittel">
+                                        {% with f_anzahl=s2|get_item:1|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=2" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+                                    {# Fach 3 #}
+                                    <td class="box col-mittel">
+                                        {% with f_anzahl=s2|get_item:2|default:0 %}
+                                            {% if f_anzahl > 0 %}
+                                                <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=3" style="color: inherit; text-decoration: none; display: block;">
+                                                    {{ f_anzahl }}
+                                                </a>
+                                            {% else %} 0 {% endif %}
+                                        {% endwith %}
+                                    </td>
                                         <td class="box col-mittel">{{ s2|get_item:3|default:0 }}</td>
                                         <td class="summe col-mittel" style="background: {{ tb.farbe }};">
                                             {{ s2|get_item:"total"|default:0 }}
@@ -132,11 +194,39 @@
                                     <td class="spacer col-mittel"></td>
 
                                     {# --- PROFI (Level 3) --- #}
-                                    {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" s3=kap_data|get_item:"3" %}
-                                        <td class="box col-profi">{{ s3|get_item:0|default:0 }}</td>
-                                        <td class="box col-profi">{{ s3|get_item:1|default:0 }}</td>
-                                        <td class="box col-profi">{{ s3|get_item:2|default:0 }}</td>
-                                        <td class="box col-profi">{{ s3|get_item:3|default:0 }}</td>
+                                    {% with s3=kap_data|get_item:"3" %}
+                                        {# Fach 1 #}
+                                        <td class="box col-profi">
+                                            {% with f_anzahl=s3|get_item:0|default:0 %}
+                                                {% if f_anzahl > 0 %}
+                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=1" style="color: inherit; text-decoration: none; display: block;">
+                                                        {{ f_anzahl }}
+                                                    </a>
+                                                {% else %} 0 {% endif %}
+                                            {% endwith %}
+                                        </td>
+
+                                        {# Fach 2 #}
+                                        <td class="box col-profi">
+                                            {% with f_anzahl=s3|get_item:1|default:0 %}
+                                                {% if f_anzahl > 0 %}
+                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=2" style="color: inherit; text-decoration: none; display: block;">
+                                                        {{ f_anzahl }}
+                                                    </a>
+                                                {% else %} 0 {% endif %}
+                                            {% endwith %}
+                                        </td>
+
+                                        {# Fach 3 #}
+                                        <td class="box col-profi">
+                                            {% with f_anzahl=s3|get_item:2|default:0 %}
+                                                {% if f_anzahl > 0 %}
+                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=3" style="color: inherit; text-decoration: none; display: block;">
+                                                        {{ f_anzahl }}
+                                                    </a>
+                                                {% else %} 0 {% endif %}
+                                            {% endwith %}
+                                        </td>
                                         <td class="summe col-profi" style="background: {{ tb.farbe }};">
                                             {{ s3|get_item:"total"|default:0 }}
                                         </td>
@@ -158,6 +248,30 @@
     </div>
 
     {{ kapitel_map|json_script:"kapitel-data" }}
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const body = document.body;
+
+            document.getElementById("toggle-mittel")?.addEventListener("click", () => {
+                body.classList.toggle("hide-mittel");
+                // Logik: Wenn Mittel weg, muss Profi auch weg
+                if (body.classList.contains("hide-mittel")) {
+                    body.classList.add("hide-profi");
+                }
+            });
+
+            document.getElementById("toggle-profi")?.addEventListener("click", () => {
+                // Profi darf nur sichtbar sein, wenn Mittel auch da ist
+                if (body.classList.contains("hide-mittel")) {
+                    body.classList.add("hide-profi");
+                    return;
+                }
+                body.classList.toggle("hide-profi");
+            });
+        });
+    </script>
 
     <script>
         (function() {

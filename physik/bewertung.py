@@ -75,12 +75,19 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # 1. Wenn Y oder Z da sind: IMMER aktiv
     # 2. Wenn es KEINE reine Ziffer ist (also 1o2 etc.): Standard AKTIV (außer X blockt es)
     # 3. Wenn es eine REINE ZIFFRE ist: Standard DEAKTIVIERT
-    if "Y" in typ_roh or "Z" in typ_roh:
+    if "Y" in typ_roh: 
         fuzzy_aktiv = True
+        ratio = 0.8
+    elif  "Z" in typ_roh:
+        fuzzy_aktiv = True
+        ratio = 0.65
     elif is_integer:
         fuzzy_aktiv = False  # Reine Ziffern (1, 2, 2X) sind immer streng!
+        ratio = 1
     else:
         fuzzy_aktiv = ("X" not in typ_roh) # Bei Ausdrücken (1o2): X schaltet Fuzzy aus
+        ratio = 1
+
     
     typ = typ_rein
     # ---------------------------------
@@ -88,7 +95,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # -----------------------------------------------------------
     # A. SPEZIAL-TYPEN (Priorität vor Text-Parsing)
     # -----------------------------------------------------------
-    if "p" in typ:
+    if typ == "p" in typ:
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
@@ -284,7 +291,15 @@ def normalisiere(text):
     return "".join(text.split()) if text else ""
 
 def bewerte_bildauswahl(aufgabe, bild_antwort, session):
-    return session and str(session.get("p_richtig")) == str(bild_antwort)
+    # Wir berechnen erst den Boolean
+    ist_richtig = session and str(session.get("p_richtig")) == str(bild_antwort)
+    
+    # Und geben sofort das erwartete Dictionary zurück
+    return {
+        "richtig": ist_richtig,
+        "hinweis": "Richtig!" if ist_richtig else "Leider falsch.",
+        "ungueltig": False
+    }
 
 def bewerte_wahr_falsch(aufgabe, norm):
     """

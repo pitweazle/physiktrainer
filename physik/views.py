@@ -92,58 +92,90 @@ def index(request):
 
 def aufgaben(request):
     anmerkung_fuer_template = ""
-    if "aufgaben_ids" not in request.session:
+    
+    # NEU: Wenn 'tb' in der URL steht, wollen wir IMMER eine neue Serie starten,
+    # auch wenn 'aufgaben_ids' schon in der Session existieren.
+    if request.GET.get("tb"):
+        # 0. Vorbereitung: Alte Session & Messages aufräumen
+        for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
+            request.session.pop(k, None)
+        
         storage = get_messages(request)
-        for message in storage:
-            pass  # Das bloße Iterieren markiert sie als gelesen/gelöscht
+        for message in storage: pass
+
         # 1. Parameter aus GET holen
         tb_id = request.GET.get("tb")
-        level = int(request.GET.get("level", 3))
+        level_param = request.GET.get("level", "3") # Standard 3
+        bis_kap_zeile = request.GET.get("bis_kap")
+        
+        # Diese bleiben für das Overlay wichtig:
         start_kap = int(request.GET.get("start", 0))
         end_kap = int(request.GET.get("end", 999))
         fach_int = int(request.GET.get("fach", 1))
 
-        # 2. Grundfilterung der Aufgaben (Thema, Kapitel, Schwierigkeit)
-        aufgaben_qs = Aufgabe.objects.filter(
-            thema_id=tb_id,
-            kapitel__zeile__gte=start_kap,
-            kapitel__zeile__lte=end_kap,
-            schwierigkeit__lte=level
-        )
+        # 2. Grundfilterung
+        aufgaben_qs = Aufgabe.objects.filter(thema_id=tb_id)
 
-        # 3. Spezifische Fach-Filterung (WICHTIG: distinct() wegen des Joins zum Protokoll)
-        if fach_int == 1:   
-            # Fach 1: 
-            # Aufgaben, die ENTWEDER ein Protokoll für diesen User mit Fach 1 haben
-            # ODER die überhaupt kein Protokoll für diesen User haben
+        # --- NEU: Kapitel-Logik unterscheiden ---
+        if bis_kap_zeile:
+            # Weg über die Index-Tabelle (kumulativ)
+            aufgaben_qs = aufgaben_qs.filter(kapitel__zeile__lte=int(bis_kap_zeile))
+        else:
+            # Klassischer Weg über das Overlay (Bereich)
+            aufgaben_qs = aufgaben_qs.filter(
+                kapitel__zeile__gte=start_kap,
+                kapitel__zeile__lte=end_kap
+            )
+
+        # --- NEU: Level-Logik (kumuliert für 1,2 etc.) ---
+        if isinstance(level_param, str) and "," in level_param:
+            levels = [int(l) for l in level_param.split(",")]
+            aufgaben_qs = aufgaben_qs.filter(schwierigkeit__in=levels)
+        else:
+            aufgaben_qs = aufgaben_qs.filter(schwierigkeit__lte=int(level_param))
+
+        # 3. Spezifische Fach-Filterung (DEIN BESTEHENDER CODE)
+        if fach_int == 1: 
             aufgaben_qs = aufgaben_qs.filter(
                 Q(protokoll__user=request.user, protokoll__fach=1) | 
-                ~Q(protokoll__user=request.user) # Das ~ Symbol bedeutet "NOT"
+                ~Q(protokoll__user=request.user)
             ).distinct()
         else:
-            # Fach 2 oder 3: Exakter Match
             aufgaben_qs = aufgaben_qs.filter(
                 protokoll__user=request.user, 
                 protokoll__fach=fach_int
             )
 
-        # 4. IDs extrahieren
+        # 3. Spezifische Fach-Filterung
+        # fach_int kommt oben aus request.GET.get("fach")
+        if fach_int == 1: 
+            # Zeigt nur Aufgaben, die noch "neu" sind oder explizit in Fach 1 liegen
+            aufgaben_qs = aufgaben_qs.filter(
+                Q(protokoll__user=request.user, protokoll__fach=1) | 
+                ~Q(protokoll__user=request.user)
+            ).distinct()
+        else:
+            # Filtert exakt auf Fach 2, 3 oder 4
+            aufgaben_qs = aufgaben_qs.filter(
+                protokoll__user=request.user, 
+                protokoll__fach=fach_int
+            )
+            
+        # 4. IDs extrahieren & initialisieren
         all_ids = list(aufgaben_qs.values_list("id", flat=True))
         
-        # 5. Check: Wenn leer, zurück zur Index
         if not all_ids:
-            messages.info(request, f"In Fach {fach_int} gibt es momentan keine Aufgaben für diesen Bereich.")
+            messages.info(request, f"Keine Aufgaben in diesem Bereich gefunden.")
             return redirect('physik:index')
 
-        # 6. Serie initialisieren (nur wenn wir nicht schon mitten drin sind)
-        if "aufgaben_ids" not in request.session:
-            random.shuffle(all_ids)
-            selektierte_ids = all_ids[:10]
-            request.session["aufgaben_ids"] = selektierte_ids
-            request.session["index"] = 0
-            request.session["warte_auf_weiter"] = False
-            request.session.pop("letzte_antwort", None)
-
+        random.shuffle(all_ids)
+        request.session["aufgaben_ids"] = all_ids[:10]
+        request.session["index"] = 0
+        request.session["warte_auf_weiter"] = False
+        
+        # WICHTIG: Redirect auf die URL ohne Parameter, damit ein Refresh 
+        # nicht die Serie neu startet
+        return redirect("physik:aufgaben")
     # 7. Aktuellen Stand aus der Session holen
     ids_in_session = request.session.get("aufgaben_ids", [])
     index = request.session.get("index", 0)
