@@ -61,37 +61,40 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     typ_roh = (aufgabe.typ or "").strip()
     norm = normalisiere(text_antwort) if text_antwort else ""
     
-    # Flags extrahieren
-    case_sensitiv = "X" in typ_roh
-    fuzzy_level = 1 if "Y" in typ_roh else 2 if "Z" in typ_roh else 0
-    typ = typ_roh.replace("X", "").replace("Y", "").replace("Z", "")
+    # --- NEUE LOGIK: X, Y, Z FLAGS ---
+    typ_rein = typ_roh.replace("X", "").replace("Y", "").replace("Z", "").strip()
+    is_integer = typ_rein.isdigit()
+
+    # X-Inverter Logik
+    if is_integer:
+        case_sensitiv = ("X" not in typ_roh) # Zahlen: Standard AN, X macht AUS
+    else:
+        case_sensitiv = ("X" in typ_roh)     # Text: Standard AUS, X macht AN
+
+    # Fuzzy-Schwellenwert & Aktivierung
+    # Standard ist 0.85, Z macht es locker (0.7)
+    ratio = 0.7 if "Z" in typ_roh else 0.85
+    # Fuzzy ist aktiv, wenn kein Buchstabe da ist ODER Y/Z dabei steht
+    fuzzy_aktiv = ("Z" in typ_roh or "Y" in typ_roh or not any(c in typ_roh for c in "XYZ"))
+    
+    typ = typ_rein
+    # ---------------------------------
 
     # -----------------------------------------------------------
     # A. SPEZIAL-TYPEN (Priorität vor Text-Parsing)
     # -----------------------------------------------------------
-
-    # 1. Bilderauswahl (p)
     if "p" in typ:
-        # Hier nutzen wir die session, um die ID des richtigen Bildes zu vergleichen
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
-
-    # 2. Wahr/Falsch (w)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
-
-    # 3. Auswahl-Liste / Multiple Choice (a)
     elif "a" in typ:
         ergebnis = bewerte_liste(aufgabe, text_antwort)
-
-    # 4. Einheiten-Spezialfall (e)
     elif "e" in typ:
         ergebnis = bewerte_e_typ(aufgabe, text_antwort)
 
     # -----------------------------------------------------------
-    # B. TEXT-PARSER (Nur wenn oben noch nichts entschieden wurde)
+    # B. TEXT-PARSER
     # -----------------------------------------------------------
-
-    # 1. Vorab-Prüfung: f (Verbotene Begriffe)
     if not ergebnis and "f" in typ:
         ok, hinweis = pruefe_verbotene_begriffe(aufgabe, norm, text_antwort)
         if not ok:
@@ -101,19 +104,17 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     if not ergebnis and typ.isdigit():
         max_idx = int(typ)
         found = False
-        # Streng
         for i in range(1, max_idx + 1):
+            # Bei reinen Zahlen: contain immer False
             ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
             if ok: 
                 ergebnis = {"richtig": True, "hinweis": "Richtig!"}
                 found = True
                 break
         
-        # Fuzzy (falls nötig)
-        if not found and fuzzy_level:
-            r = 0.85 if fuzzy_level == 1 else 0.7
+        if not found and fuzzy_aktiv:
             for i in range(1, max_idx + 1):
-                ok, h = vergleich_fuzzy(i, aufgabe, norm, text_antwort, r)
+                ok, h = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
                 if ok: 
                     ergebnis = {"richtig": True, "hinweis": h}
                     found = True
@@ -122,18 +123,18 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         if not found:
             ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
 
-    # 3. Haupt-Parser: 
+    # 3. Haupt-Parser: Streng
     if not ergebnis:
         streng_ok, hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
-            lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, True)
+            # Hier: contain=True nur wenn KEIN reiner Zahlentyp
+            lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, not is_integer)
         )
         if streng_ok:
             ergebnis = {"richtig": True, "hinweis": "Richtig!"}
 
     # 4. Haupt-Parser: Fuzzy
-    if not ergebnis and fuzzy_level:
-        ratio = 0.85 if fuzzy_level == 1 else 0.7
+    if not ergebnis and fuzzy_aktiv:
         fuzzy_ok, fuzzy_hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
             lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio)
