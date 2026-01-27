@@ -65,17 +65,22 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     typ_rein = typ_roh.replace("X", "").replace("Y", "").replace("Z", "").strip()
     is_integer = typ_rein.isdigit()
 
-    # X-Inverter Logik
+    # X-Inverter Logik (unverändert, die stimmt!)
     if is_integer:
         case_sensitiv = ("X" not in typ_roh) # Zahlen: Standard AN, X macht AUS
     else:
         case_sensitiv = ("X" in typ_roh)     # Text: Standard AUS, X macht AN
 
-    # Fuzzy-Schwellenwert & Aktivierung
-    # Standard ist 0.85, Z macht es locker (0.7)
-    ratio = 0.7 if "Z" in typ_roh else 0.85
-    # Fuzzy ist aktiv, wenn kein Buchstabe da ist ODER Y/Z dabei steht
-    fuzzy_aktiv = ("Z" in typ_roh or "Y" in typ_roh or not any(c in typ_roh for c in "XYZ"))
+    # Fuzzy-Aktivierung: JETZT KORREKT
+    # 1. Wenn Y oder Z da sind: IMMER aktiv
+    # 2. Wenn es KEINE reine Ziffer ist (also 1o2 etc.): Standard AKTIV (außer X blockt es)
+    # 3. Wenn es eine REINE ZIFFRE ist: Standard DEAKTIVIERT
+    if "Y" in typ_roh or "Z" in typ_roh:
+        fuzzy_aktiv = True
+    elif is_integer:
+        fuzzy_aktiv = False  # Reine Ziffern (1, 2, 2X) sind immer streng!
+    else:
+        fuzzy_aktiv = ("X" not in typ_roh) # Bei Ausdrücken (1o2): X schaltet Fuzzy aus
     
     typ = typ_rein
     # ---------------------------------
@@ -111,15 +116,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
                 ergebnis = {"richtig": True, "hinweis": "Richtig!"}
                 found = True
                 break
-        
-        if not found and fuzzy_aktiv:
-            for i in range(1, max_idx + 1):
-                ok, h = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
-                if ok: 
-                    ergebnis = {"richtig": True, "hinweis": h}
-                    found = True
-                    break
-        
+       
         if not found:
             ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
 
@@ -133,14 +130,16 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         if streng_ok:
             ergebnis = {"richtig": True, "hinweis": "Richtig!"}
 
-    # 4. Haupt-Parser: Fuzzy
+# 4. Haupt-Parser: Fuzzy
     if not ergebnis and fuzzy_aktiv:
         fuzzy_ok, fuzzy_hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
             lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio)
         )
         if fuzzy_ok:
-            ergebnis = {"richtig": True, "hinweis": fuzzy_hinweis}
+            # Hier bauen wir deine eigene Antwort (text_antwort) mit in den Hinweis ein:
+            detail_hinweis = f"Deine Eingabe war: „{text_antwort}“.\n{fuzzy_hinweis}"
+            ergebnis = {"richtig": True, "hinweis": detail_hinweis}
 
     # -----------------------------------------------------------
     # C. FINALE & LOGGING
@@ -338,12 +337,11 @@ def bewerte_liste(aufgabe, antwort):
         "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.antwort}"
     }
 
-def bewerte_e_typ(typ, aufgabe, antwort, vergleich):
-    # Typ am 'e' splitten
+def bewerte_e_typ(typ, aufgabe, antwort, case_sensitiv, is_integer, ratio, fuzzy_aktiv):
+    # 1. Typ am 'e' splitten
     links, rechts = typ.split("e", 1)
     
-    # Trennung bei ';' oder '...' (Regulärer Ausdruck)
-    # Das fängt "Begriff1;Begriff2" und "Begriff1...Begriff2" ab
+    # 2. Eingabe trennen
     teile = re.split(r';|\.\.\.', antwort)
     
     if len(teile) >= 2:
@@ -352,23 +350,41 @@ def bewerte_e_typ(typ, aufgabe, antwort, vergleich):
     else:
         return False, "Bitte zwei Begriffe mit ';' oder '...' trennen."
 
-    # WICHTIG: Wir übergeben die normalisierten Teil-Strings an den Parser
     norm_a = normalisiere(a)
     norm_b = normalisiere(b)
 
-    ok1, _ = bewerte_booleschen_ausdruck(links, aufgabe, norm_a, a, vergleich)
-    ok2, _ = bewerte_booleschen_ausdruck(rechts, aufgabe, norm_b, b, vergleich)
+    # Hilfsfunktion für die doppelte Prüfung (Streng -> dann Fuzzy)
+    def check_einzeln(t_typ, n_val, o_val):
+        # Erst Streng
+        ok, _ = bewerte_booleschen_ausdruck(t_typ, aufgabe, n_val, o_val, 
+                    lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, not is_integer))
+        if ok:
+            return True, None
+        
+        # Dann Fuzzy (wenn erlaubt)
+        if fuzzy_aktiv:
+            ok_f, hinw_f = bewerte_booleschen_ausdruck(t_typ, aufgabe, n_val, o_val, 
+                                lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio))
+            if ok_f:
+                return True, hinw_f
+        
+        return False, None
+
+    ok1, hinweis1 = check_einzeln(links, norm_a, a)
+    ok2, hinweis2 = check_einzeln(rechts, norm_b, b)
     
-    # Präzises Feedback für den User
+    # Präzises Feedback
     if ok1 and ok2:
-        return True, "Beide Begriffe sind richtig!"
-    if ok1:
-        return False, "Der erste Begriff ist richtig, der zweite fehlt oder ist falsch."
-    if ok2:
-        return False, "Der zweite Begriff ist richtig, der erste fehlt oder ist falsch."
+        h = "Richtig!"
+        if hinweis1 or hinweis2:
+            h = f"Fast richtig! (Achte auf: {hinweis1 or ''} {hinweis2 or ''})".strip()
+        return True, h
+    
+    if ok1: return False, "Der erste Begriff ist richtig, der zweite ist falsch oder fehlt."
+    if ok2: return False, "Der zweite Begriff ist richtig, der erste ist falsch oder fehlt."
     
     return False, "Beide Begriffe sind leider falsch."
-
+    
 def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
     typ = (aufgabe.typ or "").strip()
 
