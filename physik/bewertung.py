@@ -298,7 +298,7 @@ def bewerte_wahr_falsch(aufgabe, norm):
     db_lsg = "".join((aufgabe.antwort or "").lower().split()).rstrip(".")
 
     # 2. Bedeutungsgruppen definieren
-    WAHR_GRUPPE = {"w", "wahr", "ja", "j", "richtig", "ok", "stimmt"}
+    WAHR_GRUPPE = {"w", "wahr", "ja", "j", "richtig", "r", "ok", "stimmt"}
     FALSCH_GRUPPE = {"f", "falsch", "nein", "n", "stimmtnicht"}
 
     # 3. Bestimmen, was gemeint ist
