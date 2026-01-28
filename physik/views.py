@@ -193,9 +193,13 @@ def aufgaben(request):
     bilder_anzeige = None
     if "p" in aufgabe.typ:
         bilder = list(aufgabe.bilder.order_by("position"))
+        print(bilder)
         if bilder:
+            # ---- Fall 1: echte Bildfrage ----
             if aufgabe.typ == "p":
-                request.session["p_richtig"] = bilder[0].id
+                p_richtig = bilder[0].id
+                request.session["p_richtig"] = p_richtig
+            # ---- Fall 2: Bilder nur als Illustration ----
             else:
                 request.session.pop("p_richtig", None)
             random.shuffle(bilder)

@@ -101,7 +101,7 @@
           <!-- Button-Leiste -->
           <div class="task-buttons">
               <button type="button" onclick="location.href='/'">Stop</button>
-              {% if aufgabe.hilfe %}
+              {% if aufgabe.hilfe and aufgabe.hilfe != "0" and aufgabe.hilfe != 0 %}
                   <button type="button" onclick="alert('{{ aufgabe.hilfe|escapejs }}')">
                   Hilfe
                   </button>

@@ -48,21 +48,25 @@
   font-size: 1.2em;
 }
 
-.task-images {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 .task-image {
-  max-width: 100%;
-  width: 100%;
+  max-width: 48%;  /* Sorgt dafür, dass zwei Bilder nebeneinander passen */
+  max-height: 250px; /* Verhindert, dass ein einzelnes Bild zu hoch wird */
+  width: auto;     /* WICHTIG: Nicht mehr stur auf 100% erzwingen */
   height: auto;
   object-fit: contain;
   display: block;
   border: 1px solid #aaa;
   background: white;
+}
+
+.task-images {
+  display: flex;
+  flex-wrap: wrap;   /* Falls die Bilder mal zu breit werden, brechen sie um */
+  gap: 10px;
+  width: 100%;
+  justify-content: center; /* Zentriert die Bilder, wenn nur eines da ist */
+  box-sizing: border-box;
+  margin-bottom: 10px;
 }
 
 .task-buttons {

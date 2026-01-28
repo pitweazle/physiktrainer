@@ -128,3 +128,9 @@ class FehlerLogAdmin(admin.ModelAdmin):
     list_display = ('zeitpunkt', 'aufgabe', 'eingegebene_antwort')
     list_filter = ('aufgabe__thema', 'zeitpunkt')
     search_fields = ('eingegebene_antwort', 'aufgabe__lfd_nr')
+
+@admin.register(AufgabeBild)
+class AufgabeBildAdmin(admin.ModelAdmin):
+    list_display = ('id', 'aufgabe', 'bild', 'position')
+    list_filter = ('aufgabe__thema', 'aufgabe__lfd_nr')
+    search_fields = ('bild', 'aufgabe__lfd_nr')
