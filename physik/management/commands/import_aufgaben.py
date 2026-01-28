@@ -6,6 +6,14 @@ from django.db import transaction
 
 from physik.models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption 
 
+def clean_csv_value(value):
+    # Wandelt den Wert in einen String um und entfernt Leerzeichen
+    v = str(value).strip()
+    # Wenn der Wert "0", "0.0" oder leer ist, gib None zurück
+    if v in ["0", "0.0", "None", "nan", ""]:
+        return ""
+    return v
+
 # HIER NEU: thema_id muss jetzt in der CSV sein
 REQUIRED_COLUMNS = [
     "lfd_nr",
@@ -23,10 +31,17 @@ REQUIRED_COLUMNS = [
 
 OPTION_COLUMNS = ["2", "3", "4", "5", "6", "7", "8", "9"]
 
-def norm(val) -> str:
-    if val is None:
+def norm(wert):
+    if wert is None: 
+        return "" # Wichtig: Leerstring statt None
+    
+    s = str(wert).strip()
+    
+    # Alle "Null-Varianten" in einen sauberen Leerstring umwandeln
+    if s in ["0", "0.0", "nan", "None", ""]: 
         return ""
-    return str(val).strip()
+    
+    return s
 
 class Command(BaseCommand):
     help = "Importiert Aufgaben aus CSV. Thema wird aus Spalte 'thema_id' gelesen."
@@ -135,20 +150,29 @@ class Command(BaseCommand):
                         "typ": norm(row.get("typ")),
                         "frage": frage,
                         "antwort": norm(row.get("antwort")),
-                        "erklaerung": norm(row.get("erklaerung")),
-                        "anmerkung": norm(row.get("anmerkung")),
-                        "hilfe": norm(row.get("hilfe")),
+                        "erklaerung": clean_csv_value(row.get("erklaerung")),
+                        "anmerkung": clean_csv_value(row.get("anmerkung")),
+                        "hilfe": clean_csv_value(row.get("hilfe")),
                     },
                 )
                 if created: created_tasks += 1
                 else: updated_tasks += 1
 
                 # 5. Optionen
+                # Zuerst ALLES löschen, was zu dieser Aufgabe gehört
                 AufgabeOption.objects.filter(aufgabe=obj).delete()
+
                 for col in OPTION_COLUMNS:
-                    val = norm(row.get(col))
-                    if val:
-                        AufgabeOption.objects.create(aufgabe=obj, position=int(col), text=val)
+                    # Nutze die radikale Reinigung
+                    val = clean_csv_value(row.get(col))
+                    
+                    # Nur wenn der Wert NICHT leer ist (clean_csv_value gibt "" bei Nullen zurück)
+                    if val != "":
+                        AufgabeOption.objects.create(
+                            aufgabe=obj, 
+                            position=int(col), 
+                            text=val
+                        )
                         created_options += 1
 
             if not commit:
