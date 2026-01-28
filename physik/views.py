@@ -256,7 +256,19 @@ def aufgaben(request):
 
         # ---- falsch ----
         else:
-            messages.warning(request, ergebnis.get("hinweis", "Leider falsch."))
+            # Wir holen uns den Standard-Hinweis (z.B. "Leider falsch.")
+            hinweis_text = ergebnis.get("hinweis", "Leider falsch.")
+            
+            # Jetzt vergleichen wir Eingabe vs. Lösung direkt in der Nachricht
+            # Wir nutzen 'aufgabe.antwort' (das ist der Wert aus der DB)
+            lern_botschaft = (
+                f"{hinweis_text} "
+                f"Deine Eingabe: »{antwort}« | "
+                f"Richtige Lösung: »{aufgabe.antwort}«"
+            )
+            
+            messages.warning(request, lern_botschaft)
+            
             request.session["warte_auf_weiter"] = True
             request.session["letzte_antwort"] = antwort
 
