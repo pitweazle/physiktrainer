@@ -100,43 +100,43 @@
                                         <td class="spacer"></td>
                                         {# --- EINFACH (Level 1) --- #}
                                         {% with s1=kap_data|get_item:"1" %}
-                                        {% with f1=s1|get_item:0|default:0 f2=s1|get_item:1|default:0 f3=s1|get_item:2|default:0 f4=s1|get_item:3|default:0 total=s1|get_item:"total"|default:0 %}
-                                        {# Wir berechnen, ob schon etwas "raus" ist (Summe von Fach 2, 3 und 4) #}
-                                        {% with weg=f2|add:f3|add:f4 %}
-                                            <td class="box" style="background-color: 
-                                                {% if total == 0 %}transparent
-                                                {% elif f1 == 0 %}#c8e6c9; /* GRÜN: Fach 1 ist leer */
-                                                {% elif weg > 0 %}#fff9c4; /* GELB: In Arbeit (etwas ist in Fach 2+) */
-                                                {% else %}#ffcc80; /* ORANGE: Noch nichts bewegt */
-                                                {% endif %};">
-                                                {% if f1 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=1" style="color: inherit; text-decoration: none; display: block;">
-                                                        {{ f1 }}
-                                                    </a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
-                                            {# Fach 2 #}
-                                            <td class="box" style="background-color: {% if total == 0 %}transparent{% elif f2 == 0 and total > 0 and f1 == 0 %}#c8e6c9{% elif f2 > 0 %}#fff9c4{% else %}transparent{% endif %};">
-                                                {% if f2 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=2" style="color: inherit; text-decoration: none; display: block;">{{ f2 }}</a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
-                                            {# Fach 3 #}
-                                            <td class="box" style="background-color: {% if total == 0 %}transparent{% elif f3 == 0 and total > 0 and f1 == 0 and f2 == 0 %}#c8e6c9{% elif f3 > 0 %}#fff9c4{% else %}transparent{% endif %};">
-                                                {% if f3 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
-                                            {# Fach 4 (Das Ziel) #}
-                                            <td class="box" style="background-color: {% if total > 0 and f4 == total %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total > 0 and f4 == total %}color: white;{% endif %}">
-                                                {{ f4 }}
-                                            </td>
-                                            {# Summe Level 1 #}
-                                            <td class="summe" style="background: {{ tb.farbe }};">
-                                                {{ total }}
-                                            </td>
-                                        {% endwith %}
-                                        {% endwith %}
+                                            {% with f1=s1|get_item:0|default:0 f2=s1|get_item:1|default:0 f3=s1|get_item:2|default:0 f4=s1|get_item:3|default:0 total=s1|get_item:"total"|default:0 %}
+                                            {# Wir berechnen, ob schon etwas "raus" ist (Summe von Fach 2, 3 und 4) #}
+                                            {% with weg=f2|add:f3|add:f4 %}
+                                                <td class="box" style="background-color: 
+                                                    {% if total == 0 %}transparent
+                                                    {% elif f1 == 0 %}#c8e6c9; /* GRÜN: Fach 1 ist leer */
+                                                    {% elif weg > 0 %}#fff9c4; /* GELB: In Arbeit (etwas ist in Fach 2+) */
+                                                    {% else %}#ffcc80; /* ORANGE: Noch nichts bewegt */
+                                                    {% endif %};">
+                                                    {% if f1 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=1" style="color: inherit; text-decoration: none; display: block;">
+                                                            {{ f1 }}
+                                                        </a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
+                                                {# Fach 2 #}
+                                                <td class="box" style="background-color: {% if total == 0 %}transparent{% elif f2 == 0 and total > 0 and f1 == 0 %}#c8e6c9{% elif f2 > 0 %}#fff9c4{% else %}transparent{% endif %};">
+                                                    {% if f2 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=2" style="color: inherit; text-decoration: none; display: block;">{{ f2 }}</a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
+                                                {# Fach 3 #}
+                                                <td class="box" style="background-color: {% if total == 0 %}transparent{% elif f3 == 0 and total > 0 and f1 == 0 and f2 == 0 %}#c8e6c9{% elif f3 > 0 %}#fff9c4{% else %}transparent{% endif %};">
+                                                    {% if f3 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=1&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
+                                                {# Fach 4 (Das Ziel) #}
+                                                <td class="box" style="background-color: {% if total > 0 and f4 == total %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total > 0 and f4 == total %}color: white;{% endif %}">
+                                                    {{ f4 }}
+                                                </td>
+                                                {# Summe Level 1 #}
+                                                <td class="summe" style="background: {{ tb.farbe }};">
+                                                    {{ total }}
+                                                </td>
+                                            {% endwith %}
+                                            {% endwith %}
                                         {% endwith %}
 
                                         <td class="spacer"></td>
@@ -144,51 +144,67 @@
                                         {# --- MITTEL (Level 2) --- #}
                                         {% with s2=kap_data|get_item:"2" %}
                                             {% with f1=s2|get_item:0|default:0 f2=s2|get_item:1|default:0 f3=s2|get_item:2|default:0 f4=s2|get_item:3|default:0 total2=s2|get_item:"total"|default:0 %}
+                                            {# Hilfsvariable für Fach 1 Status #}
+                                            {% with weg_aus_f1=f2|add:f3|add:f4 %}
+
+                                            {# Fach 1 #}
+                                            <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f1 == 0 %}#c8e6c9{% elif weg_aus_f1 > 0 %}#fff9c4{% else %}#ffcc80{% endif %};">
+                                                {% if f1 > 0 %}
+                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=1" style="color: inherit; text-decoration: none; display: block;">{{ f1 }}</a>
+                                                {% else %} 0 {% endif %}
+                                            </td>
+                                            {# Fach 2 #}
+                                            <td class="box col-mittel" 
+                                                style="background-color: {% if total2 == 0 %}transparent{% elif f2 > 0 %}#fff9c4{% elif f2 == 0 and f3|add:f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
                                                 
-                                                {# Hilfsvariable für Fach 1 Status #}
-                                                {% with weg_aus_f1=f2|add:f3|add:f4 %}
+                                                {# Wir schauen auf die Summe bis hierhin (s2.kum_anzahl) #}
+                                                {% if s2.kum_anzahl > 0 %}
+                                                    {% if s2.f2_ready %}
+                                                        {# BEREIT: Link (auch wenn die lokale Zahl f2 null ist!) #}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=2" 
+                                                        title="Dieses Fach enthält insgesamt {{ s2.kum_anzahl }} Aufgaben bis zu diesem Kapitel."
+                                                        style="color: inherit; text-decoration: none; display: block; font-weight: {% if f2 > 0 %}bold{% else %}normal{% endif %};">
+                                                        {{ f2 }}
+                                                        </a>
+                                                    {% else %}
+                                                        {# GESPERRT: Hinweis #}
+                                                        <span style="color: #bbb; cursor: help;" title="{{ s2.f2_hint }}">
+                                                            {{ f2 }}
+                                                        </span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {# Wirklich gar nichts zu tun (kumulativ 0) #}
+                                                    0
+                                                {% endif %}
+                                            </td>
 
-                                                {# Fach 1 #}
-                                                <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f1 == 0 %}#c8e6c9{% elif weg_aus_f1 > 0 %}#fff9c4{% else %}#ffcc80{% endif %};">
-                                                    {% if f1 > 0 %}
-                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=1" style="color: inherit; text-decoration: none; display: block;">{{ f1 }}</a>
-                                                    {% else %} 0 {% endif %}
-                                                </td>
+                                            {# Fach 3 #}
+                                            <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f3 > 0 %}#fff9c4{% elif f3 == 0 and f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
+                                                {% if f3 > 0 %}
+                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
+                                                {% else %} 0 {% endif %}
+                                            </td>
 
-                                                {# Fach 2 #}
-                                                <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f2 > 0 %}#fff9c4{% elif f2 == 0 and f3|add:f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                    {% if f2 > 0 %}
-                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=2" style="color: inherit; text-decoration: none; display: block;">{{ f2 }}</a>
-                                                    {% else %} 0 {% endif %}
-                                                </td>
+                                            {# Fach 4 (Archiv) #}
+                                            <td class="box col-mittel" style="background-color: {% if total2 > 0 and f4 == total2 %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total2 > 0 and f4 == total2 %}color: white;{% endif %}">
+                                                {{ f4 }}
+                                            </td>
 
-                                                {# Fach 3 #}
-                                                <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f3 > 0 %}#fff9c4{% elif f3 == 0 and f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                    {% if f3 > 0 %}
-                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
-                                                    {% else %} 0 {% endif %}
-                                                </td>
+                                            {# Summe Level 2 #}
+                                            <td class="summe col-mittel" style="background: {{ tb.farbe }};">
+                                                {{ total2 }}
+                                            </td>
 
-                                                {# Fach 4 (Archiv) #}
-                                                <td class="box col-mittel" style="background-color: {% if total2 > 0 and f4 == total2 %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total2 > 0 and f4 == total2 %}color: white;{% endif %}">
-                                                    {{ f4 }}
-                                                </td>
-
-                                                {# Summe Level 2 #}
-                                                <td class="summe col-mittel" style="background: {{ tb.farbe }};">
-                                                    {{ total2 }}
-                                                </td>
-
-                                                {# Gesamtsumme (Level 1 + Level 2) #}
-                                                <td class="summe col-mittel" style="background: {{ tb.farbe }}; font-weight: bold; border-left: 2px solid rgba(0,0,0,0.1);">
-                                                    {% with s1=kap_data|get_item:"1" %}
-                                                        {% with total1=s1|get_item:"total"|default:0 %}
-                                                            {{ total1|add:total2 }}
-                                                        {% endwith %}
+                                            {# Gesamtsumme (Level 1 + Level 2) #}
+                                            <td class="summe col-mittel" style="background: {{ tb.farbe }}; font-weight: bold; border-left: 2px solid rgba(0,0,0,0.1);">
+                                                {% with s1=kap_data|get_item:"1" %}
+                                                    {% with total1=s1|get_item:"total"|default:0 %}
+                                                        {{ total1|add:total2 }}
                                                     {% endwith %}
-                                                </td>
-
                                                 {% endwith %}
+                                            </td>
+
+                                            {% endwith %}
                                             {% endwith %}
                                         {% endwith %}
 
@@ -196,50 +212,50 @@
 
                                         {# --- PROFI (Level 3) --- #}
                                         {% with s3=kap_data|get_item:"3" %}
-                                        {% with f1=s3|get_item:0|default:0 f2=s3|get_item:1|default:0 f3=s3|get_item:2|default:0 f4=s3|get_item:3|default:0 total3=s3|get_item:"total"|default:0 %}
-                                        {# Hilfsvariable für Fach 1 Status #}
-                                        {% with weg_aus_f1=f2|add:f3|add:f4 %}
-                                            {# Fach 1 #}
-                                            <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f1 == 0 %}#c8e6c9{% elif weg_aus_f1 > 0 %}#fff9c4{% else %}#ffcc80{% endif %};">
-                                                {% if f1 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=1" style="color: inherit; text-decoration: none; display: block;">{{ f1 }}</a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
+                                            {% with f1=s3|get_item:0|default:0 f2=s3|get_item:1|default:0 f3=s3|get_item:2|default:0 f4=s3|get_item:3|default:0 total3=s3|get_item:"total"|default:0 %}
+                                            {# Hilfsvariable für Fach 1 Status #}
+                                            {% with weg_aus_f1=f2|add:f3|add:f4 %}
+                                                {# Fach 1 #}
+                                                <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f1 == 0 %}#c8e6c9{% elif weg_aus_f1 > 0 %}#fff9c4{% else %}#ffcc80{% endif %};">
+                                                    {% if f1 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=1" style="color: inherit; text-decoration: none; display: block;">{{ f1 }}</a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
 
-                                            {# Fach 2 #}
-                                            <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f2 > 0 %}#fff9c4{% elif f2 == 0 and f3|add:f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                {% if f2 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=2" style="color: inherit; text-decoration: none; display: block;">{{ f2 }}</a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
+                                                {# Fach 2 #}
+                                                <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f2 > 0 %}#fff9c4{% elif f2 == 0 and f3|add:f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
+                                                    {% if f2 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=2" style="color: inherit; text-decoration: none; display: block;">{{ f2 }}</a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
 
-                                            {# Fach 3 #}
-                                            <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f3 > 0 %}#fff9c4{% elif f3 == 0 and f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                {% if f3 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
-                                                {% else %} 0 {% endif %}
-                                            </td>
+                                                {# Fach 3 #}
+                                                <td class="box col-profi" style="background-color: {% if total3 == 0 %}transparent{% elif f3 > 0 %}#fff9c4{% elif f3 == 0 and f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
+                                                    {% if f3 > 0 %}
+                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=3&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
+                                                    {% else %} 0 {% endif %}
+                                                </td>
 
-                                            {# Fach 4 (Archiv/Ziel) #}
-                                            <td class="box col-profi" style="background-color: {% if total3 > 0 and f4 == total3 %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total3 > 0 and f4 == total3 %}color: white;{% endif %}">
-                                                {{ f4 }}
-                                            </td>
+                                                {# Fach 4 (Archiv/Ziel) #}
+                                                <td class="box col-profi" style="background-color: {% if total3 > 0 and f4 == total3 %}#4caf50{% elif f4 > 0 %}#c8e6c9{% else %}transparent{% endif %}; {% if total3 > 0 and f4 == total3 %}color: white;{% endif %}">
+                                                    {{ f4 }}
+                                                </td>
 
-                                            {# Summe Level 3 #}
-                                            <td class="summe col-profi" style="background: {{ tb.farbe }};">
-                                                {{ total3 }}
-                                            </td>
+                                                {# Summe Level 3 #}
+                                                <td class="summe col-profi" style="background: {{ tb.farbe }};">
+                                                    {{ total3 }}
+                                                </td>
 
-                                            {# Gesamtsumme (Level 1 + Level 2 + Level 3) #}
-                                            <td class="summe col-profi" style="background: {{ tb.farbe }}; font-weight: bold; border-left: 2px solid rgba(0,0,0,0.1);">
-                                                {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" %}
-                                                    {% with t1=s1|get_item:"total"|default:0 t2=s2|get_item:"total"|default:0 %}
-                                                        {{ t1|add:t2|add:total3 }}
+                                                {# Gesamtsumme (Level 1 + Level 2 + Level 3) #}
+                                                <td class="summe col-profi" style="background: {{ tb.farbe }}; font-weight: bold; border-left: 2px solid rgba(0,0,0,0.1);">
+                                                    {% with s1=kap_data|get_item:"1" s2=kap_data|get_item:"2" %}
+                                                        {% with t1=s1|get_item:"total"|default:0 t2=s2|get_item:"total"|default:0 %}
+                                                            {{ t1|add:t2|add:total3 }}
+                                                        {% endwith %}
                                                     {% endwith %}
-                                                {% endwith %}
-                                            </td>
-                                        {% endwith %}
-                                        {% endwith %}
+                                                </td>
+                                            {% endwith %}
+                                            {% endwith %}
                                         {% endwith %}                                
                                     </tr>
                                 {% endif %}

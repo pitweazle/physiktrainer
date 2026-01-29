@@ -149,11 +149,7 @@ class AufgabeBild(models.Model):
 class Protokoll(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     aufgabe = models.ForeignKey('Aufgabe', on_delete=models.CASCADE)
-    
-    # "Fächer" 2, 3 und 4 (Archiv)
     fach = models.IntegerField(default=2)
-    
-    # Für die Zeitbegrenzung
     letzte_bearbeitung = models.DateTimeField(auto_now=True)
 
     class Meta:
