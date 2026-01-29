@@ -105,10 +105,8 @@ def index(request):
 
     for tb in themenbereiche:
         t_sum = {"1": 0, "2": 0, "3": 0}
-        print(tb)
         
         for kap in tb.kapitel.all().order_by("zeile"):
-            print("-----", kap)
             if tb.id not in counts: counts[tb.id] = {}
             if kap.id not in counts[tb.id]: counts[tb.id][kap.id] = {}
             
@@ -157,10 +155,6 @@ def index(request):
             res3 = counts[tb.id][kap.id]["3"]
             res3["kum_f2"], res3["f2_ready"], res3["f2_hint"] = berechne_sperre(t3, f1_3, f2_3, 2)
             res3["kum_f3"], res3["f3_ready"], res3["f3_hint"] = berechne_sperre(t3, f1_3, f2_3, 3, f3_3)
-            print("res1: ",res1)
-            print("res2: ",res2)
-            print("res3: ",res3)
-
 
             # Summen für die Balkenanzeige (bleibt wie es war)
             for s_key in ["1", "2", "3"]:
@@ -278,7 +272,6 @@ def aufgaben(request):
     bilder_anzeige = None
     if "p" in aufgabe.typ:
         bilder = list(aufgabe.bilder.order_by("position"))
-        print(bilder)
         if bilder:
             # ---- Fall 1: echte Bildfrage ----
             if aufgabe.typ == "p":

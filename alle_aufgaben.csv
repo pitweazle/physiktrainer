@@ -5,7 +5,7 @@
 0;0;0;"W012_Do";1;1;"Temperatur und Thermometer";1;"1o2";"Welche Temperatur hat Eiswasser (Wasser in dem Eis schwimmt)?";"0°C";"0°Celsius";0;0;0;0;0;0;0
 0;0;0;"W016_Do";1;1;"Temperatur und Thermometer";1;"11o1";"Wie heißt das Messgerät mit dem man Temperaturen misst ?";"Thermometer";0;0;0;0;0;0;0;0
 0;0;0;"W017_Do";1;1;"Temperatur und Thermometer";1;"1o2";"Welches ist der Gefrierpunkt von Wasser ?";"0°C";"0°Celsius";0;0;0;0;0;0;0
-0;0;0;"W020_Do";1;1;"Temperatur und Thermometer";1;"p1Y";"Wie nennt man so ein Gerät ?";"Thermometer";0;0;0;0;0;0;0;0
+0;0;0;"W020_Do";1;1;"Temperatur und Thermometer";1;"p1o1";"Wie nennt man so ein Gerät ?";"Thermometer";0;0;0;0;0;0;0;0
 "Das ist ein Barometer. Man misst mit ihm den Luftdruck.";0;0;"W022_Do";1;1;"Temperatur und Thermometer";1;"p";"Bei welchem Gerät handelt es sich nicht um einen Thermometer?";0;0;0;0;0;0;0;0;0
 "Der Begriff 'kochen' kommt aus der Küche. In der Naturwisseenschaft sagt man 'sieden'.";0;0;"W023_Do";1;1;"Temperatur und Thermometer";1;"1o2f3Y";"Was passiert mit Wasser bei 100°C?";"Es siedet";"siedet";"kocht";0;0;0;0;0;0
 0;0;0;"W043_Do";1;1;"Temperatur und Thermometer";1;"1o(2u3)Y";"Die niedrigste Temperatur beträgt -273,15 °Celsius. Nenne dafür den Fachbegriff.";"absoluter Nullpunkt";"absolute";"Nullpunkt";0;0;0;0;0;0
@@ -39,7 +39,7 @@
 "Da man Salz auf die Straßen streut um das Eis aufzutauen, sollte man meinen, die Temperatur würde steigen. Das stimmt aber nicht – Wasser + Salz ergibt Salzwasser und Salzwasser hat einen niedrigeren Gefriepunkt als reines Wasser. Da also Salzwasser entsteht und dieses bei der Temperatur auf der Straße noch nicht gefriert, taut das Eis auf – zum Auftauen wird Energie benötigt, daher sinkt die Temperatur.";0;5;"W002_Do";1;1;"Temperatur und Thermometer";2;"1o4Y";"Wie ändert sich die Temperatur von Eis wenn man Salz darauf streut?";"sie wird niedriger";"sie fällt";"sie sinkt";"kälter";0;0;0;0;0
 0;0;0;"W006_Do";1;1;"Temperatur und Thermometer";2;"1o4";"Welche Temperaturskala wird in der Wissenschaft benutzt?";"Kelvin";"K";"Grad Kelvin";"Kelvinskala";0;0;0;0;0
 "Bei dieser Temperaturskala heißt der absolute Nullpunkt 0 K (Null Kelvin) – kälter geht nicht. Dieser liegt bei -273,15°C.";0;"Es gibt folgende Temperaturskalen : Reaumur, Fahrenheit, Celsius und Kelvin.";"W019_Do";1;1;"Temperatur und Thermometer";2;"1o2";"Wie heißt die wissenschaftliche Temperatureinheit ?";"Kelvin";"Grad Kelvin";0;0;0;0;0;0;0
-0;0;0;"W046_Do";1;1;"Temperatur und Thermometer";2;"1Y";"Für was steht ""°F""?";"Fahrenheit";0;0;0;0;0;0;0;0
+0;0;0;"W046_Do";1;1;"Temperatur und Thermometer";2;"1o2";"Für was steht ""°F""?";"Grad Fahrenheit";Fahrenheit;0;0;0;0;0;0;0
 0;0;0;"W014_Do";1;2;"Ausdehnung";2;"1o3Y";"Warum finden sich an den Enden von Brücken oft kammförmige Fugen? ";"damit die Brücke sich beim Erwärmen ausdehnen kann";"ausdehn";"länger";0;0;0;0;0;0
 0;0;0;"W026_Do";1;2;"Ausdehnung";2;"1o2Z";"Von welchem Koeffizienten hängt die Volumenänderung von Flüssigkeiten ab?";"Raumausdehnungskoeffizient";"ausdehnungskoeffizien";0;0;0;0;0;0;0
 0;0;0;"W051_Do";1;2;"Ausdehnung";2;"w";"Wahr oder falsch? Aufgrund von extremen Temperaturunterschieden, können riesige Fesblöcke auseinanderbrechen.";"wahr";0;0;0;0;0;0;0;0
