@@ -13,6 +13,28 @@ from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption
 from django.db.models import Count, Q
 from .models import ThemenBereich, Aufgabe, Protokoll
 
+def berechne_sperre(total, f1_bestand, f2_bestand, ziel_fach, f3_bestand=0):
+    ready = True
+    hint = ""
+    
+    if ziel_fach == 2:
+        bestand = f2_bestand
+        if bestand > 0 and total > 0:
+            erledigt = total - f1_bestand
+            if (erledigt / total) < 0.5:
+                ready = False
+                hint = f"Noch {int(0.5 * total - erledigt) + 1} in Fach 1 lösen."
+        return bestand, ready, hint
+        
+    if ziel_fach == 3:
+        bestand = f3_bestand
+        if bestand > 0 and total > 0:
+            erledigt = total - f1_bestand - f2_bestand
+            if (erledigt / total) < 0.5:
+                ready = False
+                hint = f"Noch {int(0.5 * total - erledigt) + 1} in Fach 2 lösen."
+        return bestand, ready, hint
+
 def index(request):
     # Reset Session
     for k in ("aufgaben_ids", "index", "p_richtig", "letzte_antwort", "warte_auf_weiter"):
@@ -73,85 +95,78 @@ def index(request):
             'total': gesamt
         }
 
-    # 5. tb_totals berechnen UND die Sperr-Logik (Ready-Flags) einbauen
+    # 5. tb_totals berechnen UND die Sperr-Logik
     tb_totals = {}
-    kum_total_aufgaben = 0
-    kum_in_f1 = 0
-    kum_in_f2 = 0
+    kum_stats = {
+        "1": {"total": 0, "f1": 0, "f2": 0, "f3": 0},
+        "2": {"total": 0, "f1": 0, "f2": 0, "f3": 0},
+        "3": {"total": 0, "f1": 0, "f2": 0, "f3": 0},
+    }
 
     for tb in themenbereiche:
         t_sum = {"1": 0, "2": 0, "3": 0}
+        print(tb)
         
-        # --- INITIALISIERUNG für die kumulative Sperre (pro Themenbereich) ---
-        # Wir brauchen laufende Summen für die Basis (Nenner) und die Fach-Stände
-        kum_total_einfach_mittel = 0
-        kum_f0_einfach_mittel = 0  # Fach 1 (in deinem Code '0')
-        kum_f1_einfach_mittel = 0  # Fach 2 (in deinem Code '1')
-        
-        # Wir sortieren die Kapitel nach Zeile, damit die Kumulierung Sinn ergibt
-        kapitel_liste = tb.kapitel.all().order_by("zeile")
-        
-        # 5. tb_totals und Sperr-Logik (kumulativ über alle Themen hinweg oder pro Thema)
-        # 5. tb_totals berechnen UND die Sperr-Logik
-        tb_totals = {}
-
-        for tb in themenbereiche:
-            t_sum = {"1": 0, "2": 0, "3": 0}
-            kum_total_e_m = 0
-            kum_f1_bestand = 0
-            kum_f2_bestand = 0
+        for kap in tb.kapitel.all().order_by("zeile"):
+            print("-----", kap)
+            if tb.id not in counts: counts[tb.id] = {}
+            if kap.id not in counts[tb.id]: counts[tb.id][kap.id] = {}
             
-            for kap in tb.kapitel.all().order_by("zeile"):
-                # WICHTIG: Wir stellen sicher, dass JEDES Kapitel im counts-Dict existiert
-                if tb.id not in counts: counts[tb.id] = {}
-                if kap.id not in counts[tb.id]: counts[tb.id][kap.id] = {}
+            # Rohdaten für dieses Kapitel kumulieren
+            for lvl in ["1", "2", "3"]:
+                if lvl not in counts[tb.id][kap.id]:
+                    counts[tb.id][kap.id][lvl] = {'0':0, '1':0, '2':0, 'total':0}
                 
-                # Jetzt holen wir die Daten (oder leere Dummies, falls keine Aufgaben da sind)
-                kap_data = counts[tb.id][kap.id]
-                c1 = kap_data.get("1", {'total': 0, '0': 0, '1': 0})
-                c2 = kap_data.get("2", {'total': 0, '0': 0, '1': 0})
-                
-                # A) Summen für die Balken
-                for s in ["1", "2", "3"]:
-                    t_sum[s] += kap_data.get(s, {}).get('total', 0)
+                c_raw = counts[tb.id][kap.id][lvl]
+                kum_stats[lvl]["total"] += c_raw.get('total', 0)
+                kum_stats[lvl]["f1"]    += c_raw.get('0', 0)
+                kum_stats[lvl]["f2"]    += c_raw.get('1', 0)
+                kum_stats[lvl]["f3"]    += c_raw.get('2', 0)
 
-                # B) KUMULIERUNG
-                kum_total_e_m += (c1.get('total', 0) + c2.get('total', 0))
-                kum_f1_bestand += (c1.get('0', 0) + c2.get('0', 0))
-                kum_f2_bestand += (c1.get('1', 0) + c2.get('1', 0))
-                
-                # C) BERECHNUNG DER SPERRE
-                f2_ready = False
-                f2_hint = ""
+            # Jetzt die Vererbung: Mittel erbt von Einfach, Profi erbt von Mittel
+            # Level 1 (Einfach)
+            t1 = kum_stats["1"]["total"]
+            f1_1 = kum_stats["1"]["f1"]
+            f2_1 = kum_stats["1"]["f2"]
+            f3_1 = kum_stats["1"]["f3"]
+            
+            # Level 2 (Mittel) = Lvl 1 + Lvl 2
+            t2 = t1 + kum_stats["2"]["total"]
+            f1_2 = f1_1 + kum_stats["2"]["f1"]
+            f2_2 = f2_1 + kum_stats["2"]["f2"]
+            f3_2 = f3_1 + kum_stats["2"]["f3"]
 
-                # Nur prüfen, wenn auch wirklich Aufgaben im Fach 2 liegen
-                if kum_f2_bestand > 0:
-                    if kum_total_e_m > 0:
-                        erledigt = kum_total_e_m - kum_f1_bestand
-                        quote = erledigt / kum_total_e_m
-                        
-                        if quote >= 0.25:  # Deine Test-Quote
-                            f2_ready = True
-                        else:
-                            noch = int((0.25 * kum_total_e_m) - erledigt) + 1
-                            f2_hint = f"Noch {noch} Aufgaben in Fach 1 lösen, um Fach 2 freizuschalten."
-                    else:
-                        f2_ready = True
-                else:
-                    # Fach ist leer -> Keine Sperre nötig, da eh kein Link (siehe Template)
-                    f2_ready = True 
+            # Level 3 (Profi) = Lvl 2 + Lvl 3
+            t3 = t2 + kum_stats["3"]["total"]
+            f1_3 = f1_2 + kum_stats["3"]["f1"]
+            f2_3 = f2_2 + kum_stats["3"]["f2"]
+            f3_3 = f3_2 + kum_stats["3"]["f3"]
 
-                # D) DATEN ZURÜCKSCHREIBEN (Für alle Level vorbereiten)
-                for s_level in ["1", "2", "3"]:
-                    if s_level not in counts[tb.id][kap.id]:
-                        counts[tb.id][kap.id][s_level] = {'0':0, '1':0, '2':0, '3':0, 'total':0}
-                
-                # Speziell für Mittel (Level 2) die Sperr-Infos setzen
-                counts[tb.id][kap.id]["2"]["f2_ready"] = f2_ready
-                counts[tb.id][kap.id]["2"]["f2_hint"] = f2_hint
-                counts[tb.id][kap.id]["2"]["kum_anzahl"] = kum_f2_bestand
+            # Ergebnisse in das counts-Objekt zurückschreiben
+            # -- Daten für Level 1 --
+            res1 = counts[tb.id][kap.id]["1"]
+            res1["kum_f2"], res1["f2_ready"], res1["f2_hint"] = berechne_sperre(t1, f1_1, f2_1, 2)
+            res1["kum_f3"], res1["f3_ready"], res1["f3_hint"] = berechne_sperre(t1, f1_1, f2_1, 3, f3_1)
 
-            tb_totals[tb.id] = t_sum
+            # -- Daten für Level 2 --
+            res2 = counts[tb.id][kap.id]["2"]
+            res2["kum_f2"], res2["f2_ready"], res2["f2_hint"] = berechne_sperre(t2, f1_2, f2_2, 2)
+            res2["kum_f3"], res2["f3_ready"], res2["f3_hint"] = berechne_sperre(t2, f1_2, f2_2, 3, f3_2)
+
+            # -- Daten für Level 3 --
+            res3 = counts[tb.id][kap.id]["3"]
+            res3["kum_f2"], res3["f2_ready"], res3["f2_hint"] = berechne_sperre(t3, f1_3, f2_3, 2)
+            res3["kum_f3"], res3["f3_ready"], res3["f3_hint"] = berechne_sperre(t3, f1_3, f2_3, 3, f3_3)
+            print("res1: ",res1)
+            print("res2: ",res2)
+            print("res3: ",res3)
+
+
+            # Summen für die Balkenanzeige (bleibt wie es war)
+            for s_key in ["1", "2", "3"]:
+                t_sum[s_key] += counts[tb.id][kap.id].get(s_key, {}).get('total', 0)
+
+        tb_totals[tb.id] = t_sum 
 
     return render(request, "physik/index.html", {
             "themenbereiche": themenbereiche,

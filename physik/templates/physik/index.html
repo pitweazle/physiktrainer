@@ -153,36 +153,37 @@
                                                     <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=1" style="color: inherit; text-decoration: none; display: block;">{{ f1 }}</a>
                                                 {% else %} 0 {% endif %}
                                             </td>
+
                                             {# Fach 2 #}
-                                            <td class="box col-mittel" 
-                                                style="background-color: {% if total2 == 0 %}transparent{% elif f2 > 0 %}#fff9c4{% elif f2 == 0 and f3|add:f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                
-                                                {# Wir schauen auf die Summe bis hierhin (s2.kum_anzahl) #}
-                                                {% if s2.kum_anzahl > 0 %}
-                                                    {% if s2.f2_ready %}
-                                                        {# BEREIT: Link (auch wenn die lokale Zahl f2 null ist!) #}
-                                                        <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=2" 
-                                                        title="Dieses Fach enthält insgesamt {{ s2.kum_anzahl }} Aufgaben bis zu diesem Kapitel."
-                                                        style="color: inherit; text-decoration: none; display: block; font-weight: {% if f2 > 0 %}bold{% else %}normal{% endif %};">
-                                                        {{ f2 }}
-                                                        </a>
-                                                    {% else %}
-                                                        {# GESPERRT: Hinweis #}
-                                                        <span style="color: #bbb; cursor: help;" title="{{ s2.f2_hint }}">
-                                                            {{ f2 }}
-                                                        </span>
-                                                    {% endif %}
-                                                {% else %}
-                                                    {# Wirklich gar nichts zu tun (kumulativ 0) #}
-                                                    0
-                                                {% endif %}
+                                            <td class="box col-mittel">
+                                                {% with s2=counts|get_item:tb.id|get_item:kap.id|get_item:"2" %}
+                                                    {% if s2.kum_f2 > 0 %}
+                                                        {% if s2.f2_ready %}
+                                                            <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=2" 
+                                                            style="color: inherit; text-decoration: none; display: block;">
+                                                                {{ f2 }}
+                                                            </a>
+                                                        {% else %}
+                                                            <span style="color: #bbb; display: block;" title="{{ s2.f2_hint }}">{{ f2 }}</span>
+                                                        {% endif %}
+                                                    {% else %} 0 {% endif %}
+                                                {% endwith %}
                                             </td>
 
                                             {# Fach 3 #}
-                                            <td class="box col-mittel" style="background-color: {% if total2 == 0 %}transparent{% elif f3 > 0 %}#fff9c4{% elif f3 == 0 and f4 > 0 %}#c8e6c9{% else %}transparent{% endif %};">
-                                                {% if f3 > 0 %}
-                                                    <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=3" style="color: inherit; text-decoration: none; display: block;">{{ f3 }}</a>
-                                                {% else %} 0 {% endif %}
+                                            <td class="box col-mittel">
+                                                {% with s2=counts|get_item:tb.id|get_item:kap.id|get_item:"2" %}
+                                                    {% if s2.kum_f3 > 0 %}
+                                                        {% if s2.f3_ready %}
+                                                            <a href="{% url 'physik:aufgaben' %}?tb={{ tb.id }}&bis_kap={{ kap.zeile }}&level=2&fach=3" 
+                                                            style="color: inherit; text-decoration: none; display: block;">
+                                                                {{ f3 }}
+                                                            </a>
+                                                        {% else %}
+                                                            <span style="color: #bbb; display: block;" title="{{ s2.f3_hint }}">{{ f3 }}</span>
+                                                        {% endif %}
+                                                    {% else %} 0 {% endif %}
+                                                {% endwith %}
                                             </td>
 
                                             {# Fach 4 (Archiv) #}
