@@ -21,18 +21,18 @@ def berechne_sperre(total, f1_bestand, f2_bestand, ziel_fach, f3_bestand=0):
         bestand = f2_bestand
         if bestand > 0 and total > 0:
             erledigt = total - f1_bestand
-            if (erledigt / total) < 0.5:
+            if (erledigt / total) < 0.75:
                 ready = False
-                hint = f"Noch {int(0.5 * total - erledigt) + 1} in Fach 1 lösen."
+                hint = f"Noch {int(0.75 * total - erledigt) + 1} in Fach 1 lösen."
         return bestand, ready, hint
         
     if ziel_fach == 3:
         bestand = f3_bestand
         if bestand > 0 and total > 0:
             erledigt = total - f1_bestand - f2_bestand
-            if (erledigt / total) < 0.5:
+            if (erledigt / total) < 0.75:
                 ready = False
-                hint = f"Noch {int(0.5 * total - erledigt) + 1} in Fach 2 lösen."
+                hint = f"Noch {int(0.75 * total - erledigt) + 1} in Fach 2 lösen."
         return bestand, ready, hint
 
 def index(request):
