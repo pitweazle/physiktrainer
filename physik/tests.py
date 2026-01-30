@@ -84,3 +84,28 @@ class SchlagwortLogikTest(TestCase):
             res.get("richtig"), 
             "Typ 1X: 'Thermometer' sollte Kleinschreibung akkzeptieren."
         )
+
+    def test_typ1Z_fuzzy_locker(self):
+        factory = RequestFactory()
+        request_dummy = factory.get('/') # Erstellt einen leeren Test-Request   
+        request_dummy.user = AnonymousUser() 
+        """Prüft Typ 1Z: Sollte termomter akkzeptieren"""
+        aufgabe_t1Z = Aufgabe.objects.create(
+            lfd_nr="T1Z", 
+            thema=self.thema, 
+            kapitel=self.kapitel,
+            typ="1Z", 
+            antwort="Thermometer"
+        )
+
+        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
+        res = bewerte_aufgabe(
+            aufgabe=aufgabe_t1Z, 
+            user_antwort="termomter", 
+            request=request_dummy,
+            session={}
+            )
+        self.assertTrue(
+            res.get("richtig"), 
+            "Typ 1Z: 'Thermometer' sollte 'termomter'' akkzeptieren."
+        )

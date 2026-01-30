@@ -53,52 +53,49 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
     return False, None
 
 # ===========================================================
-# HAUPTFUNKTION
+# HAUPTFUNKTION (Korrektur: Variable 'norm' und Parser-Logik)
 # ===========================================================
 def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antwort=None, session=None):
-    # print(f"\n--- DEBUG START ---")
-    # print(f"Typ der Aufgabe: '{aufgabe.typ}'")
-    # print(f"User sagt: '{user_antwort}' | Datenbank sagt: '{aufgabe.antwort}'")
     # 1. Initialisierung
     ergebnis = None
     typ_roh = (aufgabe.typ or "").strip()
+    
+    # WICHTIG: Falls text_antwort leer ist, nehmen wir user_antwort (für die Tests wichtig!)
+    if not text_antwort and user_antwort:
+        text_antwort = user_antwort
+        
     norm = normalisiere(text_antwort) if text_antwort else ""
     
     # --- NEUE LOGIK: X, Y, Z FLAGS ---
     typ_rein = typ_roh.replace("X", "").replace("Y", "").replace("Z", "").strip()
     is_integer = typ_rein.isdigit()
 
-    # X-Inverter Logik (unverändert, die stimmt!)
+    # X-Inverter Logik
     if is_integer:
-        case_sensitiv = ("X" not in typ_roh) # Zahlen: Standard AN, X macht AUS
+        case_sensitiv = ("X" not in typ_roh) 
     else:
-        case_sensitiv = ("X" in typ_roh)     # Text: Standard AUS, X macht AN
+        case_sensitiv = ("X" in typ_roh)
 
-    # Fuzzy-Aktivierung: JETZT KORREKT
-    # 1. Wenn Y oder Z da sind: IMMER aktiv
-    # 2. Wenn es KEINE reine Ziffer ist (also 1o2 etc.): Standard AKTIV (außer X blockt es)
-    # 3. Wenn es eine REINE ZIFFRE ist: Standard DEAKTIVIERT
+    # Fuzzy-Aktivierung: Y=0.8, Z=0.65
     if "Y" in typ_roh: 
         fuzzy_aktiv = True
         ratio = 0.8
-    elif  "Z" in typ_roh:
+    elif "Z" in typ_roh:
         fuzzy_aktiv = True
         ratio = 0.65
     elif is_integer:
-        fuzzy_aktiv = False  # Reine Ziffern (1, 2, 2X) sind immer streng!
+        fuzzy_aktiv = False  
         ratio = 1
     else:
-        fuzzy_aktiv = ("X" not in typ_roh) # Bei Ausdrücken (1o2): X schaltet Fuzzy aus
-        ratio = 1
+        fuzzy_aktiv = ("X" not in typ_roh) 
+        ratio = 0.8 # Standard für Ausdrücke (1o2)
 
-    
     typ = typ_rein
-    # ---------------------------------
 
     # -----------------------------------------------------------
-    # A. SPEZIAL-TYPEN (Priorität vor Text-Parsing)
+    # A. SPEZIAL-TYPEN
     # -----------------------------------------------------------
-    if typ == "p" in typ:
+    if "p" in typ: # Korrigiert von 'typ == "p" in typ'
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
@@ -116,38 +113,45 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
             ergebnis = {"richtig": False, "hinweis": hinweis}
 
     # 2. Sonderfall: Reiner Zahlentyp (1, 2, 3...)
+    # Wichtig: Hier greifen jetzt auch 1X, 1Y etc., da 'typ' nur die Ziffer ist
     if not ergebnis and typ.isdigit():
         max_idx = int(typ)
         found = False
         for i in range(1, max_idx + 1):
-            # Bei reinen Zahlen: contain immer False
+            # Streng-Check (berücksichtigt case_sensitiv)
             ok, _ = vergleich_streng(i, aufgabe, norm, text_antwort, case_sensitiv, False)
             if ok: 
                 ergebnis = {"richtig": True, "hinweis": "Richtig!"}
                 found = True
                 break
+            
+            # NEU: Falls streng nicht ok, aber Y/Z aktiv ist -> Fuzzy Check
+            if not ok and fuzzy_aktiv:
+                ok_f, _ = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
+                if ok_f:
+                    ergebnis = {"richtig": True, "hinweis": f"Fast richtig! Gemeint war: {aufgabe.antwort}"}
+                    found = True
+                    break
        
         if not found:
             ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
 
-    # 3. Haupt-Parser: Streng
+    # 3. Haupt-Parser: Streng (für Ausdrücke wie 1o2)
     if not ergebnis:
         streng_ok, hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
-            # Hier: contain=True nur wenn KEIN reiner Zahlentyp
             lambda idx, aufg, n, o: vergleich_streng(idx, aufg, n, o, case_sensitiv, not is_integer)
         )
         if streng_ok:
             ergebnis = {"richtig": True, "hinweis": "Richtig!"}
 
-# 4. Haupt-Parser: Fuzzy
+    # 4. Haupt-Parser: Fuzzy (für Ausdrücke wie 1o2)
     if not ergebnis and fuzzy_aktiv:
         fuzzy_ok, fuzzy_hinweis = bewerte_booleschen_ausdruck(
             typ, aufgabe, norm, text_antwort,
             lambda idx, aufg, n, o: vergleich_fuzzy(idx, aufg, n, o, ratio)
         )
         if fuzzy_ok:
-            # Hier bauen wir deine eigene Antwort (text_antwort) mit in den Hinweis ein:
             detail_hinweis = f"Deine Eingabe war: „{text_antwort}“.\n{fuzzy_hinweis}"
             ergebnis = {"richtig": True, "hinweis": detail_hinweis}
 
