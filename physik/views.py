@@ -287,7 +287,7 @@ def aufgaben(request):
     anzeigen = []
     if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
-        optionen_liste = [(0, aufgabe.antwort)] # Index 0 ist immer die richtige Antwort
+        optionen_liste = [(0, aufgabe.loesung)] # Index 0 ist immer die richtige Antwort
         for i, o in enumerate(aufgabe.optionen.order_by("position"), start=1):
             optionen_liste.append((i, o.text))
         random.shuffle(optionen_liste)
@@ -303,7 +303,7 @@ def aufgaben(request):
         bild_antwort = request.POST.get("bild_antwort")
 
         # ---- Skip ----
-        if not antwort and not bild_antwort:
+        if not antwort and not bild_antwort and not request.session.get("warte_auf_weiter"):
             messages.info(request, "Letzte Aufgabe übersprungen.")
             request.session["index"] += 1
             request.session["warte_auf_weiter"] = False
@@ -338,11 +338,11 @@ def aufgaben(request):
             hinweis_text = ergebnis.get("hinweis", "Leider falsch.")
             
             # Jetzt vergleichen wir Eingabe vs. Lösung direkt in der Nachricht
-            # Wir nutzen 'aufgabe.antwort' (das ist der Wert aus der DB)
+            # Wir nutzen 'aufgabe.loesung' (das ist der Wert aus der DB)
             lern_botschaft = (
                 f"{hinweis_text} "
                 f"Deine Eingabe: »{antwort}« | "
-                f"Richtige Lösung: »{aufgabe.antwort}«"
+                f"Richtige Lösung: »{aufgabe.loesung}«"
             )
             
             messages.warning(request, lern_botschaft)
@@ -439,7 +439,7 @@ def fehler_edit(request, log_id):
             # 1. Hauptfelder der Aufgabe speichern
             aufgabe.typ = request.POST.get("typ")
             aufgabe.frage = request.POST.get("frage")
-            aufgabe.antwort = request.POST.get("antwort")
+            aufgabe.loesung = request.POST.get("antwort")
             aufgabe.anmerkung = request.POST.get("anmerkung")
             aufgabe.erklaerung = request.POST.get("erklaerung")
             aufgabe.hilfe = request.POST.get("hilfe")

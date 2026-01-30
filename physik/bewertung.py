@@ -9,7 +9,7 @@ from .models import Protokoll
 def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
                      case_sensitiv, contain):
     if index == 1:
-        text = aufgabe.antwort
+        text = aufgabe.loesung
     else:
         opts = list(aufgabe.optionen.order_by("position"))
         pos = index - 2
@@ -34,7 +34,7 @@ def vergleich_streng(index, aufgabe, antwort_norm, antwort_original,
 
 def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
     if index == 1:
-        text = aufgabe.antwort
+        text = aufgabe.loesung
     else:
         opts = list(aufgabe.optionen.order_by("position"))
         text = opts[index-2].text if (index-2) < len(opts) else ""
@@ -129,12 +129,12 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
             if not ok and fuzzy_aktiv:
                 ok_f, _ = vergleich_fuzzy(i, aufgabe, norm, text_antwort, ratio)
                 if ok_f:
-                    ergebnis = {"richtig": True, "hinweis": f"Fast richtig! Gemeint war: {aufgabe.antwort}"}
+                    ergebnis = {"richtig": True, "hinweis": f"Fast richtig! Gemeint war: {aufgabe.loesung}"}
                     found = True
                     break
        
         if not found:
-            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
+            ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.loesung}"}
 
     # 3. Haupt-Parser: Streng (für Ausdrücke wie 1o2)
     if not ergebnis:
@@ -189,7 +189,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     
     # Wenn bis hierhin nichts gegriffen hat
     if not ergebnis:
-        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.antwort}"}
+        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.loesung}"}
 
     # Sahnehäubchen: Fehlerlogging
     if not ergebnis.get("richtig") and text_antwort:
@@ -317,7 +317,7 @@ def bewerte_wahr_falsch(aufgabe, norm):
     t = (norm or "").lower()
 
     # Lösung aus Feld 1 (antwort) radikal bereinigen (entfernt auch Punkte/Leerzeichen)
-    db_lsg = "".join((aufgabe.antwort or "").lower().split()).rstrip(".")
+    db_lsg = "".join((aufgabe.loesung or "").lower().split()).rstrip(".")
 
     # 2. Bedeutungsgruppen definieren
     WAHR_GRUPPE = {"w", "wahr", "ja", "j", "richtig", "r", "ok", "stimmt"}
@@ -351,12 +351,12 @@ def bewerte_liste(aufgabe, antwort):
             return {"richtig": True, "hinweis": "Richtig!"}
     except (ValueError, TypeError):
         # 2. Fallback: Falls doch Text kommt (alte Logik)
-        if normalisiere(antwort) == normalisiere(aufgabe.antwort):
+        if normalisiere(antwort) == normalisiere(aufgabe.loesung):
             return {"richtig": True, "hinweis": "Richtig!"}
 
     return {
         "richtig": False,
-        "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.antwort}"
+        "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.loesung}"
     }
 
 def bewerte_e_typ(typ, aufgabe, antwort, case_sensitiv, is_integer, ratio, fuzzy_aktiv):
@@ -455,7 +455,7 @@ def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
         )
         if ok:
             if k == 1:
-                verbotener_begriff = aufgabe.antwort
+                verbotener_begriff = aufgabe.loesung
             else:
                 opts = list(aufgabe.optionen.order_by("position"))
                 if k - 2 < len(opts):

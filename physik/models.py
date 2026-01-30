@@ -69,7 +69,7 @@ class Aufgabe(models.Model):
         help_text="Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
     )
 
-    antwort = models.CharField("Antwort", max_length=255, blank=True, help_text="Hier steht die offizielle Antwort.")
+    loesung = models.CharField("Antwort", max_length=255, blank=True, help_text="Hier steht die offizielle Antwort.")
 
     anmerkung = models.CharField("Anmerkung", max_length=255, blank=True, help_text="Optional, nur wenn gewünscht.")
     erklaerung = models.TextField("Erklärung",blank=True,

@@ -1,11 +1,11 @@
-"erklaerung";"anmerkung";"hilfe";"lfd_nr";"thema_id";"zeile";"kapitel";"schwierigkeit";"typ";"frage";"antwort";2;3;4;5;6;7;8;9
+"erklaerung";"anmerkung";"hilfe";"lfd_nr";"thema_id";"zeile";"kapitel";"schwierigkeit";"typ";"frage";"loesung";2;3;4;5;6;7;8;9
 "Es ist die Siedetemperatur von Wasser und die Schmelztemperatur von Wasser";0;0;"W003_Do";1;1;"Temperatur und Thermometer";1;"1o(2u3)o(4u5)";"Bei welchen Temperaturen liegen die Fixpunkte der Celsiusskala?";"0°C und 100°C";"0°C";"100°C";"0°Celsius";"100°Celsius";0;0;0;0
 0;"Bei normalem Luftdruck (1020hPa)";0;"W007_Do";1;1;"Temperatur und Thermometer";1;"1o3";"Welche Temperatur hat Wasser wenn es siedet?";"100°C";"100°Celsius";"373K";0;0;0;0;0;0
 0;0;0;"W011_Do";1;1;"Temperatur und Thermometer";1;"1o2";"Wer hat unsere Temperaturskala erfunden ?";"Anders Celsius";"Celsius";0;0;0;0;0;0;0
 0;0;0;"W012_Do";1;1;"Temperatur und Thermometer";1;"1o2";"Welche Temperatur hat Eiswasser (Wasser in dem Eis schwimmt)?";"0°C";"0°Celsius";0;0;0;0;0;0;0
-0;0;0;"W016_Do";1;1;"Temperatur und Thermometer";1;"11o1";"Wie heißt das Messgerät mit dem man Temperaturen misst ?";"Thermometer";0;0;0;0;0;0;0;0
+0;0;0;"W016_Do";1;1;"Temperatur und Thermometer";1;"1Z";"Wie heißt das Messgerät mit dem man Temperaturen misst ?";"Thermometer";0;0;0;0;0;0;0;0
 0;0;0;"W017_Do";1;1;"Temperatur und Thermometer";1;"1o2";"Welches ist der Gefrierpunkt von Wasser ?";"0°C";"0°Celsius";0;0;0;0;0;0;0
-0;0;0;"W020_Do";1;1;"Temperatur und Thermometer";1;"p1o1";"Wie nennt man so ein Gerät ?";"Thermometer";0;0;0;0;0;0;0;0
+0;0;0;"W020_Do";1;1;"Temperatur und Thermometer";1;"p1Z";"Wie nennt man so ein Gerät ?";"Thermometer";0;0;0;0;0;0;0;0
 "Das ist ein Barometer. Man misst mit ihm den Luftdruck.";0;0;"W022_Do";1;1;"Temperatur und Thermometer";1;"p";"Bei welchem Gerät handelt es sich nicht um einen Thermometer?";0;0;0;0;0;0;0;0;0
 "Der Begriff 'kochen' kommt aus der Küche. In der Naturwisseenschaft sagt man 'sieden'.";0;0;"W023_Do";1;1;"Temperatur und Thermometer";1;"1o2f3Y";"Was passiert mit Wasser bei 100°C?";"Es siedet";"siedet";"kocht";0;0;0;0;0;0
 0;0;0;"W043_Do";1;1;"Temperatur und Thermometer";1;"1o(2u3)Y";"Die niedrigste Temperatur beträgt -273,15 °Celsius. Nenne dafür den Fachbegriff.";"absoluter Nullpunkt";"absolute";"Nullpunkt";0;0;0;0;0;0

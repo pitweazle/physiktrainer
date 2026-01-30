@@ -22,7 +22,7 @@ class SchlagwortLogikTest(TestCase):
             thema=self.thema, 
             kapitel=self.kapitel,
             typ="1", 
-            antwort="Thermometer"
+            loesung="Thermometer"
         )
         
         # 1. Das aufgabe-Objekt, 2. Die Antwort des Users
@@ -45,10 +45,10 @@ class SchlagwortLogikTest(TestCase):
             thema=self.thema, 
             kapitel=self.kapitel,
             typ="1o1", 
-            antwort="Thermometer"
+            loesung="Thermometer"
         )
 
-        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
+        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) loesung
         res = bewerte_aufgabe(
             aufgabe=aufgabe_t101, 
             user_antwort="Termometer", 
@@ -70,10 +70,10 @@ class SchlagwortLogikTest(TestCase):
             thema=self.thema, 
             kapitel=self.kapitel,
             typ="1X", 
-            antwort="Thermometer"
+            loesung="Thermometer"
         )
 
-        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
+        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) loesung
         res = bewerte_aufgabe(
             aufgabe=aufgabe_t1X, 
             user_antwort="thermometer", 
@@ -95,7 +95,7 @@ class SchlagwortLogikTest(TestCase):
             thema=self.thema, 
             kapitel=self.kapitel,
             typ="1Z", 
-            antwort="Thermometer"
+            loesung="Thermometer"
         )
 
         # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
