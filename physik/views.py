@@ -303,8 +303,9 @@ def aufgaben(request):
         bild_antwort = request.POST.get("bild_antwort")
 
         # ---- Skip ----
-        if not antwort and not bild_antwort and not request.session.get("warte_auf_weiter"):
-            messages.info(request, "Letzte Aufgabe übersprungen.")
+        if not antwort and not bild_antwort:# and not request.session.get("warte_auf_weiter"):
+            if not request.session.get("warte_auf_weiter"):
+                messages.info(request, "Letzte Aufgabe übersprungen.")
             request.session["index"] += 1
             request.session["warte_auf_weiter"] = False
             request.session.pop("letzte_antwort", None)
