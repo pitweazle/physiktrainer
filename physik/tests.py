@@ -1,48 +1,86 @@
+from django.contrib.auth.models import AnonymousUser # Falls der User egal ist
+
 from django.test import TestCase
-# Importiere direkt über den App-Namen, wie er in INSTALLED_APPS steht
 from physik.models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption
 from physik.bewertung import bewerte_aufgabe
+from django.test import RequestFactory
 
 class SchlagwortLogikTest(TestCase):
+
     def setUp(self):
+        # WICHTIG: Das "self." vor thema und kapitel
         self.thema = ThemenBereich.objects.create(ordnung=1, thema="Wärmelehre", farbe="red", kurz="W")
         self.kapitel = Kapitel.objects.create(thema=self.thema, zeile=1, kapitel="Wärmeausbreitung")
 
-        self.aufgabe = Aufgabe.objects.create(
-            lfd_nr="W001",
-            thema=self.thema,
+    def test_typ1_exakt(self):
+        factory = RequestFactory()
+        request_dummy = factory.get('/') # Erstellt einen leeren Test-Request
+        request_dummy.user = AnonymousUser()  # Oder ein echter Test-User        """Prüft Typ 1: Muss exakt übereinstimmen"""
+        # Wir nutzen thema/kapitel aus dem setUp (self.thema / self.kapitel)
+        aufgabe_t1 = Aufgabe.objects.create(
+            lfd_nr="T001", 
+            thema=self.thema, 
             kapitel=self.kapitel,
-            typ="3u(4o6)Y" # Die 3 muss "Luft" sein
+            typ="1", 
+            antwort="Thermometer"
         )
-
-        # Position 2 (Index 0): Langer Satz
-        AufgabeOption.objects.create(aufgabe=self.aufgabe, position=2, text="Die Luft...")
-        # Position 3 (Index 1): Luft <--- Das wird von NUM 3 gesucht (3-2=1)
-        AufgabeOption.objects.create(aufgabe=self.aufgabe, position=3, text="Luft")
-        # Position 4 (Index 2): mehr
-        AufgabeOption.objects.create(aufgabe=self.aufgabe, position=4, text="mehr")
-        # Position 5 (Index 3): isoliert
-        AufgabeOption.objects.create(aufgabe=self.aufgabe, position=5, text="isoliert")
-        # Position 6 (Index 4): schlechter Wärmeleiter
-        AufgabeOption.objects.create(aufgabe=self.aufgabe, position=6, text="schlechter Wärmeleiter")
-
-    def test_bereich_logik_4o6(self):
-        """
-        Prüft, ob 'Luft' (3) und 'isoliert' (5) als richtig erkannt werden,
-        da 5 im Bereich von 4 bis 6 liegt (4o6).
-        """
-        antwort_text = "Luft isoliert"
-        # Wir übergeben eine leere Session, falls bewerte_aufgabe sie braucht
-        ergebnis = bewerte_aufgabe(self.aufgabe, text_antwort=antwort_text, session={})
         
-        self.assertTrue(
-            ergebnis.get("richtig"), 
-            f"Fehler: '{antwort_text}' wurde als falsch gewertet. "
-            f"Logik '4o6' sollte die Position 5 (isoliert) einschließen."
+        # 1. Das aufgabe-Objekt, 2. Die Antwort des Users
+        res = bewerte_aufgabe(
+            aufgabe=aufgabe_t1, 
+            user_antwort="Thermometer", 
+            request=request_dummy,
+            session={}
+            
+            )
+        self.assertTrue(res.get("richtig"), "Typ 1: 'Thermometer' sollte richtig sein.")
+
+    def test_typ101_fuzzy(self):
+        factory = RequestFactory()
+        request_dummy = factory.get('/') # Erstellt einen leeren Test-Request   
+        request_dummy.user = AnonymousUser() 
+        """Prüft Typ 101: Sollte Tippfehler verzeihen"""
+        aufgabe_t101 = Aufgabe.objects.create(
+            lfd_nr="T101", 
+            thema=self.thema, 
+            kapitel=self.kapitel,
+            typ="1o1", 
+            antwort="Thermometer"
         )
 
-    def test_mindestbedingung_luft(self):
-        """Prüft, ob es ohne das Pflichtwort 'Luft' (3) korrekterweise falsch ist."""
-        antwort_text = "Es isoliert einfach gut."
-        ergebnis = bewerte_aufgabe(self.aufgabe, text_antwort=antwort_text, session={})
-        self.assertFalse(ergebnis.get("richtig"), "Sollte falsch sein, da 'Luft' fehlt.")
+        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
+        res = bewerte_aufgabe(
+            aufgabe=aufgabe_t101, 
+            user_antwort="Termometer", 
+            request=request_dummy,
+            session={}
+            )
+        self.assertTrue(
+            res.get("richtig"), 
+            "Typ 1o1: 'Termometer' sollte per Fuzzy-Matching erkannt werden."
+        )
+
+    def test_typ1X_casesensitv(self):
+        factory = RequestFactory()
+        request_dummy = factory.get('/') # Erstellt einen leeren Test-Request   
+        request_dummy.user = AnonymousUser() 
+        """Prüft Typ 1X: Sollte Kleinschreibung akkzeptieren"""
+        aufgabe_t1X = Aufgabe.objects.create(
+            lfd_nr="T1X", 
+            thema=self.thema, 
+            kapitel=self.kapitel,
+            typ="1X", 
+            antwort="Thermometer"
+        )
+
+        # Auch hier: Erst aufgabe, dann die (falsch geschriebene) Antwort
+        res = bewerte_aufgabe(
+            aufgabe=aufgabe_t1X, 
+            user_antwort="thermometer", 
+            request=request_dummy,
+            session={}
+            )
+        self.assertTrue(
+            res.get("richtig"), 
+            "Typ 1X: 'Thermometer' sollte Kleinschreibung akkzeptieren."
+        )

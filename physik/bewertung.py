@@ -56,6 +56,9 @@ def vergleich_fuzzy(index, aufgabe, antwort_norm, antwort_original, ratio):
 # HAUPTFUNKTION
 # ===========================================================
 def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antwort=None, session=None):
+    # print(f"\n--- DEBUG START ---")
+    # print(f"Typ der Aufgabe: '{aufgabe.typ}'")
+    # print(f"User sagt: '{user_antwort}' | Datenbank sagt: '{aufgabe.antwort}'")
     # 1. Initialisierung
     ergebnis = None
     typ_roh = (aufgabe.typ or "").strip()
