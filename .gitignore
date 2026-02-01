@@ -1,3 +1,9 @@
+/media/
+media/
+**/media/
+*.MOV
+*.mov
+
 # Ausnahmen – diese Datei soll nicht getrackt werden
 core/zaehler_geloeschte_aufgaben.json
 
