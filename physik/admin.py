@@ -21,9 +21,9 @@ class AufgabeBildInline(admin.TabularInline):
     model = AufgabeBild
     extra = 0
     can_delete = True
-    verbose_name = "Bild"
-    verbose_name_plural = "Bilder"
-    fields = ("bild",)
+    verbose_name = "Medium"
+    verbose_name_plural = "Medien"
+    fields = ("bild", "video")
 
 class AufgabeOptionInline(admin.TabularInline):
     model = AufgabeOption
@@ -79,7 +79,7 @@ class AufgabeAdmin(admin.ModelAdmin):
     list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
     #list_editable = ("typ",)
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
-    search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
+    search_fields = ("frage", "loesung", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
     date_hierarchy = "erstellt"
 
@@ -94,7 +94,7 @@ class AufgabeAdmin(admin.ModelAdmin):
             "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
         }),
 
-        ("Antwort", {"fields": ("antwort",)}),
+        ("Lösung", {"fields": ("loesung",)}),
 
         ("Zusatzinformationen", {
             "fields": ("anmerkung", "erklaerung", "hilfe"),
@@ -129,8 +129,3 @@ class FehlerLogAdmin(admin.ModelAdmin):
     list_filter = ('aufgabe__thema', 'zeitpunkt')
     search_fields = ('eingegebene_antwort', 'aufgabe__lfd_nr')
 
-@admin.register(AufgabeBild)
-class AufgabeBildAdmin(admin.ModelAdmin):
-    list_display = ('id', 'aufgabe', 'bild', 'position')
-    list_filter = ('aufgabe__thema', 'aufgabe__lfd_nr')
-    search_fields = ('bild', 'aufgabe__lfd_nr')

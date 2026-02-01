@@ -25,7 +25,6 @@ class Kapitel(models.Model):
         on_delete=models.CASCADE,
         related_name="kapitel",
     )
-
     # Sortierung innerhalb eines Themenbereichs (1..n, ohne Obergrenze)
     zeile = models.PositiveSmallIntegerField()
     kapitel = models.CharField(max_length=100)
@@ -113,7 +112,7 @@ class Aufgabe(models.Model):
 
 class AufgabeOption(models.Model):
     aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="optionen")
-    position = models.PositiveSmallIntegerField("Position")
+    position = models.PositiveSmallIntegerField("Position", blank=True, null=True)
     text = models.CharField("Text", max_length=255)
 
     class Meta:
@@ -122,18 +121,30 @@ class AufgabeOption(models.Model):
         unique_together = [("aufgabe", "position")]
         ordering = ["position"]
 
+    def save(self, *args, **kwargs):
+        if self.position is None: # Falls keine Position eingegeben wurde
+            max_pos = AufgabeOption.objects.filter(aufgabe=self.aufgabe).aggregate(
+                m=models.Max("position")
+            )["m"] or 0
+            self.position = max_pos + 1
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.aufgabe_id}:{self.position} {self.text}"
 
+def bild_pfad(instance, filename):
+    # WICHTIG: instance ist hier das AufgabeBild-Objekt
+    thema = instance.aufgabe.kapitel.thema.thema
+    lfd = instance.aufgabe.lfd_nr
+    return f"aufgabenbilder/{thema}/{lfd}/{filename}"
+
 class AufgabeBild(models.Model):
     aufgabe = models.ForeignKey(Aufgabe, on_delete=models.CASCADE, related_name="bilder")
-    position = models.PositiveSmallIntegerField()
-    def bild_pfad(instance, filename):
-        thema = instance.aufgabe.kapitel.thema.thema
-        lfd = instance.aufgabe.lfd_nr
-        return f"aufgabenbilder/{thema}/{lfd}/{filename}"
-
-    bild = models.ImageField(upload_to=bild_pfad)
+    position = models.PositiveSmallIntegerField(blank=True, null=True)
+    
+    # Hier nur den Namen der Funktion ohne "self" oder "AufgabeBild" angeben
+    bild = models.ImageField(upload_to=bild_pfad, null=True, blank=True)
+    video = models.FileField(upload_to=bild_pfad, null=True, blank=True)
 
     class Meta:
         ordering = ["position"]
