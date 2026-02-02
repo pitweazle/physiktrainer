@@ -367,6 +367,39 @@ def aufgaben(request):
             if request.session.get("warte_auf_weiter") else "",
     })
 
+from django.shortcuts import render, get_object_or_404
+from .models import Aufgabe, ThemenBereich, Kapitel
+
+def aufgaben_liste(request):
+    themenbereiche = ThemenBereich.objects.all()
+    thema_id = request.GET.get('thema')
+    kapitel_id = request.GET.get('kapitel')
+    
+    # Kapitel für den Filter laden
+    if thema_id:
+        kapitel_liste = Kapitel.objects.filter(thema_id=thema_id).order_by('zeile')
+    else:
+        kapitel_liste = Kapitel.objects.all().order_by('thema', 'zeile')
+
+    # Aufgaben filtern und effizient laden (ForeignKey-Beziehungen vorladen)
+    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema', 'kapitel__zeile', 'lfd_nr')
+    
+    if thema_id:
+        aufgaben = aufgaben.filter(kapitel__thema_id=thema_id)
+    if kapitel_id:
+        aufgaben = aufgaben.filter(kapitel_id=kapitel_id)
+
+    return render(request, 'physik/aufgaben_liste.html', {
+        'aufgaben': aufgaben,
+        'themenbereiche': themenbereiche,
+        'kapitel_liste': kapitel_liste,
+    })
+
+def aufgabe_detail(request, pk):
+    # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert
+    aufgabe = get_object_or_404(Aufgabe, pk=pk)
+    return render(request, 'physik/aufgabe_detail.html', {'aufgabe': aufgabe})
+
 def call(request, lfd_nr):
     try:
         aufgabe = Aufgabe.objects.get(lfd_nr=lfd_nr)
