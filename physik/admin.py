@@ -71,11 +71,17 @@ class AufgabeAdminForm(forms.ModelForm):
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
     inlines = [AufgabeOptionInline, AufgabeBildInline]  
+
+# 1. WICHTIG: erstellt MUSS hier immer rein!
     def get_readonly_fields(self, request, obj=None):
-        if obj:   # bestehendes Objekt → bearbeiten
-            return ("lfd_nr", "erstellt")
-        else:     # NEUE Aufgabe → anlegen
-            return ("lfd_nr", "erstellt", "von")
+        return ("erstellt",)
+
+    # 2. Die Automatik für den Ersteller
+    def save_model(self, request, obj, form, change):
+        if not obj.pk and not obj.von:
+            obj.von = request.user
+        super().save_model(request, obj, form, change)
+        
     list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
     #list_editable = ("typ",)
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
@@ -84,7 +90,7 @@ class AufgabeAdmin(admin.ModelAdmin):
     date_hierarchy = "erstellt"
 
     fieldsets = (
-        (None, {"fields": ("thema", "kapitel", "schwierigkeit", "typ")}),
+        (None, {"fields": ("lfd_nr", "thema", "kapitel", "schwierigkeit", "typ")}),
 
         ("Frage", {"fields": ("frage",)}),
 
@@ -102,13 +108,14 @@ class AufgabeAdmin(admin.ModelAdmin):
         }),
 
         ("Admin", {
-            "fields": ("lfd_nr","erstellt","von" ),
+            "fields": ("erstellt","von" ),
             "classes": ("collapse",),
         }),
     )
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
+        # Wenn die Aufgabe neu ist und noch kein 'von' gesetzt wurde
+        if not obj.pk and not obj.von:
             obj.von = request.user
         super().save_model(request, obj, form, change)
 

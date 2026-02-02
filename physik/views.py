@@ -285,6 +285,7 @@ def aufgaben(request):
 
     optionen_liste = []
     anzeigen = []
+    
     if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
         optionen_liste = [(0, aufgabe.loesung)] # Index 0 ist immer die richtige Antwort
@@ -395,10 +396,10 @@ def aufgaben_liste(request):
         'kapitel_liste': kapitel_liste,
     })
 
-def aufgabe_detail(request, pk):
+def aufgabe_einstellungen(request, pk):
     # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert
     aufgabe = get_object_or_404(Aufgabe, pk=pk)
-    return render(request, 'physik/aufgabe_detail.html', {'aufgabe': aufgabe})
+    return render(request, 'physik/aufgabe_einstellungen.html', {'aufgabe': aufgabe})
 
 def call(request, lfd_nr):
     try:
