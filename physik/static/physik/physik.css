@@ -46,8 +46,23 @@ td.kapitel-name {
 /* Erste Spalte */
 .physik-tabelle th:first-child,
 .physik-tabelle td:first-child {
-  width: 280px;        
+  width: 25%;           /* Anteilig am Desktop */
+  min-width: 100px;     /* Verhindert völliges Verschwinden */
+  max-width: 280px; 
   text-align: left;
+  word-wrap: break-word; /* Text bricht um, wenn zu lang */
+  hyphens: auto;        /* Trennt Wörter sauber */
+}
+
+/* Speziell für schmale Handys */
+@media (max-width: 600px) {
+  .physik-tabelle {
+    font-size: 12px;    /* Schrift etwas kleiner */
+  }
+  .physik-tabelle th:first-child,
+  .physik-tabelle td:first-child {
+    width: 120px;       /* Fixer Platz fürs Thema auf dem Handy */
+  }
 }
 
 /* Header sauberer */

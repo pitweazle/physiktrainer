@@ -79,7 +79,7 @@ class AufgabeAdmin(admin.ModelAdmin):
     list_display = ("frage", "lfd_nr", "typ", "thema", "kapitel", "schwierigkeit" )
     #list_editable = ("typ",)
     list_filter = ("thema", "kapitel", "schwierigkeit", "typ")
-    search_fields = ("frage", "antwort", "typ", "anmerkung", "erklaerung", "hilfe")
+    search_fields = ("frage", "loesung", "typ", "anmerkung", "erklaerung", "hilfe")
     ordering = ("thema__ordnung", "kapitel__zeile", "id")
     date_hierarchy = "erstellt"
 
@@ -94,7 +94,7 @@ class AufgabeAdmin(admin.ModelAdmin):
             "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
         }),
 
-        ("Antwort", {"fields": ("antwort",)}),
+        ("Lösung", {"fields": ("loesung",)}),
 
         ("Zusatzinformationen", {
             "fields": ("anmerkung", "erklaerung", "hilfe"),

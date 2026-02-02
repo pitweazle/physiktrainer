@@ -4,6 +4,13 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
+class Profil(models.Model):
+    user = models.OneToOneField(User, related_name='physik_profil', on_delete=models.CASCADE )
+    physik_einstellungen = models.JSONField(default=dict, blank=True, null=True)
+
+    def __str__(self):
+        return f"Physik-Profil für {self.user.username}"    
+
 class ThemenBereich(models.Model):
     ordnung = models.PositiveSmallIntegerField(unique=True)
     kurz = models.CharField(max_length=2, default="", blank=True)
