@@ -268,23 +268,35 @@ def aufgaben(request):
     # 9. Aktuelle Aufgabe laden
     aufgabe = Aufgabe.objects.get(id=ids_in_session[index])
     
-    # -------- Bilder --------
+# -------- Medien (Bilder & Videos) --------
     bilder_anzeige = None
-    if "p" in aufgabe.typ:
-        bilder = list(aufgabe.bilder.order_by("position"))
-        if bilder:
-            # ---- Fall 1: echte Bildfrage ----
+    
+    # Wir holen die Bilder/Videos immer, wenn welche da sind
+    bilder = list(aufgabe.bilder.order_by("position"))
+    
+    if bilder:
+        # ---- Fall 1: Echte Bildfrage (Typ enthält 'p') ----
+        if "p" in aufgabe.typ:
+            # Nur bei Typ genau 'p' setzen wir die richtige Bild-Antwort
             if aufgabe.typ == "p":
                 p_richtig = bilder[0].id
                 request.session["p_richtig"] = p_richtig
-            # ---- Fall 2: Bilder nur als Illustration ----
-            else:
-                request.session.pop("p_richtig", None)
+            
+            # Bilder mischen, damit das richtige nicht immer an Platz 1 steht
             random.shuffle(bilder)
-            bilder_anzeige = bilder
+        
+        # ---- Fall 2: Illustration / Video (z.B. Typ 'a' oder 'va') ----
+        else:
+            request.session.pop("p_richtig", None)
+            # Bei Videos oder normalen Illustrationen NICHT mischen? 
+            # Meistens will man Videos an Position 1 behalten.
+            pass 
+
+        bilder_anzeige = bilder
 
     optionen_liste = []
     anzeigen = []
+    
     if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
         optionen_liste = [(0, aufgabe.loesung)] # Index 0 ist immer die richtige Antwort
@@ -366,6 +378,39 @@ def aufgaben(request):
         "letzte_antwort": request.session.get("letzte_antwort", "") 
             if request.session.get("warte_auf_weiter") else "",
     })
+
+from django.shortcuts import render, get_object_or_404
+from .models import Aufgabe, ThemenBereich, Kapitel
+
+def aufgaben_liste(request):
+    themenbereiche = ThemenBereich.objects.all()
+    thema_id = request.GET.get('thema')
+    kapitel_id = request.GET.get('kapitel')
+    
+    # Kapitel für den Filter laden
+    if thema_id:
+        kapitel_liste = Kapitel.objects.filter(thema_id=thema_id).order_by('zeile')
+    else:
+        kapitel_liste = Kapitel.objects.all().order_by('thema', 'zeile')
+
+    # Aufgaben filtern und effizient laden (ForeignKey-Beziehungen vorladen)
+    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema', 'kapitel__zeile', 'lfd_nr')
+    
+    if thema_id:
+        aufgaben = aufgaben.filter(kapitel__thema_id=thema_id)
+    if kapitel_id:
+        aufgaben = aufgaben.filter(kapitel_id=kapitel_id)
+
+    return render(request, 'physik/aufgaben_liste.html', {
+        'aufgaben': aufgaben,
+        'themenbereiche': themenbereiche,
+        'kapitel_liste': kapitel_liste,
+    })
+
+def aufgabe_einstellungen(request, pk):
+    # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert
+    aufgabe = get_object_or_404(Aufgabe, pk=pk)
+    return render(request, 'physik/aufgabe_einstellungen.html', {'aufgabe': aufgabe})
 
 def call(request, lfd_nr):
     try:
