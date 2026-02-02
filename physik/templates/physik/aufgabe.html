@@ -70,33 +70,48 @@
             {% endif %}
           </div>
 
-          {% if bilder %}
-            {% with bilder_liste=bilder %}
-              <div class="task-images row1">
-                {% for b in bilder_liste %}
-                  {% if forloop.counter <= 2 %}
-                    <img src="{{ b.bild.url }}"
-                        class="task-image clickable"
-                        data-id="{{ b.id }}">
-                  {% endif %}
-                {% endfor %}
-              </div>
+{% if bilder %}
+  {% with bilder_liste=bilder %}
+    
+    {# --- 1. Video-Bereich: Erscheint ganz oben, falls vorhanden --- #}
+    {% for b in bilder_liste %}
+      {% if b.video %} {# Hier jetzt nur 'video' #}
+        <div class="video-container" style="margin-bottom: 20px; text-align: center;">
+<video width="100%" style="max-width: 500px;" autoplay muted loop playsinline controls>
+  <source src="{{ b.video.url }}" type="video/mp4">
+  Dein Browser unterstützt das Video-Tag nicht.
+</video>
+        </div>
+      {% endif %}
+    {% endfor %}
 
-              {% if bilder_liste|length > 2 %}
-                <div class="task-images row2">
-                  {% for b in bilder_liste %}
-                    {% if forloop.counter > 2 %}
-                      <img src="{{ b.bild.url }}"
-                          class="task-image clickable"
-                          data-id="{{ b.id }}">
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              {% endif %}
-            {% endwith %}
-
-            <input type="hidden" name="bild_antwort" id="bild_antwort">
+    {# --- 2. Bilder-Reihe 1 (Die ersten zwei echten BILDER) --- #}
+    <div class="task-images row1">
+      {% for b in bilder_liste %}
+        {% if b.bild %} {# Wir prüfen hier einfach: Ist es eine Bild-Datei? #}
+          {% if forloop.counter <= 2 %}
+            <img src="{{ b.bild.url }}" class="task-image clickable" data-id="{{ b.id }}">
           {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# --- 3. Bilder-Reihe 2 (Restliche Bilder ab dem dritten Bild) --- #}
+    {% if bilder_liste|length > 2 %}
+      <div class="task-images row2">
+        {% for b in bilder_liste %}
+          {% if b.bild %}
+            {% if forloop.counter > 2 %}
+              <img src="{{ b.bild.url }}" class="task-image clickable" data-id="{{ b.id }}">
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  {% endwith %}
+  <input type="hidden" name="bild_antwort" id="bild_antwort">
+{% endif %}
 
           <!-- Button-Leiste -->
           <div class="task-buttons">

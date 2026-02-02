@@ -268,20 +268,31 @@ def aufgaben(request):
     # 9. Aktuelle Aufgabe laden
     aufgabe = Aufgabe.objects.get(id=ids_in_session[index])
     
-    # -------- Bilder --------
+# -------- Medien (Bilder & Videos) --------
     bilder_anzeige = None
-    if "p" in aufgabe.typ:
-        bilder = list(aufgabe.bilder.order_by("position"))
-        if bilder:
-            # ---- Fall 1: echte Bildfrage ----
+    
+    # Wir holen die Bilder/Videos immer, wenn welche da sind
+    bilder = list(aufgabe.bilder.order_by("position"))
+    
+    if bilder:
+        # ---- Fall 1: Echte Bildfrage (Typ enthält 'p') ----
+        if "p" in aufgabe.typ:
+            # Nur bei Typ genau 'p' setzen wir die richtige Bild-Antwort
             if aufgabe.typ == "p":
                 p_richtig = bilder[0].id
                 request.session["p_richtig"] = p_richtig
-            # ---- Fall 2: Bilder nur als Illustration ----
-            else:
-                request.session.pop("p_richtig", None)
+            
+            # Bilder mischen, damit das richtige nicht immer an Platz 1 steht
             random.shuffle(bilder)
-            bilder_anzeige = bilder
+        
+        # ---- Fall 2: Illustration / Video (z.B. Typ 'a' oder 'va') ----
+        else:
+            request.session.pop("p_richtig", None)
+            # Bei Videos oder normalen Illustrationen NICHT mischen? 
+            # Meistens will man Videos an Position 1 behalten.
+            pass 
+
+        bilder_anzeige = bilder
 
     optionen_liste = []
     anzeigen = []
