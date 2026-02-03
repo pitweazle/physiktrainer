@@ -5,6 +5,7 @@ app_name = "physik"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path('view-einstellung/<str:element>/', views.update_view_settings, name='update_view_settings'),
     path("aufgaben/", views.aufgaben, name="aufgaben"),
     path('inventar/', views.aufgaben_liste, name='aufgaben_liste'),
     path('aufgabe/<int:pk>/', views.aufgabe_einstellungen, name='aufgabe_einstellungen'),

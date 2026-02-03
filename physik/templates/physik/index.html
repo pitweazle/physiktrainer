@@ -2,6 +2,13 @@
 {% load static %}
 {% load dict_extras %}
 
+{% block body_classes %}
+    {% with profil=request.user.physik_profil %}
+        {% if 'mittel' in profil.details.versteckt %}hide-mittel hide-profi{% endif %}
+        {% if 'profi' in profil.details.versteckt and 'mittel' not in profil.details.versteckt %}hide-profi{% endif %}
+    {% endwith %}
+{% endblock %}
+
 {% block css_files %}
  <link rel="stylesheet" href="{% static 'physik/physik.css' %}">
 {% endblock %}
@@ -311,99 +318,91 @@
 
     {{ kapitel_map|json_script:"kapitel-data" }}
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const body = document.body;
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const body = document.body;
+    // --- 1. DATEN LADEN FÜR MODAL ---
+    const dataTag = document.getElementById("kapitel-data");
+    let kapitelMap = {};
+    if (dataTag) {
+        try {
+            kapitelMap = JSON.parse(dataTag.textContent);
+        } catch (e) {
+            console.error("JSON Error", e);
+        }
+    }
 
-            document.getElementById("toggle-mittel")?.addEventListener("click", () => {
-                body.classList.toggle("hide-mittel");
-                // Logik: Wenn Mittel weg, muss Profi auch weg
-                if (body.classList.contains("hide-mittel")) {
-                    body.classList.add("hide-profi");
-                }
+    // --- 2. HILFSFUNKTION: SPEICHERN IM PROFIL ---
+    function syncWithProfile(element) {
+        fetch(`/physik/view-einstellung/${element}/`)
+            .then(response => response.json())
+            .then(data => console.log("Im Profil gespeichert:", data))
+            .catch(error => console.warn("Speichern fehlgeschlagen (Server/URL?)", error));
+    }
+
+    // --- 3. LOGIK: SPALTEN EIN/AUSBLENDEN ---
+    document.getElementById("toggle-mittel")?.addEventListener("click", () => {
+        const wirdVersteckt = body.classList.toggle("hide-mittel");
+        
+        // Wenn Mittel versteckt wird, muss Profi zwingend mit weg
+        if (wirdVersteckt) {
+            body.classList.add("hide-profi");
+        } 
+        // Wenn Mittel wieder eingeblendet wird, bleibt Profi erstmal noch weg (sanfter Übergang)
+        
+        syncWithProfile('mittel');
+    });
+
+    document.getElementById("toggle-profi")?.addEventListener("click", () => {
+        // Profi umschalten nur erlauben, wenn Mittel da ist
+        if (!body.classList.contains("hide-mittel")) {
+            body.classList.toggle("hide-profi");
+            syncWithProfile('profi');
+        } else {
+            console.log("Profi kann nicht angezeigt werden, solange Mittel versteckt ist.");
+        }
+    });
+
+    // --- 4. LOGIK: ZEILEN EINKLAPPEN ---
+    document.querySelectorAll(".thementitel").forEach(balken => {
+        balken.onclick = function() {
+            const target = this.getAttribute("data-target");
+            document.querySelectorAll("." + target).forEach(row => {
+                row.classList.toggle("hidden");
             });
+        };
+    });
 
-            document.getElementById("toggle-profi")?.addEventListener("click", () => {
-                // Profi darf nur sichtbar sein, wenn Mittel auch da ist
-                if (body.classList.contains("hide-mittel")) {
-                    body.classList.add("hide-profi");
-                    return;
-                }
-                body.classList.toggle("hide-profi");
+    // --- 5. MODAL STEUERUNG (Kurzfassung) ---
+    const tbSelect = document.getElementById("tbSelect");
+    const openBtn = document.getElementById("openModal");
+    const overlay = document.getElementById("overlay");
+    const startDisplay = document.getElementById("startSelectDisplay");
+    const endSelect = document.getElementById("endSelect");
+
+    function fill(tbId) {
+        const liste = kapitelMap[tbId] || [];
+        if (startDisplay && endSelect) {
+            startDisplay.innerHTML = "";
+            endSelect.innerHTML = "";
+            liste.forEach(k => {
+                const opt = new Option(k.zeile + ". " + k.name, k.zeile);
+                startDisplay.add(opt.cloneNode(true));
+                endSelect.add(opt);
             });
-        });
-    </script>
+            if (liste.length > 0) {
+                startDisplay.value = liste[0].zeile;
+                endSelect.value = liste[liste.length - 1].zeile;
+            }
+        }
+    }
 
-    <script>
-        (function() {
-            document.addEventListener("DOMContentLoaded", function() {
-                // Erst jetzt ist sichergestellt, dass "kapitel-data" existiert
-                var dataTag = document.getElementById("kapitel-data");
-                if (!dataTag) {
-                    console.error("Datentopf nicht gefunden");
-                    return;
-                }
+    if (openBtn) openBtn.onclick = () => { overlay?.classList.remove("hidden"); if(tbSelect) fill(tbSelect.value); };
+    if (tbSelect) tbSelect.onchange = (e) => fill(e.target.value);
+    document.getElementById("closeModal").onclick = () => overlay?.classList.add("hidden");
+});
+</script>
 
-                var kapitelMap = {};
-                try {
-                    kapitelMap = JSON.parse(dataTag.textContent);
-                    console.log("Kapitel geladen:", Object.keys(kapitelMap));
-                } catch (e) {
-                    console.error("JSON Error", e);
-                }
 
-                var tbSelect = document.getElementById("tbSelect");
-                var openBtn = document.getElementById("openModal");
-                var overlay = document.getElementById("overlay");
-                var startDisplay = document.getElementById("startSelectDisplay");
-                var startHidden = document.getElementById("startSelect");
-                var endSelect = document.getElementById("endSelect");
-
-                function fill(tbId) {
-                    var liste = kapitelMap[tbId] || [];
-                    if (startDisplay && endSelect) {
-                        startDisplay.innerHTML = "";
-                        endSelect.innerHTML = "";
-                        liste.forEach(function(k) {
-                            var opt = new Option(k.zeile + ". " + k.name, k.zeile);
-                            startDisplay.add(opt.cloneNode(true));
-                            endSelect.add(opt);
-                        });
-
-                        if (liste.length > 0) {
-                            startDisplay.value = liste[0].zeile;
-                            if(startHidden) startHidden.value = liste[0].zeile;
-                            endSelect.value = liste[liste.length - 1].zeile;
-                        }
-                    }
-                }
-
-                if (openBtn) {
-                    openBtn.onclick = function() {
-                        overlay.classList.remove("hidden");
-                        if (tbSelect.value) fill(tbSelect.value);
-                    };
-                }
-
-                if (tbSelect) {
-                    tbSelect.onchange = function(e) { fill(e.target.value); };
-                }
-                
-                document.getElementById("closeModal").onclick = function() { 
-                    overlay.classList.add("hidden"); 
-                };
-
-                // Einklapp-Logik
-                document.querySelectorAll(".thementitel").forEach(function(balken) {
-                    balken.onclick = function() {
-                        var target = this.getAttribute("data-target");
-                        document.querySelectorAll("." + target).forEach(function(row) {
-                            row.classList.toggle("hidden");
-                        });
-                    };
-                });
-            });
-        })();
-    </script>
 {% endblock %}

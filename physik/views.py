@@ -8,10 +8,13 @@ from django.db.models import Count
 from django.contrib.auth.decorators import user_passes_test
 
 from .bewertung import bewerte_aufgabe
-from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption
+from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption, Profil
 
 from django.db.models import Count, Q
 from .models import ThemenBereich, Aufgabe, Protokoll
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 def berechne_sperre(total, f1_bestand, f2_bestand, ziel_fach, f3_bestand=0):
     ready = True
@@ -168,6 +171,32 @@ def index(request):
             "kapitel_map": kapitel_map,
         })
 
+@login_required
+def update_view_settings(request, element):
+    try:
+        # Sicherer Weg: Profil über das Model suchen
+        profil, created = Profil.objects.get_or_create(user=request.user)
+        
+        # Feldname: Physik_einstellungen
+        einstellungen = profil.physik_einstellungen if isinstance(profil.physik_einstellungen, dict) else {}
+        
+        versteckt = list(einstellungen.get("versteckt", []))
+        
+        if element in versteckt:
+            versteckt.remove(element)
+        else:
+            versteckt.append(element)
+            if element == "mittel" and "profi" not in versteckt:
+                versteckt.append("profi")
+        
+        einstellungen["versteckt"] = versteckt
+        profil.physik_einstellungen = einstellungen
+        profil.save()
+        
+        return JsonResponse({"status": "ok", "versteckt": versteckt})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    
 def aufgaben(request):
     anmerkung_fuer_template = ""
     

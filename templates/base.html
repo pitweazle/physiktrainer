@@ -8,14 +8,15 @@
 </head>
 
 <body>
+    <body id="main-body" class="{% block body_classes %}{% endblock %}">
+        
+    <header>
+        <h1>Titel</h1>
+    </header>
 
-<header>
-    <h1>Titel</h1>
-</header>
-
-<main>
-    {% block content %}{% endblock %}
-</main>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
 </body>
 </html>
