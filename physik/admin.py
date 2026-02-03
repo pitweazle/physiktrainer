@@ -1,7 +1,35 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+
 from django import forms 
+
 from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption, AufgabeBild
 from .models import FehlerLog, Protokoll
+from .models import Profil
+
+# 1. Das Profil als 'Inline' definieren (damit es UNTEN auf der User-Seite erscheint)
+class ProfilInline(admin.StackedInline):
+    model = Profil
+    can_delete = False
+    verbose_name_plural = 'Physik-Profil'
+    fk_name = 'user' # Stellt sicher, dass die Verbindung zum User-Feld im Model stimmt
+
+# 2. Die Standard-User-Ansicht erweitern
+class UserAdmin(BaseUserAdmin):
+    inlines = (ProfilInline,)
+    
+    # Optional: Hier könntest du Spalten in der User-Liste ergänzen
+    # list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+
+# 3. Den alten User-Admin abmelden und unseren neuen anmelden
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+# 4. Falls du das Profil zusätzlich AUCH als eigene Liste haben willst (optional):
+@admin.register(Profil)
+class ProfilAdmin(admin.ModelAdmin):
+    list_display = ('user', )
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):

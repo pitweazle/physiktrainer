@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -9,7 +12,12 @@ class Profil(models.Model):
     physik_einstellungen = models.JSONField(default=dict, blank=True, null=True)
 
     def __str__(self):
-        return f"Physik-Profil für {self.user.username}"    
+        return f"Physik-Profil für {self.user.username}"  
+
+@receiver(post_save, sender=User)
+def erstelle_profil_automatisch(sender, instance, created, **kwargs):
+    if created:
+        Profil.objects.create(user=instance) 
 
 class ThemenBereich(models.Model):
     ordnung = models.PositiveSmallIntegerField(unique=True)
