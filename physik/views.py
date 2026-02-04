@@ -350,6 +350,65 @@ def aufgaben(request):
 
     optionen_liste = []
     anzeigen = []
+
+    if "r" in aufgabe.typ:
+        # 1. Optionen nach Position sortiert holen
+        optionen = aufgabe.optionen.all().order_by('position')
+        
+        if optionen.exists():
+            # 2. Anzahl der Werte aus der ersten Option ermitteln
+            # Wir splitten den Text und zählen die Elemente
+            erstes_opt_text = optionen[0].text
+            anzahl_werte = len(erstes_opt_text.split(';'))
+
+            # 3. Zufallsindex bestimmen
+            # Wir versuchen den Index aus der Session zu holen, damit er stabil bleibt
+            idx = request.session.get('aktiver_index')
+            
+            # Falls kein Index da ist oder er nicht mehr zu den Daten passt, neu würfeln
+            if idx is None or idx >= anzahl_werte:
+                idx = random.randrange(anzahl_werte)
+                request.session['aktiver_index'] = idx
+
+            # 4. Die Werte-Liste für .format() zusammenstellen
+            # Wir nehmen von jeder Option den Wert an der Stelle 'idx'
+            auswahl_liste = []
+            for opt in optionen:
+                werte = [v.strip() for v in opt.text.split(';')]
+                if idx < len(werte):
+                    auswahl_liste.append(werte[idx])
+                else:
+                    # Fallback, falls eine Liste mal kürzer ist
+                    auswahl_liste.append("???")
+
+            # 5. Fragetext formatieren
+            # Hier werden {0}, {1}, {2} etc. durch die Liste ersetzt
+            try:
+                # Wichtig: Der Stern * entpackt die Liste für die Positions-Platzhalter
+                aufgabe.frage = aufgabe.frage.format(*auswahl_liste)
+            except (IndexError, TypeError):
+                # Falls die Anzahl der {} im Text nicht zur Anzahl der Optionen passt
+                pass
+
+            # 6. Korrekte Lösung in der Session speichern
+            # Wir splitten das Lösungsfeld und nehmen den passenden Wert
+            loesungen = [l.strip() for l in aufgabe.loesung.split(';')]
+            if idx < len(loesungen):
+                request.session['korrekte_loesung'] = loesungen[idx]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
