@@ -10,7 +10,41 @@
 {% endblock %}
 
 {% block css_files %}
- <link rel="stylesheet" href="{% static 'physik/physik.css' %}">
+    <link rel="stylesheet" href="{% static 'physik/physik.css' %}">
+
+<style>
+    /* Wir schreiben im Head KEIN display:none mehr für die IDs!
+       Stattdessen nutzen wir die Klasse .hidden, die dein JS auch verwendet.
+    */
+    .hidden { display: none !important; }
+</style>
+
+<script>
+    /* Wir setzen die Initial-Zustände so, wie dein JS sie erwartet:
+       Über Klassen, nicht über feste CSS-Regeln.
+    */
+    document.addEventListener("DOMContentLoaded", function() {
+        const body = document.body;
+
+        {% if profil and profil.physik_einstellungen %}
+            
+            // 1. Spalten-Zustand wiederherstellen
+            {% if 'mittel' in profil.physik_einstellungen.versteckt %}
+                body.classList.add("hide-mittel", "hide-profi");
+            {% elif 'profi' in profil.physik_einstellungen.versteckt %}
+                body.classList.add("hide-profi");
+            {% endif %}
+
+            // 2. Zeilen-Zustand wiederherstellen
+            {% for id in profil.physik_einstellungen.zeilen_versteckt %}
+                document.querySelectorAll(".{{ id }}").forEach(el => {
+                    el.classList.add("hidden");
+                });
+            {% endfor %}
+
+        {% endif %}
+    });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -315,94 +349,58 @@
             </table>
         </div>
     </div>
-
     {{ kapitel_map|json_script:"kapitel-data" }}
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
-    // --- 1. DATEN LADEN FÜR MODAL ---
-    const dataTag = document.getElementById("kapitel-data");
-    let kapitelMap = {};
-    if (dataTag) {
-        try {
-            kapitelMap = JSON.parse(dataTag.textContent);
-        } catch (e) {
-            console.error("JSON Error", e);
-        }
-    }
-
-    // --- 2. HILFSFUNKTION: SPEICHERN IM PROFIL ---
-    function syncWithProfile(element) {
-        fetch(`/physik/view-einstellung/${element}/`)
+    // Hilfsfunktion zum Speichern (Spalten) - nutzt jetzt korrekt den Parameter 'slug'
+    function syncSpalten(slug) {
+        // WICHTIG: Hier waren die Anführungszeichen und Plus-Zeichen falsch
+        fetch(`/view-einstellung/${slug}/`) 
             .then(response => response.json())
-            .then(data => console.log("Im Profil gespeichert:", data))
-            .catch(error => console.warn("Speichern fehlgeschlagen (Server/URL?)", error));
+            .then(data => console.log("Spalten gespeichert:", data))
+            .catch(error => console.error("Fehler beim Speichern der Spalten:", error));
     }
 
-    // --- 3. LOGIK: SPALTEN EIN/AUSBLENDEN ---
-    document.getElementById("toggle-mittel")?.addEventListener("click", () => {
-        const wirdVersteckt = body.classList.toggle("hide-mittel");
-        
-        // Wenn Mittel versteckt wird, muss Profi zwingend mit weg
-        if (wirdVersteckt) {
-            body.classList.add("hide-profi");
-        } 
-        // Wenn Mittel wieder eingeblendet wird, bleibt Profi erstmal noch weg (sanfter Übergang)
-        
-        syncWithProfile('mittel');
+    // Hilfsfunktion zum Speichern (Zeilen) - nutzt jetzt korrekt den Parameter 'slug'
+    function syncZeilen(slug) {
+        fetch(`/row-einstellung/${slug}/`)
+            .then(response => response.json())
+            .then(data => console.log("Zeile gespeichert:", data))
+            .catch(error => console.error("Fehler beim Speichern der Zeile:", error));
+    }
+
+    // Event-Listener für die Buttons (Spalten)
+    document.getElementById("toggle-mittel")?.addEventListener("click", function() {
+        const isHidden = body.classList.toggle("hide-mittel");
+        if (isHidden) body.classList.add("hide-profi");
+        syncSpalten('mittel'); // Hier wird der 'slug' übergeben
     });
 
-    document.getElementById("toggle-profi")?.addEventListener("click", () => {
-        // Profi umschalten nur erlauben, wenn Mittel da ist
-        if (!body.classList.contains("hide-mittel")) {
-            body.classList.toggle("hide-profi");
-            syncWithProfile('profi');
-        } else {
-            console.log("Profi kann nicht angezeigt werden, solange Mittel versteckt ist.");
-        }
+    document.getElementById("toggle-profi")?.addEventListener("click", function() {
+        if (body.classList.contains("hide-mittel")) return;
+        body.classList.toggle("hide-profi");
+        syncSpalten('profi');
     });
 
-    // --- 4. LOGIK: ZEILEN EINKLAPPEN ---
+    // Event-Listener für die Themen-Balken (Zeilen)
     document.querySelectorAll(".thementitel").forEach(balken => {
         balken.onclick = function() {
-            const target = this.getAttribute("data-target");
-            document.querySelectorAll("." + target).forEach(row => {
+            // Wir holen den Wert aus data-target (z.B. "tb-2")
+            const slug = this.getAttribute("data-target"); 
+            
+            // Ein-/Ausblenden der Zeilen
+            document.querySelectorAll("." + slug).forEach(row => {
                 row.classList.toggle("hidden");
             });
+            
+            // Speichern im Profil
+            syncZeilen(slug);
         };
     });
-
-    // --- 5. MODAL STEUERUNG (Kurzfassung) ---
-    const tbSelect = document.getElementById("tbSelect");
-    const openBtn = document.getElementById("openModal");
-    const overlay = document.getElementById("overlay");
-    const startDisplay = document.getElementById("startSelectDisplay");
-    const endSelect = document.getElementById("endSelect");
-
-    function fill(tbId) {
-        const liste = kapitelMap[tbId] || [];
-        if (startDisplay && endSelect) {
-            startDisplay.innerHTML = "";
-            endSelect.innerHTML = "";
-            liste.forEach(k => {
-                const opt = new Option(k.zeile + ". " + k.name, k.zeile);
-                startDisplay.add(opt.cloneNode(true));
-                endSelect.add(opt);
-            });
-            if (liste.length > 0) {
-                startDisplay.value = liste[0].zeile;
-                endSelect.value = liste[liste.length - 1].zeile;
-            }
-        }
-    }
-
-    if (openBtn) openBtn.onclick = () => { overlay?.classList.remove("hidden"); if(tbSelect) fill(tbSelect.value); };
-    if (tbSelect) tbSelect.onchange = (e) => fill(e.target.value);
-    document.getElementById("closeModal").onclick = () => overlay?.classList.add("hidden");
 });
 </script>
-
 
 {% endblock %}

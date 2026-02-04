@@ -5,7 +5,8 @@ from django.contrib.messages import get_messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Count
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import user_passes_test, login_required
 
 from .bewertung import bewerte_aufgabe
 from .models import ThemenBereich, Kapitel, Aufgabe, FehlerLog, AufgabeOption, Profil
@@ -14,7 +15,6 @@ from django.db.models import Count, Q
 from .models import ThemenBereich, Aufgabe, Protokoll
 
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
 
 def berechne_sperre(total, f1_bestand, f2_bestand, ziel_fach, f3_bestand=0):
     ready = True
@@ -60,7 +60,9 @@ def index(request):
 
     # 3. Lernstand des Users abrufen (nur wenn eingeloggt)
     user_protokoll = {}
+    profil = None
     if request.user.is_authenticated:
+        profil, created = Profil.objects.get_or_create(user=request.user)
         qp = (
             Protokoll.objects.filter(user=request.user, aufgabe__thema__in=themenbereiche)
             .values("aufgabe__thema_id", "aufgabe__kapitel_id", "aufgabe__schwierigkeit", "fach")
@@ -169,10 +171,15 @@ def index(request):
             "themenbereiche": themenbereiche,
             "counts": counts,
             "kapitel_map": kapitel_map,
+            'profil': profil,
         })
 
+def force_logout(request):
+    logout(request)
+    return redirect('/')
+
 @login_required
-def update_view_settings(request, element):
+def update_view_settings(request, slug):
     try:
         # Sicherer Weg: Profil über das Model suchen
         profil, created = Profil.objects.get_or_create(user=request.user)
@@ -182,11 +189,11 @@ def update_view_settings(request, element):
         
         versteckt = list(einstellungen.get("versteckt", []))
         
-        if element in versteckt:
-            versteckt.remove(element)
+        if slug in versteckt:
+            versteckt.remove(slug)
         else:
-            versteckt.append(element)
-            if element == "mittel" and "profi" not in versteckt:
+            versteckt.append(slug)
+            if slug == "mittel" and "profi" not in versteckt:
                 versteckt.append("profi")
         
         einstellungen["versteckt"] = versteckt
@@ -196,6 +203,24 @@ def update_view_settings(request, element):
         return JsonResponse({"status": "ok", "versteckt": versteckt})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    
+@login_required
+def update_row_settings(request, slug):
+    profil, created = Profil.objects.get_or_create(user=request.user)
+    einstellungen = profil.physik_einstellungen if isinstance(profil.physik_einstellungen, dict) else {}
+    
+    if 'zeilen_versteckt' not in einstellungen:
+        einstellungen['zeilen_versteckt'] = []
+    
+    if slug in einstellungen['zeilen_versteckt']:
+        einstellungen['zeilen_versteckt'].remove(slug)
+    else:
+        einstellungen['zeilen_versteckt'].append(slug)
+    
+    profil.physik_einstellungen = einstellungen
+    profil.save()
+    
+    return JsonResponse({'status': 'ok', 'versteckt': einstellungen['zeilen_versteckt']})
     
 def aufgaben(request):
     anmerkung_fuer_template = ""

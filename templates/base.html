@@ -8,8 +8,14 @@
 </head>
 
 <body>
-    <body id="main-body" class="{% block body_classes %}{% endblock %}">
-        
+<nav style="background: #eee; padding: 10px; margin-bottom: 20px;">
+    {% if user.is_authenticated %}
+        <span>Eingeloggt als: <strong>{{ user.username }}</strong></span> | 
+        <a href="/accounts/logout/" style="color: red;">Abmelden</a>
+    {% else %}
+        <a href="/accounts/login/" style="color: green;">Anmelden</a>
+    {% endif %}
+</nav>
     <header>
         <h1>Titel</h1>
     </header>
