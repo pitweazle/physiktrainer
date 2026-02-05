@@ -16,6 +16,9 @@ from .models import ThemenBereich, Aufgabe, Protokoll
 
 from django.http import JsonResponse
 
+def ist_mitarbeiter(user):
+    return user.is_staff
+
 def berechne_sperre(total, f1_bestand, f2_bestand, ziel_fach, f3_bestand=0):
     ready = True
     hint = ""
@@ -369,6 +372,7 @@ def aufgaben(request):
             if idx is None or idx >= anzahl_werte:
                 idx = random.randrange(anzahl_werte)
                 request.session['aktiver_index'] = idx
+            print(idx)
 
             # 4. Die Werte-Liste für .format() zusammenstellen
             # Wir nehmen von jeder Option den Wert an der Stelle 'idx'
@@ -390,26 +394,6 @@ def aufgaben(request):
                 # Falls die Anzahl der {} im Text nicht zur Anzahl der Optionen passt
                 pass
 
-            # 6. Korrekte Lösung in der Session speichern
-            # Wir splitten das Lösungsfeld und nehmen den passenden Wert
-            loesungen = [l.strip() for l in aufgabe.loesung.split(';')]
-            if idx < len(loesungen):
-                request.session['korrekte_loesung'] = loesungen[idx]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     if "a" in aufgabe.typ:
         # Wir bauen eine Liste aus (Index, Text) Paaren
         optionen_liste = [(0, aufgabe.loesung)] # Index 0 ist immer die richtige Antwort
@@ -432,6 +416,7 @@ def aufgaben(request):
             if not request.session.get("warte_auf_weiter"):
                 messages.info(request, "Letzte Aufgabe übersprungen.")
             request.session["index"] += 1
+            request.session.pop('aktiver_index', None)
             request.session["warte_auf_weiter"] = False
             request.session.pop("letzte_antwort", None)
             return redirect("physik:aufgaben")
@@ -449,6 +434,7 @@ def aufgaben(request):
         if ergebnis.get("richtig"):
             messages.success(request, ergebnis.get("hinweis", "Richtig!"))
             request.session["index"] += 1
+            request.session.pop('aktiver_index', None)
             request.session["warte_auf_weiter"] = False
             request.session.pop("letzte_antwort", None)
 
@@ -495,6 +481,7 @@ def aufgaben(request):
 from django.shortcuts import render, get_object_or_404
 from .models import Aufgabe, ThemenBereich, Kapitel
 
+@user_passes_test(ist_mitarbeiter)
 def aufgaben_liste(request):
     themenbereiche = ThemenBereich.objects.all()
     thema_id = request.GET.get('thema')
@@ -520,16 +507,22 @@ def aufgaben_liste(request):
         'kapitel_liste': kapitel_liste,
     })
 
+@user_passes_test(ist_mitarbeiter)
 def aufgabe_einstellungen(request, pk):
     # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert
     aufgabe = get_object_or_404(Aufgabe, pk=pk)
     return render(request, 'physik/aufgabe_einstellungen.html', {'aufgabe': aufgabe})
 
+@user_passes_test(ist_mitarbeiter)
 def call(request, lfd_nr):
     try:
         aufgabe = Aufgabe.objects.get(lfd_nr=lfd_nr)
     except Aufgabe.DoesNotExist:
-        return HttpResponse(f"Aufgabe {lfd_nr} nicht gefunden")
+        try:
+            aufgabe = Aufgabe.objects.get(lfd_nr__iexact=lfd_nr)
+        except Aufgabe.DoesNotExist:
+            return HttpResponse(f"Aufgabe mit der Bezeichnung '{lfd_nr}' wurde nicht gefunden.")
+    request.session.pop('aktiver_index', None)
 
     request.session["aufgaben_ids"] = [aufgabe.id]
     request.session["index"] = 0
@@ -538,7 +531,7 @@ def call(request, lfd_nr):
 
     return redirect("physik:aufgaben")
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(ist_mitarbeiter)
 def fehler_liste(request):
     # Basis-Queryset
     logs = FehlerLog.objects.all().select_related('aufgabe__thema', 'aufgabe__kapitel')
@@ -586,7 +579,7 @@ def fehler_liste(request):
     }
     return render(request, 'physik/fehler_liste.html', context)
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(ist_mitarbeiter)
 def fehler_edit(request, log_id):
     log = get_object_or_404(FehlerLog, id=log_id)
     aufgabe = log.aufgabe
@@ -640,3 +633,7 @@ def fehler_edit(request, log_id):
         return redirect('physik:fehler_liste')
 
     return render(request, 'physik/fehler_edit.html', {'log': log})
+
+@user_passes_test(ist_mitarbeiter)
+def howto():
+    pass

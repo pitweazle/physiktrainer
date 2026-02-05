@@ -48,6 +48,37 @@
 {% endblock %}
 
 {% block content %}
+    <nav>
+        <div class="nav-links">
+
+            {% if user.is_staff %}
+                <span class="nav-divider">| Lehrer-Tools:</span>
+                
+                <a href="{% url 'physik:aufgaben_liste' %}">📋 Inventar</a>
+                <a href="{% url 'physik:fehler_liste' %}">📊 Analyse</a>
+                <a href="{% url 'physik:howto' %}">❓ Anleitung (HowTo)</a>
+                
+                <a href="/admin/" target="_blank" class="admin-link">⚙️ Admin</a>
+            {% endif %}
+        </div>
+
+<a href="#" class="btn-call" onclick="frageLfdNrAb()">🔍 Aufgabe direkt aufrufen</a>
+
+<script>
+function frageLfdNrAb() {
+    // Öffnet ein Eingabefenster im Browser
+    let nr = prompt("Bitte die laufende Nummer eingeben (z. B. E025_Do):");
+    
+    // Wenn der User nicht auf "Abbrechen" geklickt hat und das Feld nicht leer ist
+    if (nr && nr.trim() !== "") {
+        window.location.href = "/call/" + encodeURIComponent(nr.trim()) + "/";
+    }
+}
+</script>
+
+
+    </nav>
+
     <div class="page-container">
         <h1>Physiktrainer</h1>
         <div class="table-controls">
