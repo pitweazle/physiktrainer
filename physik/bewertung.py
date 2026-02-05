@@ -95,49 +95,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # -----------------------------------------------------------
     # A. SPEZIAL-TYPEN
     # -----------------------------------------------------------
-
-    if "r" in typ:
-        # 1. Den gespeicherten Index holen
-        idx = request.session.get('aktiver_index')
-        
-        if idx is not None:
-            # 2. Die Liste der Lösungen aus dem Aufgaben-Objekt holen
-            loesungen_liste = [l.strip() for l in aufgabe.loesung.split(';')]
-            
-            # 3. Prüfen, ob der Index zur Liste passt
-            if idx < len(loesungen_liste):
-                korrekte_loesung = loesungen_liste[idx]
-                
-                # 4. Vergleich (Normalisierung von Komma zu Punkt für die Rechnung)
-                s_input = text_antwort.strip().replace(',', '.')
-                t_value = korrekte_loesung.replace(',', '.')
-                
-                try:
-                    # Vergleich als Fließkommazahlen (erlaubt 1.5 == 1.50)
-                    if float(s_input) == float(t_value):
-                        ergebnis = {"richtig": True, "hinweis": "Richtig gerechnet!"}
-                    else:
-                        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Das Ergebnis ist: {korrekte_loesung}"}
-                except ValueError:
-                    # Fallback, falls der Schüler keine Zahl eingegeben hat (z.B. Text)
-                    if s_input == t_value:
-                        ergebnis = {"richtig": True, "hinweis": "Richtig!"}
-                    else:
-                        ergebnis = {"richtig": False, "hinweis": f"Falsch. Erwartet wurde: {korrekte_loesung}"}
-            else:
-                # Fall: Index ist z.B. 5, aber es gibt nur 3 Lösungen
-                ergebnis = {
-                    "richtig": False, 
-                    "hinweis": "Huch, da ist etwas schiefgelaufen. Bitte klicke einmal auf 'Nächste Aufgabe', um die Daten zu aktualisieren."
-                }
-        else:
-            # Fall: Session ist abgelaufen oder Index verloren gegangen
-            ergebnis = {
-                "richtig": False, 
-                "hinweis": "Deine Sitzung war zu lange inaktiv. Bitte lade die Seite einmal neu, damit ich dir neue Zahlen geben kann."
-            }
-
-    elif "p" in typ: # Korrigiert von 'typ == "p" in typ'
+    if "p" in typ: # Korrigiert von 'typ == "p" in typ'
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
@@ -230,8 +188,9 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
                 print(f"Falsch: Aufgabe {aufgabe.id} war schon in Fach 1 (kein Protokoll vorhanden)")
     
     # Wenn bis hierhin nichts gegriffen hat
-    if not ergebnis:
-        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Lösung: {aufgabe.loesung}"}
+    if not ergebnis.get("richtig"):
+        hinweis = f"Leider falsch."# Lösung: {aufgabe.loesung}"
+
 
     # Sahnehäubchen: Fehlerlogging
     if not ergebnis.get("richtig") and text_antwort:
