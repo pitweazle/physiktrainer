@@ -95,6 +95,41 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # -----------------------------------------------------------
     # A. SPEZIAL-TYPEN
     # -----------------------------------------------------------
+    if "r" in typ:
+        # 1. Den gespeicherten Index holen
+        idx = request.session.get('aktiver_index')
+        
+        if idx is not None:
+            # 2. Die Liste der Lösungen aus dem Aufgaben-Objekt holen
+            loesungen_liste = [l.strip() for l in aufgabe.loesung.split(';')]
+            
+            # 3. Prüfen, ob der Index zur Liste passt
+            if idx < len(loesungen_liste):
+                korrekte_loesung = loesungen_liste[idx]
+                
+                # Normalisierung von Komma zu Punkt
+                s_input = text_antwort.strip().replace(',', '.')
+                t_value = korrekte_loesung.replace(',', '.')
+                
+                try:
+                    # Der eigentliche Zahlenvergleich
+                    if float(s_input) == float(t_value):
+                        ergebnis = {"richtig": True, "hinweis": "Richtig gerechnet!"}
+                    else:
+                        ergebnis = {"richtig": False, "hinweis": f"Leider falsch. Deine Eingabe: »{text_antwort}« | Richtige Lösung: »{korrekte_loesung}«"}
+                
+                except ValueError:
+                    # NEU: Der Joker greift hier! 
+                    # Wenn der Schüler keine Zahl eingibt (z.B. "zwanzig"), wird nicht gesperrt.
+                    ergebnis = {
+                        "richtig": False, 
+                        "ungueltig": True, 
+                        "hinweis": f"»{text_antwort}« ist keine Zahl. Bitte gib das Ergebnis als Zahl ein (z.B. 20 oder 12,5)."
+                    }
+            else:
+                ergebnis = {"richtig": False, "hinweis": "Huch! Da passen die Daten nicht zusammen. Bitte klicke auf 'Nächste Aufgabe'."}
+        else:
+            ergebnis = {"richtig": False, "hinweis": "Deine Sitzung ist abgelaufen. Bitte lade die Seite neu."}
     if "p" in typ: # Korrigiert von 'typ == "p" in typ'
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
@@ -104,7 +139,6 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         ergebnis = bewerte_liste(aufgabe, text_antwort)
     elif "e" in typ:
         ergebnis = bewerte_e_typ(aufgabe, text_antwort)
-
     # -----------------------------------------------------------
     # B. TEXT-PARSER
     # -----------------------------------------------------------
@@ -191,7 +225,6 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     # Wenn bis hierhin nichts gegriffen hat
     if not ergebnis.get("richtig"):
         hinweis = f"Leider falsch."# Lösung: {aufgabe.loesung}"
-
 
     # Sahnehäubchen: Fehlerlogging
     if not ergebnis.get("richtig") and text_antwort:

@@ -353,7 +353,6 @@ def aufgaben(request):
 
     optionen_liste = []
     anzeigen = []
-
     if "r" in aufgabe.typ:
         # 1. Optionen nach Position sortiert holen
         optionen = aufgabe.optionen.all().order_by('position')
@@ -372,7 +371,6 @@ def aufgaben(request):
             if idx is None or idx >= anzahl_werte:
                 idx = random.randrange(anzahl_werte)
                 request.session['aktiver_index'] = idx
-            print(idx)
 
             # 4. Die Werte-Liste für .format() zusammenstellen
             # Wir nehmen von jeder Option den Wert an der Stelle 'idx'
