@@ -38,6 +38,7 @@
                 <th>Thema</th>
                 <th>Kapitel</th>
                 <th>Nr.</th>
+                <th>Anzeigen</th>
                 <th>Aufgabetext</th>
                 <th>Typ</th>
                 <th>Lösung</th>
@@ -51,6 +52,11 @@
                 <td>
                     <a href="{% url 'physik:aufgabe_einstellungen' a.id %}" class="fw-bold text-decoration-none">
                         {{ a.lfd_nr }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'physik:call' a.lfd_nr %}" class="btn btn-sm btn-primary">
+                        Anzeigen
                     </a>
                 </td>
                 <td>{{ a.frage|truncatechars:80 }}</td>

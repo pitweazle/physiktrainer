@@ -123,9 +123,8 @@ class AufgabeAdmin(admin.ModelAdmin):
         ("Frage", {"fields": ("frage",)}),
 
         ("Einheit (optional)", {
-            "fields": ("einheit",),
+            "fields": ("zeichen","einheit",),
             "classes": ("collapse",),
-            "description": "Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
         }),
 
         ("Lösung", {"fields": ("loesung",)}),

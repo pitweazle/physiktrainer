@@ -75,10 +75,16 @@ class Aufgabe(models.Model):
     # Typ wieder frei editierbar (ohne FK)
     typ = models.CharField("Typ", max_length=20, blank=True)
 
+    zeichen = models.CharField(
+        "Formelzeichen",
+        max_length=10,
+        blank=True,
+        help_text="Optional – wird vor dem Eingabefeld angezeigt (z.B. F=, R=, l=...).",
+    )
     frage = models.CharField("Frage", max_length=255, blank=True)
     einheit = models.CharField(
         "Einheit",
-        max_length=15,
+        max_length=10,
         blank=True,
         help_text="Optional – wird hinter dem Eingabefeld angezeigt (z.B. cm, kg, °C).",
     )
