@@ -99,6 +99,7 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, text_antwort)
+        print("ergebnis", ergebnis)
     elif "a" in typ:
         ergebnis = bewerte_liste(aufgabe, text_antwort)
     elif "e" in typ:
@@ -342,6 +343,7 @@ def bewerte_wahr_falsch(aufgabe, norm):
     # 5. Pech gehabt (Quatsch geschrieben)
     return {
         "richtig": False,
+        "ungueltig": True,
         "hinweis": "Bitte mit w/f, wahr/falsch oder ja/nein antworten."
     }
 
