@@ -579,12 +579,16 @@ def fehler_liste(request):
 
 @user_passes_test(ist_mitarbeiter)
 def fehler_edit(request, log_id):
+    # Wir holen das log trotzdem am Anfang, um sicherzugehen, dass es existiert
     log = get_object_or_404(FehlerLog, id=log_id)
     aufgabe = log.aufgabe
 
     if request.method == "POST":
         if "just_delete" in request.POST:
-            log.delete()
+            # Anstatt log.delete() nutzen wir den Filter:
+            FehlerLog.objects.filter(id=log_id).delete()
+            # Danach ein Redirect, da das Objekt 'log' nicht mehr sicher nutzbar ist
+            return redirect("physik:fehler_liste") 
         else:
             # 1. Hauptfelder der Aufgabe speichern
             aufgabe.typ = request.POST.get("typ")
