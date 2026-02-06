@@ -225,6 +225,7 @@ def update_row_settings(request, slug):
     
     return JsonResponse({'status': 'ok', 'versteckt': einstellungen['zeilen_versteckt']})
     
+@login_required
 def aufgaben(request):
     anmerkung_fuer_template = ""
     
