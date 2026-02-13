@@ -13,7 +13,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Erlaubte Hosts als Liste (in .env mit Komma getrennt)
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = ['physiktrainer.app', 'www.physiktrainer.app', 'rt.uber.space', '127.0.0.1', 'localhost']
 
 # 4. Weiche für Uberspace-Erkennung
 ON_UBERSPACE = 'caelum' in socket.gethostname()
