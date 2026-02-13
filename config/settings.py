@@ -12,9 +12,13 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Erlaubte Hosts als Liste (in .env mit Komma getrennt)
 ALLOWED_HOSTS = ['physiktrainer.app','www.physiktrainer.app','rt.uber.space','127.0.0.1','localhost']
 
+CSRF_TRUSTED_ORIGINS = ['https://physiktrainer.app', 'https://www.physiktrainer.app']
 
 # 4. Weiche für Uberspace-Erkennung
 ON_UBERSPACE = 'caelum' in socket.gethostname()
