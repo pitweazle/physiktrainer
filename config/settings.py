@@ -90,7 +90,7 @@ USE_TZ = True
 # 7. Static & Media (Hier ist der Schutz für den Rechentrainer!)
 STATIC_URL = '/static/'
 # Auf dem Server landen PT-Statics im Rechentrainer Projektordner
-STATIC_ROOT = '/staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 if ON_UBERSPACE:
