@@ -90,7 +90,9 @@ USE_TZ = True
 # 7. Static & Media (Hier ist der Schutz für den Rechentrainer!)
 STATIC_URL = '/static/'
 # Auf dem Server landen PT-Statics im Rechentrainer Projektordner
-STATIC_ROOT = BASE_DIR / "staticfiles"
+#STATIC_ROOT = BASE_DIR / "staticfiles"
+# Das sagt Django, wo die Dateien beim Befehl "collectstatic" landen sollen
+STATIC_ROOT = '/home/rt/html/staticfiles'
 
 MEDIA_URL = "/media/"
 if ON_UBERSPACE:
