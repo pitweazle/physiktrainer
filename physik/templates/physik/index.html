@@ -631,4 +631,28 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
+<script>
+    const openBtn = document.getElementById('openModal');
+    const closeBtn = document.getElementById('closeModal');
+    const overlay = document.getElementById('overlay');
+
+    // Modal öffnen
+    openBtn.addEventListener('click', () => {
+        overlay.classList.remove('hidden');
+    });
+
+    // Modal schließen (beim X)
+    closeBtn.addEventListener('click', () => {
+        overlay.classList.add('hidden');
+    });
+
+    // Optional: Schließen, wenn man außerhalb des Fensters klickt
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.classList.add('hidden');
+        }
+    });
+</script>
+
 {% endblock %}
