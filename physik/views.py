@@ -492,7 +492,7 @@ def aufgaben_liste(request):
         kapitel_liste = Kapitel.objects.all().order_by('thema', 'zeile')
 
     # Aufgaben filtern und effizient laden (ForeignKey-Beziehungen vorladen)
-    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema', 'kapitel__zeile', 'lfd_nr')
+    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema',  'lfd_nr')
     
     if thema_id:
         aufgaben = aufgaben.filter(kapitel__thema_id=thema_id)

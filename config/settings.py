@@ -97,7 +97,7 @@ STATIC_ROOT = '/home/rt/html/staticfiles'
 MEDIA_URL = "/media/"
 if ON_UBERSPACE:
     # Hier legen wir einen NEUEN Ordner an, damit 'medien' vom RT sicher ist
-    MEDIA_ROOT = "/home/rt/medien_physik/"
+    MEDIA_ROOT = "/home/rt/physiktrainer/media/"
 else:
     # Lokal auf Windows
     MEDIA_ROOT = BASE_DIR / "media"
