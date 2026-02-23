@@ -244,15 +244,15 @@
 {% block content %}
     <nav>
         <div class="nav-links">
-
             {% if user.is_staff %}
                 <span class="nav-divider">| Lehrer-Tools:</span>
                 
                 <a href="{% url 'physik:aufgaben_liste' %}">📋 Inventar</a>
                 <a href="{% url 'physik:fehler_liste' %}">📊 Analyse</a>
                 <a href="{% url 'physik:howto' %}">❓ Anleitung (HowTo)</a>
-                
-                <a href="/admin/" target="_blank" class="admin-link">⚙️ Admin</a>
+                {% comment %} <a href="/admin/" target="_blank" class="admin-link">⚙️ Admin</a> {% endcomment %}
+                <a href="/admin/physik/aufgabe/add/" target="_blank">➕ Neue Aufgabe</a>
+                {% comment %} <a href="/admin/physik/aufgabe/add/?next={% url 'physik:aufgaben_liste' %}" target="_blank" ...> {% endcomment %}
                 <a href="#" class="btn-call" onclick="frageLfdNrAb()">🔍 Aufgabe direkt aufrufen</a>
             {% endif %}
         </div>
