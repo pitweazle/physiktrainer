@@ -87,21 +87,21 @@ TIME_ZONE = "Europe/Berlin"
 USE_I18N = True
 USE_TZ = True
 
-# 7. Static & Media (Hier ist der Schutz für den Rechentrainer!)
+# 7. Static & Media (Saubere Struktur für PT und RT gemeinsam)
 STATIC_URL = '/static/'
-# Auf dem Server landen PT-Statics im Rechentrainer Projektordner
-#STATIC_ROOT = BASE_DIR / "staticfiles"
-# Das sagt Django, wo die Dateien beim Befehl "collectstatic" landen sollen
-STATIC_ROOT = '/home/rt/html/staticfiles'
 
-MEDIA_URL = "/media/"
 if ON_UBERSPACE:
-    # Hier legen wir einen NEUEN Ordner an, damit 'medien' vom RT sicher ist
-    MEDIA_ROOT = "/home/rt/physiktrainer/media/"
+    # Jetzt direkt in den echten html-Ordner (ohne 'staticfiles' Umweg)
+    STATIC_ROOT = '/home/rt/html/static/'
+    
+    # Der neue zentrale Ort für alle Bilder
+    MEDIA_ROOT = '/home/rt/html/media/'
 else:
-    # Lokal auf Windows
+    # Lokal auf Windows bleibt alles beim Alten
+    STATIC_ROOT = BASE_DIR / "staticfiles" 
     MEDIA_ROOT = BASE_DIR / "media"
 
+MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Deine zusätzlichen Einstellungen
