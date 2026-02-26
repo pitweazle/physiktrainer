@@ -10,22 +10,31 @@
 
     <div class="row g-2 mb-4 no-print bg-light p-3 border rounded">
         <form method="get" class="d-flex gap-3 w-100">
-<select name="thema" class="form-select" onchange="this.form.submit()">
-    <option value="">Alle Themenbereiche</option>
-    {% for t in themenbereiche %}
-    <option value="{{ t.id }}" {% if request.GET.thema == t.id|stringformat:"i" %}selected{% endif %}>{{ t.thema }}</option>
-    {% endfor %}
-</select>
+            <select name="thema" class="form-select" onchange="this.form.submit()">
+                <option value="">Alle Themenbereiche</option>
+                {% for t in themenbereiche %}
+                <option value="{{ t.id }}" {% if request.GET.thema == t.id|stringformat:"i" %}selected{% endif %}>{{ t.thema }}</option>
+                {% endfor %}
+            </select>
 
-<select name="kapitel" class="form-select" onchange="this.form.submit()">
-    <option value="">Alle Kapitel</option>
-    {% for k in kapitel_liste %}
-    <option value="{{ k.id }}" {% if request.GET.kapitel == k.id|stringformat:"i" %}selected{% endif %}>
-        {{ k.zeile }}: {{ k.kapitel }} </option>
-    {% endfor %}
-</select>
+            <select name="kapitel" class="form-select" onchange="this.form.submit()">
+                <option value="">Alle Kapitel</option>
+                {% for k in kapitel_liste %}
+                <option value="{{ k.id }}" {% if request.GET.kapitel == k.id|stringformat:"i" %}selected{% endif %}>
+                    {{ k.zeile }}: {{ k.kapitel }} </option>
+                {% endfor %}
+            </select>
 
-<td><small>{{ a.kapitel.kapitel }}</small></td>
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Suche (z.B. _Do)" value="{{ request.GET.q|default:'' }}">
+                <button class="btn btn-outline-secondary" type="submit">🔍</button>
+                {% if request.GET.q %}
+                    <a href="?{% if request.GET.thema %}thema={{ request.GET.thema }}&{% endif %}{% if request.GET.kapitel %}kapitel={{ request.GET.kapitel }}{% endif %}" class="btn btn-outline-danger">✕</a>
+                {% endif %}
+            </div>
+
+
+            <td><small>{{ a.kapitel.kapitel }}</small></td>
             
             <a href="?" class="btn btn-outline-secondary">Reset</a>
             <button type="button" class="btn btn-primary" onclick="window.print()">Drucken</button>

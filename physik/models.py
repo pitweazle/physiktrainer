@@ -23,6 +23,7 @@ class ThemenBereich(models.Model):
     ordnung = models.PositiveSmallIntegerField(unique=True)
     kurz = models.CharField(max_length=2, default="", blank=True)
     thema = models.CharField(max_length=30)
+    kapitel_unabhaengig = models.BooleanField(default=False, verbose_name="Kapitel unabhängig")
     farbe = models.CharField(max_length=40,)
     eingeblendet = models.BooleanField(default = True)
 
@@ -73,7 +74,7 @@ class Aufgabe(models.Model):
     schwierigkeit = models.PositiveSmallIntegerField(choices=SCHWIERIGKEIT_CHOICES, default=EINFACH)
 
     # Typ wieder frei editierbar (ohne FK)
-    typ = models.CharField("Typ", max_length=20, blank=True)
+    typ = models.CharField("Typ", max_length=20)
 
     zeichen = models.CharField(
         "Formelzeichen",
@@ -81,7 +82,7 @@ class Aufgabe(models.Model):
         blank=True,
         help_text="Optional – wird vor dem Eingabefeld angezeigt (z.B. F=, R=, l=...).",
     )
-    frage = models.CharField("Frage", max_length=255, blank=True)
+    frage = models.CharField("Frage", max_length=255)
     einheit = models.CharField(
         "Einheit",
         max_length=10,

@@ -59,6 +59,13 @@
   background: white;
 }
 
+/* Neue Klasse für das einsame Bild */
+.task-image.single-image {
+  max-width: 100%;   /* Darf die volle Breite nutzen */
+  max-height: 600px; /* Erlaubt deutlich mehr Höhe */
+  width: auto;       /* Behält Proportionen bei */
+}
+
 .task-images {
   display: flex;
   flex-wrap: wrap;   /* Falls die Bilder mal zu breit werden, brechen sie um */

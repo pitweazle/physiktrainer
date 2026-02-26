@@ -250,18 +250,34 @@ def aufgaben(request):
         fach_int = int(request.GET.get("fach", 1))
 
         # 2. Grundfilterung
-        aufgaben_qs = Aufgabe.objects.filter(thema_id=tb_id)
+        thema = ThemenBereich.objects.get(id=tb_id)
+        aufgaben_qs = Aufgabe.objects.filter(thema=thema)
 
         # --- NEU: Kapitel-Logik unterscheiden ---
-        if bis_kap_zeile:
-            # Weg über die Index-Tabelle (kumulativ)
-            aufgaben_qs = aufgaben_qs.filter(kapitel__zeile__lte=int(bis_kap_zeile))
+        
+        # Fall A: Das Thema ist als "kapitel_unabhaengig" markiert (z.B. Sonstige)
+        if thema.kapitel_unabhaengig:
+            if bis_kap_zeile:
+                # Nur EXAKT dieses Kapitel (keine kumulative Summe)
+                aufgaben_qs = aufgaben_qs.filter(kapitel__zeile=int(bis_kap_zeile))
+            else:
+                # Bereich bleibt wie gewählt (meist nur ein Kapitel im Overlay)
+                aufgaben_qs = aufgaben_qs.filter(
+                    kapitel__zeile__gte=start_kap,
+                    kapitel__zeile__lte=end_kap
+                )
+        
+        # Fall B: Normales Verhalten (Physik-Themen: Aufbauend/Kumulativ)
         else:
-            # Klassischer Weg über das Overlay (Bereich)
-            aufgaben_qs = aufgaben_qs.filter(
-                kapitel__zeile__gte=start_kap,
-                kapitel__zeile__lte=end_kap
-            )
+            if bis_kap_zeile:
+                # Weg über die Index-Tabelle (kumulativ: alle bis hierhin)
+                aufgaben_qs = aufgaben_qs.filter(kapitel__zeile__lte=int(bis_kap_zeile))
+            else:
+                # Klassischer Weg über das Overlay (Bereich)
+                aufgaben_qs = aufgaben_qs.filter(
+                    kapitel__zeile__gte=start_kap,
+                    kapitel__zeile__lte=end_kap
+                )
 
         # --- NEU: Level-Logik (kumuliert für 1,2 etc.) ---
         if isinstance(level_param, str) and "," in level_param:
@@ -476,35 +492,38 @@ def aufgaben(request):
             if request.session.get("warte_auf_weiter") else "",
     })
 
-from django.shortcuts import render, get_object_or_404
-from .models import Aufgabe, ThemenBereich, Kapitel
-
 @user_passes_test(ist_mitarbeiter)
 def aufgaben_liste(request):
     themenbereiche = ThemenBereich.objects.all()
     thema_id = request.GET.get('thema')
     kapitel_id = request.GET.get('kapitel')
-    
+    suche = request.GET.get('q') # Das neue Suchfeld abgreifen
+
     # Kapitel für den Filter laden
     if thema_id:
         kapitel_liste = Kapitel.objects.filter(thema_id=thema_id).order_by('zeile')
     else:
         kapitel_liste = Kapitel.objects.all().order_by('thema', 'zeile')
 
-    # Aufgaben filtern und effizient laden (ForeignKey-Beziehungen vorladen)
-    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema',  'lfd_nr')
+    # Basis-Abfrage
+    aufgaben = Aufgabe.objects.select_related('kapitel__thema').all().order_by('kapitel__thema', 'lfd_nr')
     
+    # Filterung nach Thema/Kapitel
     if thema_id:
         aufgaben = aufgaben.filter(kapitel__thema_id=thema_id)
     if kapitel_id:
         aufgaben = aufgaben.filter(kapitel_id=kapitel_id)
+        
+    # NEU: Die Suche nach dem Namenskürzel oder Text
+    if suche:
+        aufgaben = aufgaben.filter(lfd_nr__icontains=suche)
 
     return render(request, 'physik/aufgaben_liste.html', {
         'aufgaben': aufgaben,
         'themenbereiche': themenbereiche,
         'kapitel_liste': kapitel_liste,
+        'suche': suche, # Damit das Suchwort im Feld stehen bleibt
     })
-
 @user_passes_test(ist_mitarbeiter)
 def aufgabe_einstellungen(request, pk):
     # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert

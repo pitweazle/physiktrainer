@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from django import forms 
+from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import ThemenBereich, Kapitel, Aufgabe, AufgabeOption, AufgabeBild
 from .models import FehlerLog, Protokoll
@@ -33,7 +34,7 @@ class ProfilAdmin(admin.ModelAdmin):
 
 @admin.register(ThemenBereich)
 class ThemenBereichAdmin(admin.ModelAdmin):
-    list_display = ("ordnung", "thema", "kurz", "eingeblendet")
+    list_display = ("ordnung", "thema", "kurz", "kapitel_unabhaengig", "eingeblendet")
     list_filter = ("eingeblendet",)
     search_fields = ("thema",)
     ordering = ("ordnung",)
@@ -94,8 +95,23 @@ class AufgabeAdminForm(forms.ModelForm):
         # HTML für datalist erzeugen
         self.typ_datalist = list(typen)
 
-@admin.register(Aufgabe)
+# Wir erstellen eine kleine Form für die Validierung
+class AufgabeAdminForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        typ = cleaned_data.get('typ')
+        loesung = cleaned_data.get('loesung')
 
+        # Die Spezialregel: 
+        # Wenn der Typ NICHT 'p' ist, darf die Lösung nicht leer sein.
+        if typ != 'p' and not loesung:
+            raise ValidationError({
+                'loesung': "Für diesen Aufgabentyp muss eine Lösung angegeben werden! (Nur bei Typ 'p' darf dieses Feld leer bleiben)."
+            })
+        
+        return cleaned_data
+
+@admin.register(Aufgabe)
 class AufgabeAdmin(admin.ModelAdmin):
     form = AufgabeAdminForm
     inlines = [AufgabeOptionInline, AufgabeBildInline]  
