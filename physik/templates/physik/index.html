@@ -259,19 +259,17 @@
 
 
 
-    <script>
-    function frageLfdNrAb() {
-        // Öffnet ein Eingabefenster im Browser
-        let nr = prompt("Bitte die laufende Nummer eingeben (z. B. E025_Do):");
-        
-        // Wenn der User nicht auf "Abbrechen" geklickt hat und das Feld nicht leer ist
-        if (nr && nr.trim() !== "") {
-            window.location.href = "/call/" + encodeURIComponent(nr.trim()) + "/";
+        <script>
+        function frageLfdNrAb() {
+            // Öffnet ein Eingabefenster im Browser
+            let nr = prompt("Bitte die laufende Nummer eingeben (z. B. E025_Do):");
+            
+            // Wenn der User nicht auf "Abbrechen" geklickt hat und das Feld nicht leer ist
+            if (nr && nr.trim() !== "") {
+                window.location.href = "/call/" + encodeURIComponent(nr.trim()) + "/";
+            }
         }
-    }
-    </script>
-
-
+        </script>
     </nav>
 
     <div class="page-container">
@@ -312,14 +310,14 @@
                             <label><input type="radio" name="level" value="2" required checked> Mittel</label>
                             <label><input type="radio" name="level" value="3"> Profi</label>
                         </div>
-                        <label>welches Fach</label>
-                            <div class="radio-row">
-                                <label><input type="radio" name="fach" value="1" required checked> Fach 1</label>
-                                <label><input type="radio" name="fach" value="2"> Fach 2</label>
-                                <label><input type="radio" name="fach" value="3"> Fach 3</label>
-                            </div>
-                            <p class="small text-muted mt-1">Hinweis: Fach 4 (Archiv) kann nicht gezielt geübt werden.</p>
+                        <input type="hidden" name="fach" value="1">
 
+                        <div style="background-color: #f8f9fa; border-left: 4px solid #447e9b; padding: 10px; margin-top: 15px;">
+                            <p style="margin: 0; font-size: 0.9em; color: #555;">
+                                <strong>Hinweis:</strong> Du startest hier in <strong>Fach 1</strong>. 
+                                Um gezielt <i>Fach 2</i> oder <i>3</i> zu üben, wähle bitte die entsprechende Zahl direkt in der Übersichtstabelle aus.
+                            </p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit">weiter</button>
@@ -631,7 +629,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
 <script>
     const openBtn = document.getElementById('openModal');
     const closeBtn = document.getElementById('closeModal');
@@ -653,6 +650,47 @@ document.addEventListener("DOMContentLoaded", () => {
             overlay.classList.add('hidden');
         }
     });
+</script>
+
+<script>
+// 1. Die kapitel_map direkt aus Django übernehmen
+// 'safe' sorgt dafür, dass die Anführungszeichen nicht in HTML-Entities umgewandelt werden
+const kapitelData = {{ kapitel_map|safe }};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tbSelect = document.getElementById('tbSelect');
+    const endSelect = document.getElementById('endSelect');
+    const startDisplay = document.getElementById('startSelectDisplay');
+    const startHidden = document.getElementById('startSelect');
+
+    tbSelect.addEventListener('change', function() {
+        const selectedTbId = this.value;
+        const gefiltert = kapitelData[selectedTbId] || [];
+
+        // Dropdown für End-Kapitel leeren
+        endSelect.innerHTML = '<option value="">– bitte wählen –</option>';
+        
+        if (gefiltert.length > 0) {
+            // 1. Start-Kapitel setzen (das erste Element aus der Liste)
+            // Wir nehmen gefiltert[0].name, weil dein Backend {"name": ...} liefert
+            startDisplay.innerHTML = `<option>${gefiltert[0].name}</option>`;
+            startHidden.value = gefiltert[0].zeile;
+
+            // 2. End-Kapitel Dropdown befüllen
+            gefiltert.forEach(k => {
+                const opt = new Option(k.name, k.zeile);
+                endSelect.add(opt);
+            });
+            
+            // 3. Das letzte Kapitel als Standard für "Ende" vorwählen
+            endSelect.value = gefiltert[gefiltert.length - 1].zeile;
+        } else {
+            // Falls keine Kapitel vorhanden sind
+            startDisplay.innerHTML = '';
+            startHidden.value = '';
+        }
+    });
+});
 </script>
 
 {% endblock %}

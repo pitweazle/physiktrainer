@@ -524,6 +524,7 @@ def aufgaben_liste(request):
         'kapitel_liste': kapitel_liste,
         'suche': suche, # Damit das Suchwort im Feld stehen bleibt
     })
+
 @user_passes_test(ist_mitarbeiter)
 def aufgabe_einstellungen(request, pk):
     # Holt die Aufgabe oder zeigt 404, wenn die ID nicht existiert
