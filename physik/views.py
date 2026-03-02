@@ -451,7 +451,7 @@ def aufgaben(request):
             
             # Wir hängen den Standard-Text NICHT an bei:
             # 'p' (Bilder) und 'a' (Listen/Auswahl), weil diese eigene Formate haben.
-            if aufgabe.typ not in ["p", "a"]:
+            if aufgabe.typ not in ["p", "a", "r"]:
                 hinweis_text = (
                     f"{hinweis_text} "
                     f"Deine Eingabe: »{antwort}« | "

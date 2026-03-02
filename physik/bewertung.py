@@ -110,15 +110,17 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
 
     # --- A. Spezial-Typen (r, p, w, a, e) ---
     # (Hier gekürzt: Deine bestehenden Funktionen bewerte_bildauswahl etc. bleiben gleich)
-    if "r" in typ:
-        # ... (Dein r-Code für Rechenaufgaben)
-        pass 
-    if "p" in typ:
+    if typ == "r":
+        ergebnis = bewerte_rechnen(aufgabe, text_antwort, request)
+    elif "p" in typ:
         ergebnis = bewerte_bildauswahl(aufgabe, bild_antwort, session)
     elif "w" in typ:
         ergebnis = bewerte_wahr_falsch(aufgabe, norm)
     elif "a" in typ:
         ergebnis = bewerte_liste(aufgabe, text_antwort)
+    elif aufgabe.typ == "l":
+        # Die neue Lückentext-Weiche
+        ergebnis = bewerte_luecke(aufgabe, user_antwort)
 
     # --- B. Text-Parser (Der entscheidende Teil) ---
     if not ergebnis and "f" in typ:
@@ -257,6 +259,32 @@ def bewerte_booleschen_ausdruck(typ, aufgabe, antwort_norm, antwort_original, ve
 
 def normalisiere(text):
     return "".join(text.split()) if text else ""
+
+def bewerte_rechnen(aufgabe, antwort, request):
+    idx = request.session.get('aktiver_index', 0)
+    loesungs_liste = [l.strip() for l in aufgabe.loesung.split(";")]
+    
+    try:
+        korrektes_ergebnis = loesungs_liste[idx]
+    except:
+        korrektes_ergebnis = loesungs_liste[0]
+
+    # Säuberung (Komma, Einheiten)
+    import re
+    ist_clean = re.sub(r'[^0-9,.]', '', antwort).replace(",", ".")
+    soll_clean = re.sub(r'[^0-9,.]', '', korrektes_ergebnis).replace(",", ".")
+
+    if ist_clean == soll_clean and ist_clean != "":
+        return {"richtig": True, "hinweis": "Richtig gerechnet!"}
+    
+    return {
+        "richtig": False,
+        "hinweis": (
+            f"Das Ergebnis ist leider nicht korrekt.<br><br>"
+            f"<strong>Deine Eingabe:</strong> »{antwort}«<br>"
+            f"<strong>Richtig wäre:</strong> »{korrektes_ergebnis}«"
+        )
+    }
 
 def bewerte_bildauswahl(aufgabe, bild_antwort, session):
     # Wir berechnen erst den Boolean
@@ -460,3 +488,42 @@ def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
 
     return False, hinweis
 
+def bewerte_luecke(aufgabe, user_antwort):
+    # 1. Die Eingabe des Users am Semikolon zerlegen
+    # Beispiel: "Reihe; parallel" -> ["reihe", "parallel"]
+    user_eingaben = [a.strip().lower() for a in user_antwort.split(";")]
+    
+    # 2. Die korrekten Felder aus der Option holen (Feld 2, Feld 3, etc.)
+    # Wir nehmen an, du hast ein Option-Objekt mit den Feldern
+    # In diesem Beispiel greifen wir auf die Felder der zugehörigen Option zu
+    option = aufgabe.optionen.first() # Oder wie du die aktive Option holst
+    
+    # Liste der Lösungsfelder (als Strings oder Attribute)
+    loesungs_felder = [option.feld2, option.feld3, option.feld4] 
+    
+    ergebnisse = []
+    alle_korrekt = True
+    
+    for i, eingabe in enumerate(user_eingaben):
+        if i < len(loesungs_felder):
+            # Erlaubte Begriffe für diese Lücke (auch per Semikolon getrennt)
+            # Feld 2 könnte sein: "Reihe; Reihenschaltung"
+            erlaubt = [e.strip().lower() for e in str(loesungs_felder[i]).split(";")]
+            
+            if eingabe in erlaubt and eingabe != "":
+                ergebnisse.append(True)
+            else:
+                ergebnisse.append(False)
+                alle_korrekt = False
+        else:
+            alle_korrekt = False # Mehr Eingaben als Felder
+
+    # 3. Rückgabe
+    if alle_korrekt and len(user_eingaben) >= 1:
+        return {"richtig": True, "hinweis": "Hervorragend! Alle Begriffe sind korrekt."}
+    else:
+        # Hier kannst du sogar genau sagen, welche Lücke falsch ist
+        return {
+            "richtig": False, 
+            "hinweis": f"Fast! Schau dir die Lücken noch einmal genau an. (Eingabe: {user_antwort})"
+        }
