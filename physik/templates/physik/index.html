@@ -257,8 +257,6 @@
             {% endif %}
         </div>
 
-
-
         <script>
         function frageLfdNrAb() {
             // Öffnet ein Eingabefenster im Browser
@@ -281,7 +279,7 @@
         </div>
 
         <button type="button" id="openModal">Start</button>
-        <p>(Du kannst auch im gewünschten Themenbereich, -Schwierigkeitsgrad und -Fachnummer auf das Endkapitel klicken)</p>
+        <p>(Du kannst die Fragen auch starten, indem du im gewünschten Themenbereich, -Schwierigkeitsgrad und -Fachnummer auf das Endkapitel klickst)</p>
 
         <div id="overlay" class="modal-overlay hidden">
             <div class="modal">
@@ -341,23 +339,46 @@
                         <th rowspan="2" class="col-profi">Σ<br>gesamt</th>
                     </tr>
                     <tr>
-                        {# Umbenennung auf 1, 2, 3, Archiv (4) #}
-                        <th>1</th><th>2</th><th>3</th><th>Archiv</th><th>Σ</th>
+                        <th style="text-align: center;">1</th><th>2</th><th>3</th><th>Archiv</th><th>Σ</th>
                         <th class="col-mittel">1</th><th class="col-mittel">2</th><th class="col-mittel">3</th><th class="col-mittel">Archiv</th><th class="col-mittel">Σ</th>
                         <th class="col-profi">1</th><th class="col-profi">2</th><th class="col-profi">3</th><th class="col-profi">Archiv</th><th class="col-profi">Σ</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for tb in themenbereiche %}
+                        {% with stats=tb_totals|get_item:tb.id %}
                         <tr class="themenbereich thementitel" style="background: {{ tb.farbe }}; cursor: pointer;" data-target="tb-{{ tb.id }}">
-                            <td class="tb-title">{{ tb.thema }}</td>
+                            <td class="tb-title"><strong>{{ tb.thema }}</strong></td>
                             <td class="spacer"></td>
-                            <td colspan="5"></td>
+                            
+                            {# EINFACH - Alle Zahlen mittig #}
+                            <td style="text-align: center;">{{ stats.s1.0 }}</td>
+                            <td style="text-align: center;">{{ stats.s1.1 }}</td>
+                            <td style="text-align: center;">{{ stats.s1.2 }}</td>
+                            <td style="text-align: center;">{{ stats.s1.3 }}</td>
+                            <td style="text-align: center; background: rgba(255,255,255,0.2)"><strong>{{ stats.s1.total }}</strong></td>
+                            
                             <td class="spacer col-mittel"></td>
-                            <td colspan="6" class="col-mittel"></td>
+                            
+                            {# MITTEL - Alle Zahlen mittig #}
+                            <td class="col-mittel" style="text-align: center;">{{ stats.s2.0 }}</td>
+                            <td class="col-mittel" style="text-align: center;">{{ stats.s2.1 }}</td>
+                            <td class="col-mittel" style="text-align: center;">{{ stats.s2.2 }}</td>
+                            <td class="col-mittel" style="text-align: center;">{{ stats.s2.3 }}</td>
+                            <td class="col-mittel" style="text-align: center; background: rgba(255,255,255,0.2)"><strong>{{ stats.s2.total }}</strong></td>
+                            <td class="col-mittel" style="text-align: center; background: rgba(0,0,0,0.1)"><strong>{{ stats.sum_em }}</strong></td>
+
                             <td class="spacer col-profi"></td>
-                            <td colspan="6" class="col-profi"></td>
+
+                            {# PROFI - Alle Zahlen mittig #}
+                            <td class="col-profi" style="text-align: center;">{{ stats.s3.0 }}</td>
+                            <td class="col-profi" style="text-align: center;">{{ stats.s3.1 }}</td>
+                            <td class="col-profi" style="text-align: center;">{{ stats.s3.2 }}</td>
+                            <td class="col-profi" style="text-align: center;">{{ stats.s3.3 }}</td>
+                            <td class="col-profi" style="text-align: center; background: rgba(255,255,255,0.2)"><strong>{{ stats.s3.total }}</strong></td>
+                            <td class="col-profi" style="text-align: center; background: rgba(0,0,0,0.15)"><strong>{{ stats.sum_all }}</strong></td>
                         </tr>
+                        {% endwith %}
                         {% for kap in tb.kapitel.all %}
                             {% with tb_map=counts|get_item:tb.id %}
                             {% with kap_data=tb_map|get_item:kap.id %}
@@ -578,7 +599,7 @@
     {{ kapitel_map|json_script:"kapitel-data" }}
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
     // Hilfsfunktion zum Speichern (Spalten) - nutzt jetzt korrekt den Parameter 'slug'
@@ -653,44 +674,44 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-// 1. Die kapitel_map direkt aus Django übernehmen
-// 'safe' sorgt dafür, dass die Anführungszeichen nicht in HTML-Entities umgewandelt werden
-const kapitelData = {{ kapitel_map|safe }};
+    // 1. Die kapitel_map direkt aus Django übernehmen
+    // 'safe' sorgt dafür, dass die Anführungszeichen nicht in HTML-Entities umgewandelt werden
+    const kapitelData = {{ kapitel_map|safe }};
 
-document.addEventListener("DOMContentLoaded", () => {
-    const tbSelect = document.getElementById('tbSelect');
-    const endSelect = document.getElementById('endSelect');
-    const startDisplay = document.getElementById('startSelectDisplay');
-    const startHidden = document.getElementById('startSelect');
+    document.addEventListener("DOMContentLoaded", () => {
+        const tbSelect = document.getElementById('tbSelect');
+        const endSelect = document.getElementById('endSelect');
+        const startDisplay = document.getElementById('startSelectDisplay');
+        const startHidden = document.getElementById('startSelect');
 
-    tbSelect.addEventListener('change', function() {
-        const selectedTbId = this.value;
-        const gefiltert = kapitelData[selectedTbId] || [];
+        tbSelect.addEventListener('change', function() {
+            const selectedTbId = this.value;
+            const gefiltert = kapitelData[selectedTbId] || [];
 
-        // Dropdown für End-Kapitel leeren
-        endSelect.innerHTML = '<option value="">– bitte wählen –</option>';
-        
-        if (gefiltert.length > 0) {
-            // 1. Start-Kapitel setzen (das erste Element aus der Liste)
-            // Wir nehmen gefiltert[0].name, weil dein Backend {"name": ...} liefert
-            startDisplay.innerHTML = `<option>${gefiltert[0].name}</option>`;
-            startHidden.value = gefiltert[0].zeile;
-
-            // 2. End-Kapitel Dropdown befüllen
-            gefiltert.forEach(k => {
-                const opt = new Option(k.name, k.zeile);
-                endSelect.add(opt);
-            });
+            // Dropdown für End-Kapitel leeren
+            endSelect.innerHTML = '<option value="">– bitte wählen –</option>';
             
-            // 3. Das letzte Kapitel als Standard für "Ende" vorwählen
-            endSelect.value = gefiltert[gefiltert.length - 1].zeile;
-        } else {
-            // Falls keine Kapitel vorhanden sind
-            startDisplay.innerHTML = '';
-            startHidden.value = '';
-        }
+            if (gefiltert.length > 0) {
+                // 1. Start-Kapitel setzen (das erste Element aus der Liste)
+                // Wir nehmen gefiltert[0].name, weil dein Backend {"name": ...} liefert
+                startDisplay.innerHTML = `<option>${gefiltert[0].name}</option>`;
+                startHidden.value = gefiltert[0].zeile;
+
+                // 2. End-Kapitel Dropdown befüllen
+                gefiltert.forEach(k => {
+                    const opt = new Option(k.name, k.zeile);
+                    endSelect.add(opt);
+                });
+                
+                // 3. Das letzte Kapitel als Standard für "Ende" vorwählen
+                endSelect.value = gefiltert[gefiltert.length - 1].zeile;
+            } else {
+                // Falls keine Kapitel vorhanden sind
+                startDisplay.innerHTML = '';
+                startHidden.value = '';
+            }
+        });
     });
-});
 </script>
 
 {% endblock %}
