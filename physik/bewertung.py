@@ -118,7 +118,8 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
         ergebnis = bewerte_wahr_falsch(aufgabe, norm)
     elif "a" in typ:
         ergebnis = bewerte_liste(aufgabe, text_antwort)
-    elif aufgabe.typ == "l":
+    elif "l" in typ:
+        print("OK")
         # Die neue Lückentext-Weiche
         ergebnis = bewerte_luecke(aufgabe, user_antwort)
 
@@ -488,42 +489,50 @@ def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
 
     return False, hinweis
 
-def bewerte_luecke(aufgabe, user_antwort):
-    # 1. Die Eingabe des Users am Semikolon zerlegen
-    # Beispiel: "Reihe; parallel" -> ["reihe", "parallel"]
-    user_eingaben = [a.strip().lower() for a in user_antwort.split(";")]
-    
-    # 2. Die korrekten Felder aus der Option holen (Feld 2, Feld 3, etc.)
-    # Wir nehmen an, du hast ein Option-Objekt mit den Feldern
-    # In diesem Beispiel greifen wir auf die Felder der zugehörigen Option zu
-    option = aufgabe.optionen.first() # Oder wie du die aktive Option holst
-    
-    # Liste der Lösungsfelder (als Strings oder Attribute)
-    loesungs_felder = [option.feld2, option.feld3, option.feld4] 
-    
-    ergebnisse = []
-    alle_korrekt = True
-    
-    for i, eingabe in enumerate(user_eingaben):
-        if i < len(loesungs_felder):
-            # Erlaubte Begriffe für diese Lücke (auch per Semikolon getrennt)
-            # Feld 2 könnte sein: "Reihe; Reihenschaltung"
-            erlaubt = [e.strip().lower() for e in str(loesungs_felder[i]).split(";")]
-            
-            if eingabe in erlaubt and eingabe != "":
-                ergebnisse.append(True)
-            else:
-                ergebnisse.append(False)
-                alle_korrekt = False
-        else:
-            alle_korrekt = False # Mehr Eingaben als Felder
+from difflib import SequenceMatcher
 
-    # 3. Rückgabe
-    if alle_korrekt and len(user_eingaben) >= 1:
-        return {"richtig": True, "hinweis": "Hervorragend! Alle Begriffe sind korrekt."}
-    else:
-        # Hier kannst du sogar genau sagen, welche Lücke falsch ist
+def bewerte_luecke(aufgabe, user_antwort):
+    optionen = aufgabe.optionen.all().order_by('position', 'id')
+    anzahl_vorgabe = optionen.count()
+    
+    # 1. Vorab-Check auf die Anzahl
+    user_eingaben = [a.strip().lower() for a in user_antwort.split(";") if a.strip()]
+    
+    if len(user_eingaben) != anzahl_vorgabe:
         return {
             "richtig": False, 
-            "hinweis": f"Fast! Schau dir die Lücken noch einmal genau an. (Eingabe: {user_antwort})"
+            "hinweis": f"Die Anzahl stimmt nicht: {anzahl_vorgabe} Begriffe erwartet, {len(user_eingaben)} erhalten."
         }
+
+    # 2. Ist Fuzzy aktiviert? (Typ enthält ein 'Y')
+    fuzzy_aktiv = "Y" in aufgabe.typ
+    
+    loesungs_vorgaben = [opt.text for opt in optionen]
+    
+    for i, korrekter_text in enumerate(loesungs_vorgaben):
+        print("i: ",i)
+        user_wort = user_eingaben[i]
+        erlaubte = [e.strip().lower() for e in str(korrekter_text).split(";") if e.strip()]
+        
+        wort_korrekt = False
+        for alternative in erlaubte:
+            if fuzzy_aktiv:
+                # Fuzzy-Vergleich (Schwellenwert 0.8)
+                if SequenceMatcher(None, user_wort, alternative).ratio() >= 0.8:
+                    wort_korrekt = True
+                    break
+            else:
+                # Strenger Vergleich
+                if user_wort == alternative:
+                    wort_korrekt = True
+                    break
+        
+        if not wort_korrekt:
+            # Falls ein Wort falsch ist, Abbruch und Lösung zeigen
+            loesung_fett = "; ".join([f"<b>{str(t).split(';')[0].strip()}</b>" for t in loesungs_vorgaben])
+            return {
+                "richtig": False, 
+                "hinweis": f"Inhaltlich leider nicht ganz korrekt. Richtig wäre: {loesung_fett}"
+            }
+
+    return {"richtig": True, "hinweis": "Hervorragend! Alles korrekt gelöst."}
