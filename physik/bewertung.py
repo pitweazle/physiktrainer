@@ -307,18 +307,40 @@ def bewerte_wahr_falsch(aufgabe, norm):
     }
 
 def bewerte_liste(aufgabe, antwort):
-    # 1. Versuch: Ist 'antwort' ein Index (0 für richtig)?
+    # 1. Die richtige Lösung (Text) holen
+    korrekt_text = aufgabe.loesung
+    gewaehlter_text = ""
+
+    # 2. Versuchen, den Text der Schüler-Wahl zu identifizieren
     try:
-        if int(antwort) == 0:
+        idx = int(antwort)
+        if idx == 0:
             return {"richtig": True, "hinweis": "Richtig!"}
+        else:
+            # Holen der gewählten Option aus der DB für das Feedback
+            # Da 0 richtig ist, sind 1, 2, 3... die falschen Optionen
+            opts = list(aufgabe.optionen.order_by("position"))
+            # -1, weil in deiner Logik 0 die Lösung ist und 1 die erste Option
+            pos = idx - 1 
+            if 0 <= pos < len(opts):
+                gewaehlter_text = opts[pos].text
     except (ValueError, TypeError):
-        # 2. Fallback: Falls doch Text kommt (alte Logik)
-        if normalisiere(antwort) == normalisiere(aufgabe.loesung):
+        # Fallback: Falls Text direkt gesendet wurde
+        gewaehlter_text = antwort
+        if normalisiere(antwort) == normalisiere(korrekt_text):
             return {"richtig": True, "hinweis": "Richtig!"}
 
+    # 3. Das "schöne" Feedback zusammenbauen
+    # Wenn wir den Text der Wahl kennen, zeigen wir ihn an
+    wahl_display = f"»{gewaehlter_text}«" if gewaehlter_text else f"Nummer {antwort}"
+    
     return {
         "richtig": False,
-        "hinweis": f"Leider falsch. Richtige Antwort: {aufgabe.loesung}"
+        "hinweis": (
+            f"Das war leider nicht die gesuchte Antwort.<br><br>"
+            f"**Deine Wahl:** {wahl_display}<br>"
+            f"**Richtig wäre:** »{korrekt_text}«"
+        )
     }
 
 def bewerte_e_typ(typ, aufgabe, antwort, case_sensitiv, is_integer, ratio, fuzzy_aktiv):

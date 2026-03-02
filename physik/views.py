@@ -448,14 +448,20 @@ def aufgaben(request):
         # ---- falsch ----
         else:
             hinweis_text = ergebnis.get("hinweis", "Leider falsch.")
-            if aufgabe.typ != "p":
+            
+            # Wir hängen den Standard-Text NICHT an bei:
+            # 'p' (Bilder) und 'a' (Listen/Auswahl), weil diese eigene Formate haben.
+            if aufgabe.typ not in ["p", "a"]:
                 hinweis_text = (
                     f"{hinweis_text} "
                     f"Deine Eingabe: »{antwort}« | "
                     f"Richtige Lösung: »{aufgabe.loesung}«"
                 )
-            if aufgabe.erklaerung:
-                hinweis_text += f"\n\nBegründung: {aufgabe.erklaerung}"
+            
+            # Die Begründung/Erklärung anhängen
+            if aufgabe.erklaerung and aufgabe.erklaerung not in hinweis_text:
+                # Nutze <br> für HTML-Umbrüche, falls dein Template das rendert
+                hinweis_text += f"<br><br><strong>Begründung:</strong> {aufgabe.erklaerung}"
             
             messages.warning(request, hinweis_text)
             
