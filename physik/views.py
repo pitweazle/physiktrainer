@@ -647,6 +647,5 @@ def fehler_edit(request, log_id):
 
     return render(request, 'physik/fehler_edit.html', {'log': log})
 
-@user_passes_test(ist_mitarbeiter)
-def howto():
-    pass
+def howto(request):
+    return render(request, 'physik/howto.html')

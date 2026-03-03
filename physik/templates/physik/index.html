@@ -249,8 +249,7 @@
                 
                 <a href="{% url 'physik:aufgaben_liste' %}">📋 Inventar</a>
                 <a href="{% url 'physik:fehler_liste' %}">📊 Fehleranalyse</a>
-                <a href="{% url 'physik:howto' %}">❓ Anleitung (HowTo)</a>
-                {% comment %} <a href="/admin/" target="_blank" class="admin-link">⚙️ Admin</a> {% endcomment %}
+                <a href="{% static 'physik/howto.pdf' %}" target="_blank">❓ Anleitung (HowTo)</a>
                 <a href="/admin/physik/aufgabe/add/" target="_blank">➕ Neue Aufgabe</a>
                 {% comment %} <a href="/admin/physik/aufgabe/add/?next={% url 'physik:aufgaben_liste' %}" target="_blank" ...> {% endcomment %}
                 <a href="#" class="btn-call" onclick="frageLfdNrAb()">🔍 Aufgabe direkt aufrufen</a>
