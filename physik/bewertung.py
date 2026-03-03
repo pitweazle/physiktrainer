@@ -119,9 +119,8 @@ def bewerte_aufgabe(request, aufgabe, user_antwort, text_antwort=None, bild_antw
     elif "a" in typ:
         ergebnis = bewerte_liste(aufgabe, text_antwort)
     elif "l" in typ:
-        print("OK")
         # Die neue Lückentext-Weiche
-        ergebnis = bewerte_luecke(aufgabe, user_antwort)
+        ergebnis = bewerte_luecke(aufgabe, user_antwort, fuzzy_aktiv, ratio)
 
     # --- B. Text-Parser (Der entscheidende Teil) ---
     if not ergebnis and "f" in typ:
@@ -489,50 +488,61 @@ def pruefe_verbotene_begriffe(aufgabe, norm, text_antwort):
 
     return False, hinweis
 
-from difflib import SequenceMatcher
-
-def bewerte_luecke(aufgabe, user_antwort):
+def bewerte_luecke(aufgabe, user_antwort, fuzzy_aktiv=False, ratio=0.8):
+    # 1. Einträge aus den Optionen holen (sortiert)
     optionen = aufgabe.optionen.all().order_by('position', 'id')
     anzahl_vorgabe = optionen.count()
+    print(optionen)
     
-    # 1. Vorab-Check auf die Anzahl
-    user_eingaben = [a.strip().lower() for a in user_antwort.split(";") if a.strip()]
-    
-    if len(user_eingaben) != anzahl_vorgabe:
+    # User-Eingabe am Semikolon splitten und Leerzeichen vorn/hinten entfernen
+    user_eingaben = [a.strip() for a in user_antwort.split(";") if a.strip()]
+    anzahl_user = len(user_eingaben)
+    print(anzahl_user)
+
+    # PUNKT 1: Überprüfung der Anzahl
+    if anzahl_user != anzahl_vorgabe:
         return {
             "richtig": False, 
-            "hinweis": f"Die Anzahl stimmt nicht: {anzahl_vorgabe} Begriffe erwartet, {len(user_eingaben)} erhalten."
+            "hinweis": f"Die Anzahl der Begriffe stimmt nicht. Erwartet werden <b>{anzahl_vorgabe}</b> Begriffe (getrennt durch Semikolon), du hast <b>{anzahl_user}</b> eingegeben. Versuch es noch einmal!"
         }
 
-    # 2. Ist Fuzzy aktiviert? (Typ enthält ein 'Y')
-    fuzzy_aktiv = "Y" in aufgabe.typ
-    
     loesungs_vorgaben = [opt.text for opt in optionen]
     
+    # Wir gehen die Lücken nacheinander durch
     for i, korrekter_text in enumerate(loesungs_vorgaben):
-        print("i: ",i)
         user_wort = user_eingaben[i]
-        erlaubte = [e.strip().lower() for e in str(korrekter_text).split(";") if e.strip()]
+        # Falls in einer Option Alternativen stehen (z.B. "Reihe; Reihenschaltung")
+        erlaubte = [e.strip() for e in str(korrekter_text).split(";") if e.strip()]
         
         wort_korrekt = False
         for alternative in erlaubte:
             if fuzzy_aktiv:
-                # Fuzzy-Vergleich (Schwellenwert 0.8)
-                if SequenceMatcher(None, user_wort, alternative).ratio() >= 0.8:
+                # PUNKT 3: Mit "Y" -> Case-Insensitive, ENTHALTEN und FUZZY
+                u_word_lower = user_wort.lower()
+                alt_lower = alternative.lower()
+                print(u_word_lower,alt_lower)               
+                # Check A: Ist die Lösung im Schüler-Eintrag enthalten?
+                # Check B: Ist die Fuzzy-Ähnlichkeit hoch genug?
+                similarity = SequenceMatcher(None, u_word_lower, alt_lower).ratio()
+                
+                if alt_lower in u_word_lower or similarity >= ratio:
                     wort_korrekt = True
                     break
             else:
-                # Strenger Vergleich
+                # PUNKT 2: Ohne "Y" -> Exakte Übereinstimmung (Case-Sensitive, ohne Leerzeichen)
+                print(user_wort,alternative)
                 if user_wort == alternative:
                     wort_korrekt = True
                     break
         
+        # Falls ein Begriff (trotz eventueller Alternativen) falsch ist:
         if not wort_korrekt:
-            # Falls ein Wort falsch ist, Abbruch und Lösung zeigen
-            loesung_fett = "; ".join([f"<b>{str(t).split(';')[0].strip()}</b>" for t in loesungs_vorgaben])
+            # Wir zeigen nur die korrekten Begriffe der Optionen als Hilfe
+            loesung_hilfe = " ; ".join([f"<b>{t.split(';')[0].strip()}</b>" for t in loesungs_vorgaben])
             return {
                 "richtig": False, 
-                "hinweis": f"Inhaltlich leider nicht ganz korrekt. Richtig wäre: {loesung_fett}"
+                "hinweis": f"Nicht ganz korrekt. Die Begriffe wären: {loesung_hilfe}"
             }
 
+    # Wenn alle Schleifen durchgelaufen sind:
     return {"richtig": True, "hinweis": "Hervorragend! Alles korrekt gelöst."}
