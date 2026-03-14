@@ -121,3 +121,6 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = 'info@physiktrainer.app'
 SERVER_EMAIL = 'info@physiktrainer.app'
+
+print(f"DEBUG-MAIL-USER: '{EMAIL_HOST_USER}'")
+print(f"DEBUG-MAIL-PW: '{EMAIL_HOST_PASSWORD}'")
