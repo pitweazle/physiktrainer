@@ -227,7 +227,7 @@ def benachrichtige_mich(sender, instance, created, **kwargs):
     send_mail(
         betreff,
         nachricht,
-        'rt@uber.space',
-        empfaenger,
-        fail_silently=False, # Verhindert, dass die Seite abstürzt, wenn Mail mal nicht geht
+        'info@physiktrainer.app', # Hier jetzt die Artfiles-Adresse
+        ['info@physiktrainer.app'],
+        fail_silently=False, 
     )
