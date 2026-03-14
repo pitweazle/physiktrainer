@@ -7,6 +7,10 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import send_mail
+
 class Profil(models.Model):
     user = models.OneToOneField(User, related_name='physik_profil', on_delete=models.CASCADE )
     physik_einstellungen = models.JSONField(default=dict, blank=True, null=True)
@@ -201,3 +205,29 @@ class FehlerLog(models.Model):
 
     class Meta:
         ordering = ['-zeitpunkt']
+
+
+
+@receiver(post_save, sender=Aufgabe) 
+def benachrichtige_mich(sender, instance, created, **kwargs):
+    status = "NEU ERSTELLT" if created else "GEÄNDERT"
+    
+    # Wir holen uns die lfd_nr von der Instanz
+    # Falls lfd_nr mal leer sein sollte, nutzen wir .get oder einen Fallback
+    nummer = getattr(instance, 'lfd_nr', 'Unbekannt')
+
+    betreff = f"PT-Info: Aufgabe Nr. {nummer} {status}"
+    
+    nachricht = f"Die Aufgabe mit der laufenden Nummer {nummer} wurde {status.lower()}.\n\n"
+    # Der Link braucht für Django intern meist trotzdem die ID (instance.id), 
+    # da die Admin-URLs auf der Primärschlüssel-ID basieren.
+    nachricht += f"Link zur Aufgabe: https://physiktrainer.app/admin/app/aufgabe/{instance.id}/change/"
+    empfaenger = ['info@physiktrainer.app'] 
+
+    send_mail(
+        betreff,
+        nachricht,
+        'physiktrainer@rt.uber.space',
+        empfaenger,
+        fail_silently=True, # Verhindert, dass die Seite abstürzt, wenn Mail mal nicht geht
+    )
