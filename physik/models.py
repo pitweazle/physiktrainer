@@ -221,13 +221,13 @@ def benachrichtige_mich(sender, instance, created, **kwargs):
     nachricht = f"Die Aufgabe mit der laufenden Nummer {nummer} wurde {status.lower()}.\n\n"
     # Der Link braucht für Django intern meist trotzdem die ID (instance.id), 
     # da die Admin-URLs auf der Primärschlüssel-ID basieren.
-    nachricht += f"Link zur Aufgabe: https://physiktrainer.app/admin/app/aufgabe/{instance.id}/change/"
+    nachricht += f"Link zur Aufgabe: https://physiktrainer.app/admin/physik/aufgabe/{instance.id}/change/"
     empfaenger = ['info@physiktrainer.app'] 
 
     send_mail(
         betreff,
         nachricht,
-        'physiktrainer@rt.uber.space',
+        'rt@uber.space',
         empfaenger,
-        fail_silently=True, # Verhindert, dass die Seite abstürzt, wenn Mail mal nicht geht
+        fail_silently=False, # Verhindert, dass die Seite abstürzt, wenn Mail mal nicht geht
     )
