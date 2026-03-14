@@ -115,7 +115,6 @@ EMAIL_HOST = 'smtp.artfiles.de'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# Hier holen wir die Daten sicher aus der Umgebung
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = 'info@physiktrainer.app'
+EMAIL_HOST_PASSWORD = 'Tel:3178'  # Das Passwort deines neuen Postfachs
+DEFAULT_FROM_EMAIL = 'info@physiktrainer.app'
