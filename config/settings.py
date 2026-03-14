@@ -109,9 +109,11 @@ LOGOUT_ON_GET = True
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# eine Email wird gesendet, wenn eine Aufgabe erstellt oder geändert wurde
+# settings.py auf dem Server
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'physiktrainer@rt.uber.space'
+EMAIL_HOST = 'mx.artfiles.de'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'info@physiktrainer.app'
+EMAIL_HOST_PASSWORD = 'Tel:3178'  # Das Passwort deines neuen Postfachs
+DEFAULT_FROM_EMAIL = 'info@physiktrainer.app'
